@@ -1,0 +1,1 @@
+touch "notes_$(date +"%F %T").md"

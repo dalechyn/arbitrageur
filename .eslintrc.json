@@ -1,0 +1,69 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "**/tsconfig.json",
+    "sourceType": "module",
+    "ecmaVersion": 2020
+  },
+  "env": {
+    "browser": false,
+    "node": true
+  },
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "standard-with-typescript",
+    "plugin:prettier/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "@typescript-eslint/consistent-type-assertions": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/no-unnecessary-type-assertion": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/no-extraneous-class": "off",
+    "@typescript-eslint/no-redeclare": "off",
+    "@typescript-eslint/method-signature-style": "off",
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/triple-slash-reference": "off",
+    "@typescript-eslint/no-invalid-void-type": "off",
+    "@typescript-eslint/no-base-to-string": "off",
+    "no-case-declarations": "off",
+    "no-inner-declarations": "off",
+    "@typescript-eslint/restrict-plus-operands": "off",
+    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/consistent-type-definitions": "off",
+    "@typescript-eslint/require-await": "off",
+    "@typescript-eslint/promise-function-async": "off",
+    "@typescript-eslint/no-misused-promises": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/strict-boolean-expressions": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/return-await": "off",
+    "no-return-await": "off",
+    "@typescript-eslint/restrict-template-expressions": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/prefer-optional-chain": ["off"],
+    "@typescript-eslint/prefer-nullish-coalescing": "off",
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "parent", "sibling", "index"],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ]
+
+  },
+  "settings": {
+    "import/extensions": [".ts", ".d.ts"]
+  }
+}
