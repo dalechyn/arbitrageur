@@ -1,11 +1,13 @@
-import {
+/* import {
   FlashbotsBundleProvider,
   FlashbotsBundleResolution
 } from '@flashbots/ethers-provider-bundle'
 
-import { createEIP1559Transaction } from './transactions'
-import { BLOCKS_IN_THE_FUTURE, CHAIN_ID, ethProvider } from './utils'
-import { authSigner } from './wallet'
+import { BLOCKS_IN_THE_FUTURE, CHAIN_ID } from './constants' */
+import { getProfitableOpportunities } from './fetcher'
+/* import { createEIP1559Transaction } from './transactions' */
+import { ethProvider } from './utils'
+/* import { authSigner } from './wallet' */
 
 // Standard json rpc provider directly from ethers.js (NOT Flashbots)
 
@@ -15,14 +17,15 @@ import { authSigner } from './wallet'
 
 // Flashbots provider requires passing in a standard provider
 const main = async () => {
-  const flashbotsProvider = await FlashbotsBundleProvider.create(
+  /*  const flashbotsProvider = await FlashbotsBundleProvider.create(
     ethProvider, // a normal ethers.js provider, to perform gas estimiations and nonce lookups
     authSigner, // ethers.js signer wallet, only for signing request payloads, not transactions
     ...(CHAIN_ID === 5 ? ['https://relay-goerli.flashbots.net'] : [])
-  )
+  ) */
 
   ethProvider.on('block', async (blockNumber) => {
-    const transaction = await createEIP1559Transaction(
+    await getProfitableOpportunities()
+    /*  const transaction = await createEIP1559Transaction(
       blockNumber,
       '0x2B74ccA2983Da88bEcb7eD9A969Ad3CE3fb7F95a',
       '0x'
@@ -72,7 +75,7 @@ const main = async () => {
         bundleStats: await flashbotsProvider.getBundleStats(simulation.bundleHash, targetBlock),
         userStats: await flashbotsProvider.getUserStats()
       })
-    }
+    } */
   })
 }
 

@@ -2,7 +2,8 @@ import { TransactionRequest } from '@ethersproject/abstract-provider'
 import { FlashbotsBundleProvider } from '@flashbots/ethers-provider-bundle'
 import { ethers } from 'ethers'
 
-import { BLOCKS_IN_THE_FUTURE, CHAIN_ID, ethProvider } from '../utils'
+import { BLOCKS_IN_THE_FUTURE, CHAIN_ID } from '../constants'
+import { ethProvider } from '../utils'
 
 import { getPriorityFee } from './priorityFee'
 
@@ -25,7 +26,7 @@ export const createEIP1559Transaction: (
     maxFeePerGas: priorityFee.add(maxBaseFeeInFutureBlock).toString(),
     maxPriorityFeePerGas: priorityFee.toString(),
     gasLimit: 21000,
-    value: ethers.utils.parseEther('0.0000001').toString(),
+    value: ethers.utils.parseEther('0.00000000001').toString(),
     chainId: CHAIN_ID
   }
 }
