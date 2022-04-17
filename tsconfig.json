@@ -15,7 +15,8 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "sourceMap": true
   },
   "include": [
     "src/**/*"
