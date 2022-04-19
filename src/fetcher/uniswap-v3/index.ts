@@ -4,15 +4,15 @@ import { Contract } from 'ethers'
 
 import { FEE_AMOUNTS, UNISWAP_V3_FACTORY_ADDRESS } from '../../constants'
 import { ethProvider } from '../../utils'
-import { GetTokenPrice } from '../interfaces/getTokenPrice'
+import { GetTokenPrices } from '../interfaces/getTokenPrices'
 
 import UniswapV3FactoryABI from './abi/UniswapV3Factory.json'
 import UniswapV3PoolABI from './abi/UniswapV3Pool.json'
 
 const factory = new Contract(UNISWAP_V3_FACTORY_ADDRESS, UniswapV3FactoryABI, ethProvider)
 
-export const UniswapV3: GetTokenPrice = {
-  async getTokenPrice(tokenA: Token, tokenB: Token, lowest = false) {
+export const UniswapV3: GetTokenPrices = {
+  async getTokenPrices(tokenA: Token, tokenB: Token) {
     // Get all Pool addresses regarding the fees
     const poolAddressesWithFees = (
       await Promise.all(
@@ -25,7 +25,7 @@ export const UniswapV3: GetTokenPrice = {
 
     if (poolAddressesWithFees.length === 0) {
       console.warn(`UniswapV3: Any pool with pair ${tokenA.symbol}-${tokenB.symbol} does not exist`)
-      return null
+      return []
     }
 
     const prices = await Promise.all(
@@ -40,10 +40,7 @@ export const UniswapV3: GetTokenPrice = {
         return pool.token1Price
       })
     )
-    const sortedPrices = prices.sort((p1, p2) =>
-      p1.subtract(p2)[lowest ? 'lessThan' : 'greaterThan'](0) ? 1 : -1
-    )
 
-    return sortedPrices[0]
+    return prices
   }
 }
