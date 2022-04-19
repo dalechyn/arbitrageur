@@ -5,32 +5,32 @@ import { Contract } from 'ethers'
 
 import { UNISWAP_V2_FACTORY_ADDRESS } from '../../constants'
 import { ethProvider } from '../../utils'
-import { GetTokenPrice } from '../interfaces/getTokenPrice'
+import { GetTokenPrices } from '../interfaces/getTokenPrices'
 
 import UniswapV2FactoryABI from './abi/UniswapV2Factory.json'
 import UniswapV2PairABI from './abi/UniswapV2Pair.json'
 
 const factory = new Contract(UNISWAP_V2_FACTORY_ADDRESS, UniswapV2FactoryABI, ethProvider)
 
-export const UniswapV2: GetTokenPrice = {
-  async getTokenPrice(tokenA: Token, tokenB: Token, _lowest) {
-    const pairAddress = await factory.getPair(tokenA.address, tokenB.address)
+export const UniswapV2: GetTokenPrices = {
+  async getTokenPrices(baseToken: Token, token: Token) {
+    const pairAddress = await factory.getPair(baseToken.address, token.address)
 
     if (pairAddress === ADDRESS_ZERO) {
-      console.warn(`UniswapV2: ${tokenA.symbol}-${tokenB.symbol} pair does not exist`)
-      return null
+      console.warn(`UniswapV2: ${baseToken.symbol}-${token.symbol} pair does not exist`)
+      return []
     }
 
-    console.info(`UniswapV2: Checking ${tokenA.symbol}-${tokenB.symbol}: ${pairAddress}`)
+    console.info(`UniswapV2: Checking ${baseToken.symbol}-${token.symbol}: ${pairAddress}`)
     const pairContract = new Contract(pairAddress, UniswapV2PairABI, ethProvider)
     const { _reserve0, _reserve1 } = await pairContract.getReserves()
-    const [reserveA, reserveB] = tokenA.sortsBefore(tokenB)
+    const [reserveA, reserveB] = baseToken.sortsBefore(token)
       ? [_reserve0, _reserve1]
       : [_reserve1, _reserve0]
     const pair = new Pair(
-      CurrencyAmount.fromRawAmount(tokenA, reserveA),
-      CurrencyAmount.fromRawAmount(tokenB, reserveB)
+      CurrencyAmount.fromRawAmount(baseToken, reserveA),
+      CurrencyAmount.fromRawAmount(token, reserveB)
     )
-    return pair.token0Price
+    return [pair.priceOf(token)]
   }
 }
