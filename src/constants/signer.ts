@@ -1,1 +1,1 @@
-export const SIGNER_KEY = process.env.SIGNER_KEY
+export const KEY = process.env.KEY
