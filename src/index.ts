@@ -1,3 +1,4 @@
+import 'module-alias/register'
 /* import {
   FlashbotsBundleProvider,
   FlashbotsBundleResolution

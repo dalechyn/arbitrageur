@@ -16,7 +16,24 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "downlevelIteration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": "./src/",
+    "paths": {
+      "~constants": ["constants"],
+      "~constants/*": ["constants/*"],
+      "~equilibrium": ["equilibrium"],
+      "~equilibrium/*": ["equilibrium/*"],
+      "~fetcher": ["fetcher"],
+      "~fetcher/*": ["fetcher/*"],
+      "~interfaces": ["interfaces"],
+      "~interfaces/*": ["interfaces/*"],
+      "~transactions": ["transactions"],
+      "~transactions/*": ["transactions/*"],
+      "~units": ["units"],
+      "~units/*": ["units/*"],
+      "~utils": ["utils"],
+      "~utils/*": ["utils/*"]
+    }
   },
   "include": [
     "src/**/*",
@@ -24,5 +41,5 @@
     "./scripts",
     "./deploy",
     "./test"
-  ]
+  ],
 }

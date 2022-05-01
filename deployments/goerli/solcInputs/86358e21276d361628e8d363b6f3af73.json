@@ -1,0 +1,38 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/MulticallTickerLens.sol": {
+      "content": "// SPDX-License-Identifier: MIT\n\npragma solidity >=0.8.0;\n\nimport \"@uniswap/v3-periphery/contracts/interfaces/ITickLens.sol\";\n\n/// @title MulticallTickerLens - Aggregate results from multiple TickLens function calls\ncontract MulticallTickerLens {\n    ITickLens lens;\n\n    constructor(address _lens) {\n        lens = ITickLens(_lens);\n    }\n\n    function concat(ITickLens.PopulatedTick[] memory Accounts, ITickLens.PopulatedTick[] memory Accounts2) internal pure returns(ITickLens.PopulatedTick[] memory) {\n        ITickLens.PopulatedTick[] memory returnArr = new ITickLens.PopulatedTick[](Accounts.length + Accounts2.length);\n\n        uint i=0;\n        for (; i < Accounts.length; i++) {\n            returnArr[i] = Accounts[i];\n        }\n\n        uint j=0;\n        while (j < Accounts.length) {\n            returnArr[i++] = Accounts2[j++];\n        }\n\n        return returnArr;\n    }\n\n    function getPopulatedTicks(\n        address pool,\n        int16 tickBitmapIndexStart,\n        int16 tickBitmapIndexEnd\n    ) external view returns (ITickLens.PopulatedTick[] memory populatedTicks) {\n        while (tickBitmapIndexStart != tickBitmapIndexEnd + 1) {\n            ITickLens.PopulatedTick[] memory ticks = lens.getPopulatedTicksInWord(\n                pool,\n                tickBitmapIndexStart++);\n            populatedTicks = concat(populatedTicks, ticks);\n        }\n        return populatedTicks;\n    }\n}"
+    },
+    "@uniswap/v3-periphery/contracts/interfaces/ITickLens.sol": {
+      "content": "// SPDX-License-Identifier: GPL-2.0-or-later\npragma solidity >=0.7.5;\npragma abicoder v2;\n\n/// @title Tick Lens\n/// @notice Provides functions for fetching chunks of tick data for a pool\n/// @dev This avoids the waterfall of fetching the tick bitmap, parsing the bitmap to know which ticks to fetch, and\n/// then sending additional multicalls to fetch the tick data\ninterface ITickLens {\n    struct PopulatedTick {\n        int24 tick;\n        int128 liquidityNet;\n        uint128 liquidityGross;\n    }\n\n    /// @notice Get all the tick data for the populated ticks from a word of the tick bitmap of a pool\n    /// @param pool The address of the pool for which to fetch populated tick data\n    /// @param tickBitmapIndex The index of the word in the tick bitmap for which to parse the bitmap and\n    /// fetch all the populated ticks\n    /// @return populatedTicks An array of tick data for the given word in the tick bitmap\n    function getPopulatedTicksInWord(address pool, int16 tickBitmapIndex)\n        external\n        view\n        returns (PopulatedTick[] memory populatedTicks);\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 2000
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

@@ -1,0 +1,4 @@
+export enum DEX {
+  UNISWAPV2 = 'UNISWAPV2',
+  UNISWAPV3 = 'UNISWAPV3'
+}

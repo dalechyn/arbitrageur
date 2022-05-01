@@ -12,6 +12,7 @@ declare namespace NodeJS {
     BASE_TOKEN_DECIMALS: string
     BASE_TOKEN_NAME: string
     UNISWAP_V3_FACTORY_ADDRESS: string
+    MULTI_CALL_TICK_LENS_ADDRESS: string
     UNISWAP_V2_FACTORY_ADDRESS: string
   }
 }
