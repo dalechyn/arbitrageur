@@ -1,5 +1,5 @@
 /**
- * Unwraps Uniswap-V3 SDK's FeeAmount
+ * @description Unwraps Uniswap-V3 SDK's FeeAmount
  */
 import { FeeAmount } from '@uniswap/v3-sdk'
 

@@ -1,8 +1,7 @@
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
 import 'hardhat-deploy'
+import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-ethers'
+import '@nomiclabs/hardhat-waffle'
 
 import { HardhatUserConfig } from 'hardhat/config'
 
@@ -24,10 +23,21 @@ const config: HardhatUserConfig = {
     deployer: 0
   },
   networks: {
+    hardhat: {
+      forking: {
+        enabled: true,
+        url: 'https://eth-goerli.alchemyapi.io/v2/oKG7sMevlL_ZQgGcZCOTEsaksS_nM922'
+      }
+    },
     goerli: {
       url: 'https://eth-goerli.alchemyapi.io/v2/oKG7sMevlL_ZQgGcZCOTEsaksS_nM922',
       accounts: [process.env.KEY]
     }
+  },
+  etherscan: {
+    // Your API key for Etherscan
+    // Obtain one at https://etherscan.io/
+    apiKey: '95T5DKJXV3DWIRNCD56FXVMJ8VM1W8J4AE'
   }
 }
 

@@ -1,5 +1,7 @@
-import { Token, Price } from '@uniswap/sdk-core'
+import { Token } from '@uniswap/sdk-core'
+
+import { SupportedPoolWithContract } from '~interfaces'
 
 export interface GetTokenPrices {
-  getTokenPrices(baseToken: Token, token: Token): Promise<Array<Price<Token, Token>>>
+  getTokenPrices(baseToken: Token, queryToken: Token): Promise<SupportedPoolWithContract[]>
 }
