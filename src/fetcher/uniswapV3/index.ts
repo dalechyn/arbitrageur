@@ -1,18 +1,17 @@
 import { Token } from '@uniswap/sdk-core'
+import UniswapV3Factory from '@uniswap/v3-core/artifacts/contracts/UniswapV3Factory.sol/UniswapV3Factory.json'
+import UniswapV3Pool from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json'
 import { ADDRESS_ZERO, FeeAmount, Pool, Tick, TICK_SPACINGS, TickMath } from '@uniswap/v3-sdk'
 import { Contract } from 'ethers'
 
 import MultiCallTickLens from '../../../deployments/goerli/MulticallTickLens.json'
-import { GetTokenPrices } from '../interfaces/getTokenPrices'
-
-import UniswapV3FactoryABI from './abi/UniswapV3Factory.json'
-import UniswapV3PoolABI from './abi/UniswapV3Pool.json'
+import { GetPriceWithPool } from '../interfaces/getTokenPrices'
 
 import { FEE_AMOUNTS, MULTI_CALL_TICK_LENS_ADDRESS, UNISWAP_V3_FACTORY_ADDRESS } from '~constants'
 import { TickLensDataProvider } from '~fetcher/uniswapV3/tickLensDataProvider'
 import { ethProvider } from '~utils'
 
-const factory = new Contract(UNISWAP_V3_FACTORY_ADDRESS, UniswapV3FactoryABI, ethProvider)
+const factory = new Contract(UNISWAP_V3_FACTORY_ADDRESS, UniswapV3Factory.abi, ethProvider)
 
 const bitmapIndex = (tick: number, tickSpacing: number) => {
   return Math.floor(tick / tickSpacing / 256)
@@ -20,8 +19,8 @@ const bitmapIndex = (tick: number, tickSpacing: number) => {
 
 // const numSurroundingTicks = 125
 
-export const UniswapV3: GetTokenPrices = {
-  async getTokenPrices(baseToken: Token, queryToken: Token) {
+export const UniswapV3: GetPriceWithPool = {
+  async getPoolWithPrices(baseToken: Token, queryToken: Token) {
     // Get all Pool addresses regarding the fees
     const poolAddressesWithFees = (
       await Promise.all(
@@ -46,7 +45,7 @@ export const UniswapV3: GetTokenPrices = {
             fee / 10_000
           }% Fee): ${address}`
         )
-        const poolContract = new Contract(address, UniswapV3PoolABI, ethProvider)
+        const poolContract = new Contract(address, UniswapV3Pool.abi, ethProvider)
         const { sqrtPriceX96, tick } = await poolContract.slot0()
         const poolLiquidity = await poolContract.liquidity()
 
@@ -83,7 +82,10 @@ export const UniswapV3: GetTokenPrices = {
           sqrtPriceX96,
           poolLiquidity,
           tick,
-          new TickLensDataProvider(populatedTicks, TICK_SPACINGS[fee])
+          new TickLensDataProvider(
+            populatedTicks.sort((a, b) => a.index - b.index),
+            TICK_SPACINGS[fee]
+          )
         )
         return { price: pool.priceOf(queryToken), contract: poolContract, pool }
       })

@@ -21,8 +21,8 @@
     "paths": {
       "~constants": ["constants"],
       "~constants/*": ["constants/*"],
-      "~equilibrium": ["equilibrium"],
-      "~equilibrium/*": ["equilibrium/*"],
+      "~balancer": ["balancer"],
+      "~balancer/*": ["balancer/*"],
       "~fetcher": ["fetcher"],
       "~fetcher/*": ["fetcher/*"],
       "~interfaces": ["interfaces"],
