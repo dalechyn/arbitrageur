@@ -1,20 +1,19 @@
 import { Token, CurrencyAmount } from '@uniswap/sdk-core'
+import UniswapV2Factory from '@uniswap/v2-core/build/UniswapV2Factory.json'
+import UniswapV2Pair from '@uniswap/v2-core/build/UniswapV2Pair.json'
 import { Pair } from '@uniswap/v2-sdk'
 import { ADDRESS_ZERO } from '@uniswap/v3-sdk'
 import { Contract } from 'ethers'
 
-import { GetTokenPrices } from '../interfaces/getTokenPrices'
-
-import UniswapV2FactoryABI from './abi/UniswapV2Factory.json'
-import UniswapV2PairABI from './abi/UniswapV2Pair.json'
+import { GetPriceWithPool } from '../interfaces/getTokenPrices'
 
 import { UNISWAP_V2_FACTORY_ADDRESS } from '~constants'
 import { ethProvider } from '~utils'
 
-const factory = new Contract(UNISWAP_V2_FACTORY_ADDRESS, UniswapV2FactoryABI, ethProvider)
+const factory = new Contract(UNISWAP_V2_FACTORY_ADDRESS, UniswapV2Factory.abi, ethProvider)
 
-export const UniswapV2: GetTokenPrices = {
-  async getTokenPrices(baseToken: Token, quoteToken: Token) {
+export const UniswapV2: GetPriceWithPool = {
+  async getPoolWithPrices(baseToken: Token, quoteToken: Token) {
     const pairAddress = await factory.getPair(baseToken.address, quoteToken.address)
 
     if (pairAddress === ADDRESS_ZERO) {
@@ -23,7 +22,7 @@ export const UniswapV2: GetTokenPrices = {
     }
 
     console.info(`UniswapV2: Checking ${baseToken.symbol}-${quoteToken.symbol}: ${pairAddress}`)
-    const pairContract = new Contract(pairAddress, UniswapV2PairABI, ethProvider)
+    const pairContract = new Contract(pairAddress, UniswapV2Pair.abi, ethProvider)
     const { _reserve0, _reserve1 } = await pairContract.getReserves()
     const [reserveA, reserveB] = baseToken.sortsBefore(quoteToken)
       ? [_reserve0, _reserve1]

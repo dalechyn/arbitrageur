@@ -36,4 +36,14 @@
     When a swap is made in UniswapV3 Pool, the protocol looks if the current tick will be pushed
     up, or down, depending on the token ordering, which is a comparison of token contracts addresses and swap direction.
 
+\section{Arbitrage}
+    Arbitrage can be thought as rebalancing the pools in order for their price to meet equally.
+    We don't know at the moment exaclty how much liquidity is locked in each tick.
+
+\section{Formulas}
+    $Price (\text{if both lte})= \frac{Q192}{ratioX192} = \frac{numerator}{denominator}$\\
+    $Price (\text{if both not lte})= \frac{ratioX192}{Q192} = \frac{numerator}{denominator}$\\
+    $ratioX192 (\text{if both lte})= \frac{Q192 * denominator}{numerator} $\\
+    $ratioX192 (\text{if both not lte})= \frac{Q192 * numerator}{denominator} $\\
+
 \end{document}
