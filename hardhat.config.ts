@@ -2,14 +2,19 @@ import 'hardhat-deploy'
 import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
+import 'dotenv/config'
 
 import { HardhatUserConfig } from 'hardhat/config'
+
+if (process.env.HARDHAT_FORK) {
+  process.env.HARDHAT_DEPLOY_FORK = process.env.HARDHAT_FORK
+}
 
 const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: '0.8.9',
+        version: '0.7.6',
         settings: {
           optimizer: {
             enabled: true,

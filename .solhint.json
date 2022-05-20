@@ -1,0 +1,8 @@
+{
+    "plugins": ["prettier"],
+    "rules": {
+      "prettier/prettier": "error",
+      "compiler-fixed": "off",
+      "not-rely-on-time": "off"
+    }
+}

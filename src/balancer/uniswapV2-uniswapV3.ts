@@ -122,9 +122,9 @@ export const balanceUniswapV2ToUniswapV3 = async (
   })
 
   const state = {
-    amountA: JSBI.BigInt(0),
-    amountB: JSBI.BigInt(0),
-    amountC: JSBI.BigInt(0),
+    amountA: JSBI.BigInt(0), // in UniswapV2
+    amountB: JSBI.BigInt(0), // out UniswapV2=in UniswapV3
+    amountC: JSBI.BigInt(0), // out UniswapV3
     sqrtPriceX96: pool.sqrtRatioX96,
     tick: pool.tickCurrent,
     liquidity: pool.liquidity
@@ -148,7 +148,7 @@ export const balanceUniswapV2ToUniswapV3 = async (
     ;[step.tickNext, step.initialized] =
       await pool.tickDataProvider.nextInitializedTickWithinOneWord(
         state.tick,
-        tokenA.equals(pool.token0),
+        tokenB.equals(pool.token0),
         pool.tickSpacing
       )
 
@@ -161,7 +161,6 @@ export const balanceUniswapV2ToUniswapV3 = async (
     // need to make sure the next price is not bigger than Pair price
     const sqrtPriceNextX96V3 = TickMath.getSqrtRatioAtTick(step.tickNext)
     const sqrtPriceFinalX96 = TickMath.getSqrtRatioAtTick(priceToClosestTick(v2Price.invert()))
-
     const nextV3Price = tickToPrice(tokenB, tokenC, step.tickNext)
     step.sqrtPriceNextX96 = nextV3Price.lessThan(v2Price.invert())
       ? sqrtPriceFinalX96
@@ -171,10 +170,8 @@ export const balanceUniswapV2ToUniswapV3 = async (
         state.sqrtPriceX96,
         step.sqrtPriceNextX96,
         state.liquidity,
-        true,
         pool.fee
       )
-
     const amountB = JSBI.add(state.amountB, JSBI.add(step.amountIn, step.feeAmount))
     const amountC = JSBI.add(state.amountC, step.amountOut)
     const [currencyAmountA, pairUpdated] = pair.getInputAmount(
@@ -237,6 +234,9 @@ export const balanceUniswapV2ToUniswapV3 = async (
       state.tick = TickMath.getTickAtSqrtRatio(state.sqrtPriceX96)
     }
   }
+  // ALCHEMY
+  // REQ -> NODE -> SYNC (ETH)
+  // LOCAL REQ -> NODE -> SYNC
 
   console.log('Finished! Profit:', JSBI.subtract(state.amountC, state.amountA).toString(), ' WETH')
 
@@ -318,7 +318,6 @@ export const balanceUniswapV3ToUniswapV2 = async (
         state.sqrtPriceX96,
         step.sqrtPriceNextX96,
         state.liquidity,
-        true,
         pool.fee
       )
 
