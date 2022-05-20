@@ -12,7 +12,7 @@ import { FractionUtils } from '~utils'
 
 const TOKENS_TO_SPOT = {
   [Chain.GOERLI]: [
-    // new Token(Chain.GOERLI, '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', 18, 'UNI'),
+    // new Token(Chain.GOERLI, '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', 18, 'UNI')
     // new Token(Chain.GOERLI, '0xdc31ee1784292379fbb2964b3b9c4124d8f89c60', 18, 'DAI')
     // new Token(Chain.GOERLI, '0x70cba46d2e933030e2f274ae58c951c800548aef', 18, 'BAT')
     // new Token(Chain.GOERLI, '0x822397d9a55d0fefd20F5c4bCaB33C5F65bd28Eb', 8, 'cDAI')
