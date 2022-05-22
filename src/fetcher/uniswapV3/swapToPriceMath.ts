@@ -1,5 +1,7 @@
+import { CurrencyAmount, Fraction, Token } from '@uniswap/sdk-core'
 import { FeeAmount, FullMath, SqrtPriceMath } from '@uniswap/v3-sdk'
 import JSBI from 'jsbi'
+import invariant from 'tiny-invariant'
 
 const MAX_FEE = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(6))
 
@@ -75,5 +77,82 @@ export abstract class SwapToPriceMath {
       returnValues.amountOut!,
       returnValues.feeAmount!
     ]
+  }
+
+  private static sqrt(value: JSBI) {
+    invariant(JSBI.greaterThan(value, JSBI.BigInt(2)), 'NEGATIVE')
+    if (JSBI.lessThanOrEqual(value, JSBI.BigInt(2))) {
+      return value
+    }
+
+    function newtonIteration(n: JSBI, x0: JSBI): JSBI {
+      const x1 = JSBI.signedRightShift(JSBI.add(JSBI.divide(n, x0), x0), JSBI.BigInt(1))
+
+      if (JSBI.equal(x0, x1) || JSBI.equal(x0, JSBI.subtract(x1, JSBI.BigInt(1)))) {
+        return x0
+      }
+      return newtonIteration(n, x1)
+    }
+
+    return newtonIteration(value, JSBI.BigInt(1))
+  }
+
+  public static computeAmountOfTokensToPrice(
+    reservesIn: CurrencyAmount<Token>,
+    reservesOut: CurrencyAmount<Token>,
+    targetPrice: Fraction,
+    FEE_NUMERATOR = JSBI.BigInt(997),
+    FEE_DENOMINATOR = JSBI.BigInt(1000)
+  ) {
+    // dif numerators as square formula has two roots - pick biggest of em
+    const rIn = reservesIn.quotient
+    const rOut = reservesOut.quotient
+    const tNumerator = targetPrice.numerator
+    const tDenominator = targetPrice.denominator
+    const numeratorLeftSide = JSBI.multiply(
+      JSBI.multiply(rIn, JSBI.subtract(JSBI.unaryMinus(FEE_NUMERATOR), FEE_DENOMINATOR)),
+      tNumerator
+    )
+
+    const numeratorRightSide = this.sqrt(
+      JSBI.multiply(
+        tNumerator,
+        JSBI.multiply(
+          rIn,
+          JSBI.add(
+            JSBI.multiply(
+              tNumerator,
+              JSBI.multiply(
+                rIn,
+                JSBI.add(
+                  JSBI.exponentiate(FEE_NUMERATOR, JSBI.BigInt(2)),
+                  JSBI.exponentiate(FEE_DENOMINATOR, JSBI.BigInt(2))
+                )
+              )
+            ),
+            JSBI.multiply(
+              FEE_NUMERATOR,
+              JSBI.multiply(
+                FEE_DENOMINATOR,
+                JSBI.subtract(
+                  JSBI.multiply(JSBI.BigInt(4), JSBI.multiply(rOut, tDenominator)),
+                  JSBI.multiply(JSBI.BigInt(2), JSBI.multiply(rIn, tNumerator))
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+
+    const numerators = [false, true].map((sign) =>
+      JSBI[sign ? 'add' : 'subtract'](numeratorLeftSide, numeratorRightSide)
+    )
+    const denominator = JSBI.multiply(JSBI.BigInt(2), JSBI.multiply(FEE_NUMERATOR, tNumerator))
+    const roots = numerators.map((numerator) => JSBI.divide(numerator, denominator))
+    return CurrencyAmount.fromRawAmount(
+      reservesIn.currency,
+      JSBI.greaterThan(roots[0], roots[1]) ? roots[0] : roots[1]
+    )
   }
 }

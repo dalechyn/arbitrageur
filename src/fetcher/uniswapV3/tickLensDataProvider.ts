@@ -9,10 +9,11 @@ export class TickLensDataProvider extends TickListDataProvider {
 
   async getTick(tick: number): Promise<{ liquidityNet: BigintIsh; liquidityGross: BigintIsh }> {
     try {
-      return super.getTick(tick)
+      return await super.getTick(tick)
     } catch (e: any) {
       // if not contained - it looked up for a unexistent Tick
-      if (e.message === 'NOT_CONTAINED') return { liquidityNet: 0, liquidityGross: 0 }
+      if (e.message === 'Invariant failed: NOT_CONTAINED')
+        return { liquidityNet: 0, liquidityGross: 0 }
       throw e
     }
   }
