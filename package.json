@@ -7,8 +7,10 @@
   "scripts": {
     "start:testnet": "tsc && node --enable-source-maps -r dotenv/config ./build/src/index.js dotenv_config_path=.env.testnet",
     "start:mainnet": "tsc && node --enable-source-maps -r dotenv/config ./build/src/index.js dotenv_config_path=.env.mainnet",
-    "deploy:goerli": "npx hardhat deploy --network goerli",
-    "console:goerli": "npx hardhat console --network goerli",
+    "deploy:goerli": "yarn hardhat deploy --network goerli",
+    "console:goerli": "yarn hardhat console --network goerli",
+    "fork:console": "HARDHAT_FORK=goerli yarn hardhat console",
+    "fork:deploy": "HARDHAT_FORK=goerli yarn hardhat deploy",
     "lint": "eslint . --ext .ts,.tsx --fix"
   },
   "dependencies": {
@@ -23,7 +25,6 @@
     "@uniswap/v2-sdk": "^3.0.1",
     "@uniswap/v3-periphery": "^1.4.1",
     "@uniswap/v3-sdk": "^3.8.2",
-    "bignumber.js": "^9.0.2",
     "chai": "^4.3.6",
     "dotenv": "^16.0.0",
     "ethereum-waffle": "^3.4.4",

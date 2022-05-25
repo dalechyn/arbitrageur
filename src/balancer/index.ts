@@ -42,7 +42,7 @@ export class Balancer {
     throw new Error('DEX from one of the pools is not supported')
   }
 
-  public balance(): CurrencyAmount<Token> {
+  public balance(): Promise<[string, string, CurrencyAmount<Token>]> {
     const f = DEX_MODULE_ROUTER[this.p1DEX][this.p2DEX]
     if (!f) throw new Error(`${this.p1DEX}-${this.p2DEX} are not supported`)
     // @ts-expect-error Error is suppressed for easier typing.

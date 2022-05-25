@@ -49,8 +49,14 @@ export const balanceUniswapV2ToUniswapV3 = async (
   poolV3Info: SupportedPoolWithContract<Pool>,
   tokenA: Token
 ) => {
-  const { pool } = poolV3Info
-  const { pool: initialPair } = poolV2Info
+  const {
+    pool,
+    contract: { address: poolAddress }
+  } = poolV3Info
+  const {
+    pool: initialPair,
+    contract: { address: pairAddress }
+  } = poolV2Info
   const tokenB = tokenA === pool.token0 ? pool.token1 : pool.token0
   const tokenC = tokenA
 
@@ -84,7 +90,7 @@ export const balanceUniswapV2ToUniswapV3 = async (
     const step: Partial<StepComputations> = {}
     step.sqrtPriceStartX96 = state.sqrtPriceX96
 
-    step.tickNext = state.tick + (tokenB.equals(pool.token0) ? -pool.tickSpacing : pool.tickSpacing)
+    step.tickNext = state.tick + (tokenB.equals(pool.token0) ? -1 : 1)
 
     if (step.tickNext < TickMath.MIN_TICK) {
       step.tickNext = TickMath.MIN_TICK
@@ -133,14 +139,14 @@ export const balanceUniswapV2ToUniswapV3 = async (
       pairUpdated.priceOf(tokenB).greaterThan(nextV3Price) &&
       JSBI.notEqual(step.sqrtPriceNextX96, sqrtPriceFinalX96)
     ) {
-      console.log('Single-tick swap needed, recalculating')
+      console.log('Last step! V3 reached, pulling V2 price to match V3')
       const amountIn = SwapToPriceMath.computeAmountOfTokensToPrice(
         initialPair.reserveOf(tokenA),
         initialPair.reserveOf(tokenB),
         nextV3Price.invert()
       )
       state.amountA = amountIn.quotient
-      const amountOut = initialPair.getOutputAmount(amountIn)[0]
+      const [amountOut] = initialPair.getOutputAmount(amountIn)
       state.amountB = amountOut.quotient
       state.amountC = (await pool.getOutputAmount(amountOut))[0].quotient
       break
@@ -188,9 +194,9 @@ export const balanceUniswapV2ToUniswapV3 = async (
   // REQ -> NODE -> SYNC (ETH)
   // LOCAL REQ -> NODE -> SYNC
 
-  console.log('Finished! Profit:', JSBI.subtract(state.amountC, state.amountA).toString(), ' WETH')
+  console.log('Finished! Profit:', JSBI.subtract(state.amountC, state.amountA).toString(), 'weiETH')
 
-  return CurrencyAmount.fromRawAmount(tokenA, state.amountA)
+  return [pairAddress, poolAddress, CurrencyAmount.fromRawAmount(tokenA, state.amountA)]
 }
 
 // i.e: V3: WETH->CDAI; V2: CDAI->WETH
@@ -201,8 +207,14 @@ export const balanceUniswapV3ToUniswapV2 = async (
   poolV2Info: SupportedPoolWithContract<Pair>,
   tokenA: Token
 ) => {
-  const { pool } = poolV3Info
-  const { pool: initialPair } = poolV2Info
+  const {
+    pool,
+    contract: { address: poolAddress }
+  } = poolV3Info
+  const {
+    pool: initialPair,
+    contract: { address: pairAddress }
+  } = poolV2Info
   const tokenB = tokenA === pool.token0 ? pool.token1 : pool.token0
   const tokenC = tokenA
 
@@ -236,7 +248,7 @@ export const balanceUniswapV3ToUniswapV2 = async (
     step.sqrtPriceStartX96 = state.sqrtPriceX96
 
     // we have to go through each tick as it changes the V2 pair accordingly
-    step.tickNext = state.tick + (tokenA.equals(pool.token0) ? -pool.tickSpacing : pool.tickSpacing)
+    step.tickNext = state.tick + (tokenA.equals(pool.token0) ? -1 : 1)
 
     if (step.tickNext < TickMath.MIN_TICK) {
       step.tickNext = TickMath.MIN_TICK
@@ -274,11 +286,8 @@ export const balanceUniswapV3ToUniswapV2 = async (
     // if the next is true - tick crossing will take so much liquidity that V2 price will be
     // bumped too much
     // So here we look how much liquidity is needed to push V2 price to the current V3 price
-    if (
-      pairUpdated.priceOf(tokenB).lessThan(nextV3Price) &&
-      JSBI.notEqual(step.sqrtPriceNextX96, sqrtPriceFinalX96)
-    ) {
-      console.log('Single-tick swap needed, recalculating')
+    if (pairUpdated.priceOf(tokenB).lessThan(nextV3Price)) {
+      console.log('Last step! V3 reached, pulling V2 price to match V3')
       const amountIn = SwapToPriceMath.computeAmountOfTokensToPrice(
         initialPair.reserveOf(tokenB),
         initialPair.reserveOf(tokenC),
@@ -288,6 +297,8 @@ export const balanceUniswapV3ToUniswapV2 = async (
       const [amountOut] = initialPair.getOutputAmount(amountIn)
       state.amountC = amountOut.quotient
       state.amountA = (await pool.getInputAmount(amountIn))[0].quotient
+      // tick changing in newPool not just by tickSpacing
+      // tick changes differently, should be precise but it's not
       break
     }
     state.pair = pairUpdated
@@ -332,5 +343,5 @@ export const balanceUniswapV3ToUniswapV2 = async (
 
   console.log('Finished! Profit:', JSBI.subtract(state.amountC, state.amountA).toString(), ' WETH')
 
-  return CurrencyAmount.fromRawAmount(tokenA, state.amountA)
+  return [pairAddress, poolAddress, CurrencyAmount.fromRawAmount(tokenA, state.amountA)]
 }
