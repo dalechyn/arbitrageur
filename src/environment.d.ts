@@ -14,5 +14,6 @@ declare namespace NodeJS {
     UNISWAP_V3_FACTORY_ADDRESS: string
     MULTI_CALL_TICK_LENS_ADDRESS: string
     UNISWAP_V2_FACTORY_ADDRESS: string
+    SUSHISWAP_FACTORY_ADDRESS: string
   }
 }

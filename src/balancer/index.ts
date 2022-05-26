@@ -2,6 +2,7 @@ import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { Pool } from '@uniswap/v3-sdk'
 
+import { balanceUniswapV2ToUniswapV2 } from './uniswapV2-uniswapV2'
 import { balanceUniswapV2ToUniswapV3, balanceUniswapV3ToUniswapV2 } from './uniswapV2-uniswapV3'
 
 import { DEX } from '~constants'
@@ -10,7 +11,7 @@ import { SupportedPoolWithContract } from '~interfaces'
 const DEX_MODULE_ROUTER = {
   [DEX.UNISWAPV2]: {
     [DEX.UNISWAPV3]: balanceUniswapV2ToUniswapV3,
-    [DEX.UNISWAPV2]: null
+    [DEX.UNISWAPV2]: balanceUniswapV2ToUniswapV2
   },
   [DEX.UNISWAPV3]: {
     [DEX.UNISWAPV2]: balanceUniswapV3ToUniswapV2,
