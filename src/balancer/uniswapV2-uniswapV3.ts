@@ -156,6 +156,9 @@ export const balanceUniswapV2ToUniswapV3 = async (
 
     if (JSBI.equal(sqrtPriceFinalX96, state.sqrtPriceX96)) {
       console.log('Equillibrim met')
+      if (JSBI.lessThan(state.amountC, state.amountA)) {
+        console.log('But it`s not profitable. Fees eat up too much.')
+      }
       break
     }
 
@@ -305,6 +308,9 @@ export const balanceUniswapV3ToUniswapV2 = async (
 
     if (JSBI.equal(sqrtPriceFinalX96, state.sqrtPriceX96)) {
       console.log('Equillibrium met')
+      if (JSBI.lessThan(state.amountC, state.amountA)) {
+        console.log('But it`s not profitable. Fees eat up too much.')
+      }
       break
     }
 
