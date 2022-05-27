@@ -3,6 +3,7 @@ import { Token } from '@uniswap/sdk-core'
 import JSBI from 'jsbi'
 
 import { GetPriceWithPool } from './interfaces/getTokenPrices'
+import { Sushiswap } from './sushiswap'
 import { UniswapV2 } from './uniswapV2'
 import { UniswapV3 } from './uniswapV3'
 
@@ -23,7 +24,7 @@ const TOKENS_TO_SPOT = {
   ]
 }
 
-const SWAPS: GetPriceWithPool[] = [UniswapV3, UniswapV2]
+const SWAPS: GetPriceWithPool[] = [/* UniswapV3 */ UniswapV2, Sushiswap]
 
 export const getProfitableOpportunities = async () => {
   // TODO: create an array of two non-identical pairs from SWAPS array
