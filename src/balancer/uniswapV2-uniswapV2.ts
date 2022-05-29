@@ -1,7 +1,6 @@
 import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import JSBI from 'jsbi'
-
 import { SupportedPoolWithContract } from '~interfaces'
 import { MathUtils } from '~utils/mathUtils'
 
@@ -62,8 +61,11 @@ function calculateProfit(
   secondPair: Pair,
   amountIn: CurrencyAmount<Token>
 ): CurrencyAmount<Token> {
-  const amountB = firstPair.getOutputAmount(amountIn)[0]
-  return secondPair.getOutputAmount(amountB)[0].subtract(amountIn)
+  const [amountB, firstPairAfter] = firstPair.getOutputAmount(amountIn)
+  const [amountC, secondPairAfter] = secondPair.getOutputAmount(amountB)
+  console.log(firstPairAfter.token0Price.toSignificant(20))
+  console.log(secondPairAfter.token0Price.toSignificant(20))
+  return amountC.subtract(amountIn)
 }
 
 export async function balanceUniswapV2ToUniswapV2(
