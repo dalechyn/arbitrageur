@@ -1,7 +1,8 @@
 import { CurrencyAmount, Fraction, Token } from '@uniswap/sdk-core'
 import { FeeAmount, FullMath, SqrtPriceMath } from '@uniswap/v3-sdk'
 import JSBI from 'jsbi'
-import invariant from 'tiny-invariant'
+
+import { MathUtils } from '~utils'
 
 const MAX_FEE = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(6))
 
@@ -79,24 +80,6 @@ export abstract class SwapToPriceMath {
     ]
   }
 
-  private static sqrt(value: JSBI) {
-    invariant(JSBI.greaterThan(value, JSBI.BigInt(2)), 'NEGATIVE')
-    if (JSBI.lessThanOrEqual(value, JSBI.BigInt(2))) {
-      return value
-    }
-
-    function newtonIteration(n: JSBI, x0: JSBI): JSBI {
-      const x1 = JSBI.signedRightShift(JSBI.add(JSBI.divide(n, x0), x0), JSBI.BigInt(1))
-
-      if (JSBI.equal(x0, x1) || JSBI.equal(x0, JSBI.subtract(x1, JSBI.BigInt(1)))) {
-        return x0
-      }
-      return newtonIteration(n, x1)
-    }
-
-    return newtonIteration(value, JSBI.BigInt(1))
-  }
-
   public static computeAmountOfTokensToPrice(
     reservesIn: CurrencyAmount<Token>,
     reservesOut: CurrencyAmount<Token>,
@@ -114,7 +97,7 @@ export abstract class SwapToPriceMath {
       tNumerator
     )
 
-    const numeratorRightSide = this.sqrt(
+    const numeratorRightSide = MathUtils.sqrt(
       JSBI.multiply(
         tNumerator,
         JSBI.multiply(
