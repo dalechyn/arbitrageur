@@ -1,68 +1,69 @@
 import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
-import BN, { BigNumber } from 'bignumber.js'
+import JSBI from 'jsbi'
 
 import { SupportedPoolWithContract } from '~interfaces'
-
-const F = new BN(0.997) // 997n
-
-// function newtonIteration(n: bigint, x0: bigint): bigint {
-//   const x1 = (n / x0 + x0) >> 1n
-//   if (x0 === x1 || x0 === x1 - 1n) return x0
-//   return newtonIteration(n, x1)
-// }
-
-// function sqrt(value: bigint): bigint {
-//   if (value < 0n) throw Error('square root of negative numbers is not supported')
-//   if (value < 2n) return value
-
-//   return newtonIteration(value, 1n)
-// }
-
-// function pow(v: bigint, by: number = 2): bigint {
-//   return v ** BigInt(by)
-// }
+import { MathUtils } from '~utils/mathUtils'
 
 function getReserves(
   token: Token,
   { pool: { token0, reserve0, reserve1 } }: SupportedPoolWithContract<Pair>
 ) {
-  const streight = token.equals(token0)
-  const reserves = [reserve0, reserve1].map((v) => new BN(v.quotient.toString(10)))
-
-  return streight ? reserves : reserves.reverse()
+  const zeroForOne = token.equals(token0)
+  const reserves = [reserve0, reserve1]
+  return zeroForOne ? reserves : reserves.reverse()
 }
 
-// function calculateProfit(x: bigint, rA1: bigint, rB1: bigint, rA2: bigint, rB2: bigint) {
-//   return (x * rB1 * rA2 * pow(F)) / (rA1 * rB2 + x * F * (rA2 * F + rA1)) - x
-// }
-
-// function calculateMaxPoint(rA1: bigint, rB1: bigint, rA2: bigint, rB2: bigint) {
-//   const nom = F * sqrt(rA1 * rA2 * rB1 * rB2) - rA1 * rB2
-//   const denom = F * (rA2 * F + rA1)
-//   return nom / denom
-// }
-
-// https://www.wolframalpha.com/input?i=%28b_1+b_2+f%5E2+%28a_1+%28a_2+-+2+x%29+-+2+f+x%5E2%29+-+b_2%5E2+%28a_1+%2B+f+x%29%5E2+%2B+b_1%5E2+f%5E4+%28-x%5E2%29%29%2F%28b_2+%28a_1+%2B+f+x%29+%2B+b_1+f%5E2+x%29%5E2%3D0
-function calculateMaxPoint(rA1: BigNumber, rB1: BigNumber, rA2: BigNumber, rB2: BigNumber) {
-  const nom = rA1.times(rA2).times(rB1).times(rB2).sqrt().times(F).minus(rA1.times(rB2))
-  const denom = F.times(rB1.times(F).plus(rB2))
-
-  return nom.div(denom).integerValue()
-}
-
-// https://www.wolframalpha.com/input?i=%28a_2+b_1+f%5E2+x%29%2F%28a_1+b_2+%2B+b_1+f%5E2+x+%2B+b_2+f+x%29+-+x%2C+a_1%3D50%2C+b_1%3D100%2C+a_2%3D700%2C+b_2%3D800%2C+f%3D0.997
-function calculateProfit(
-  x: BigNumber,
-  rA1: BigNumber,
-  rB1: BigNumber,
-  rA2: BigNumber,
-  rB2: BigNumber
+// Buying in token(reservesIn_0) -> swapping(reservesIn_1) -> getting(reservesOut_1)
+// token(reservesOut_1) = token(reservesIn_0)
+// token(reservesOut_0) = token(reservesIn_1)
+function calculateMaxPoint(
+  reservesIn0: JSBI,
+  reservesOut0: JSBI,
+  reservesIn1: JSBI,
+  reservesOut1: JSBI,
+  FEE_NUMERATOR_0: JSBI,
+  FEE_DENOMINATOR_0: JSBI,
+  FEE_NUMERATOR_1: JSBI,
+  FEE_DENOMINATOR_1: JSBI
 ) {
-  const nom = rA2.times(rB1).times(x).times(F.pow(2))
-  const denom = rB2.times(rA1.plus(x.times(F))).plus(rB1.times(x).times(F.pow(2)))
+  const numerator = JSBI.subtract(
+    MathUtils.sqrt(
+      [
+        reservesIn0,
+        reservesOut0,
+        reservesIn1,
+        reservesOut1,
+        FEE_NUMERATOR_0,
+        FEE_DENOMINATOR_0,
+        FEE_NUMERATOR_1,
+        FEE_DENOMINATOR_1
+      ].reduce((acc, el) => JSBI.multiply(acc, el), JSBI.BigInt(1))
+    ),
+    JSBI.multiply(
+      reservesIn0,
+      JSBI.multiply(reservesIn1, JSBI.multiply(FEE_DENOMINATOR_0, FEE_DENOMINATOR_1))
+    )
+  )
 
-  return nom.div(denom).minus(x).integerValue()
+  const denominator = JSBI.multiply(
+    FEE_NUMERATOR_0,
+    JSBI.add(
+      JSBI.multiply(reservesOut0, FEE_NUMERATOR_1),
+      JSBI.multiply(reservesIn1, FEE_DENOMINATOR_1)
+    )
+  )
+
+  return JSBI.divide(numerator, denominator)
+}
+
+function calculateProfit(
+  firstPair: Pair,
+  secondPair: Pair,
+  amountIn: CurrencyAmount<Token>
+): CurrencyAmount<Token> {
+  const amountB = firstPair.getOutputAmount(amountIn)[0]
+  return secondPair.getOutputAmount(amountB)[0].subtract(amountIn)
 }
 
 export async function balanceUniswapV2ToUniswapV2(
@@ -70,26 +71,24 @@ export async function balanceUniswapV2ToUniswapV2(
   secondPoolV2Info: SupportedPoolWithContract<Pair>,
   tokenA: Token
 ) {
-  const [rA1, rB1] = getReserves(tokenA, firstPoolV2Info)
-  const [rA2, rB2] = getReserves(tokenA, secondPoolV2Info)
+  const [reservesIn0, reservesOut0] = getReserves(tokenA, firstPoolV2Info).map((r) => r.quotient)
+  const [reservesOut1, reservesIn1] = getReserves(tokenA, secondPoolV2Info).map((r) => r.quotient)
 
-  const x = calculateMaxPoint(rA1, rB1, rA2, rB2)
-  const maxProfit = calculateProfit(x, rA1, rB1, rA2, rB2)
-
-  console.log(
-    'Finished! Amount:',
-    CurrencyAmount.fromRawAmount(tokenA, x.toFixed()).toSignificant(),
-    ' WETH'
+  const x = calculateMaxPoint(
+    reservesIn0,
+    reservesOut0,
+    reservesIn1,
+    reservesOut1,
+    firstPoolV2Info.pool.feeNumerator,
+    firstPoolV2Info.pool.feeDenominator,
+    secondPoolV2Info.pool.feeNumerator,
+    secondPoolV2Info.pool.feeDenominator
   )
-  console.log(
-    'Finished! Profit:',
-    CurrencyAmount.fromRawAmount(tokenA, maxProfit.toFixed()).toSignificant(),
-    ' WETH'
-  )
+  const amountIn = CurrencyAmount.fromRawAmount(tokenA, x)
+  const maxProfit = calculateProfit(firstPoolV2Info.pool, secondPoolV2Info.pool, amountIn)
 
-  return [
-    secondPoolV2Info.contract.address,
-    firstPoolV2Info.contract.address,
-    CurrencyAmount.fromRawAmount(tokenA, x.toFixed())
-  ]
+  console.log('Finished! Amount:', x.toString(), ' weiWETH')
+  console.log('Finished! Profit:', maxProfit.toSignificant(), ' WETH')
+
+  return [secondPoolV2Info.contract.address, firstPoolV2Info.contract.address, amountIn]
 }

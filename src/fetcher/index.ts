@@ -14,10 +14,11 @@ import { FractionUtils } from '~utils'
 const TOKENS_TO_SPOT = {
   [Chain.GOERLI]: [
     // new Token(Chain.GOERLI, '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', 18, 'UNI')
-    new Token(Chain.GOERLI, '0xdc31ee1784292379fbb2964b3b9c4124d8f89c60', 18, 'DAI')
+    // new Token(Chain.GOERLI, '0xdc31ee1784292379fbb2964b3b9c4124d8f89c60', 18, 'DAI')
     // new Token(Chain.GOERLI, '0x70cba46d2e933030e2f274ae58c951c800548aef', 18, 'BAT')
     // new Token(Chain.GOERLI, '0x822397d9a55d0fefd20F5c4bCaB33C5F65bd28Eb', 8, 'cDAI')
-    // new Token(Chain.GOERLI, '0xd87ba7a50b2e7e660f678a895e4b72e7cb4ccd9c', 6, 'USDC')
+    // new Token(Chain.GOERLI, '0xd87ba7a50b2e7e660f678a895e4b72e7cb4ccd9c', 6, 'USDC'),
+    new Token(Chain.GOERLI, '0xC04B0d3107736C32e19F1c62b2aF67BE61d63a05', 8, 'WBTC')
   ],
   [Chain.MAINNET]: [
     new Token(Chain.MAINNET, '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', 6, 'USDC')
