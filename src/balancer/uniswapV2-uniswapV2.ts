@@ -1,6 +1,7 @@
 import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import JSBI from 'jsbi'
+
 import { SupportedPoolWithContract } from '~interfaces'
 import { MathUtils } from '~utils/mathUtils'
 
@@ -60,12 +61,10 @@ function calculateProfit(
   firstPair: Pair,
   secondPair: Pair,
   amountIn: CurrencyAmount<Token>
-): CurrencyAmount<Token> {
-  const [amountB, firstPairAfter] = firstPair.getOutputAmount(amountIn)
-  const [amountC, secondPairAfter] = secondPair.getOutputAmount(amountB)
-  console.log(firstPairAfter.token0Price.toSignificant(20))
-  console.log(secondPairAfter.token0Price.toSignificant(20))
-  return amountC.subtract(amountIn)
+): [CurrencyAmount<Token>, CurrencyAmount<Token>] {
+  const [amountB] = firstPair.getOutputAmount(amountIn)
+  const [amountC] = secondPair.getOutputAmount(amountB)
+  return [amountC.subtract(amountIn), amountB]
 }
 
 export async function balanceUniswapV2ToUniswapV2(
@@ -86,8 +85,45 @@ export async function balanceUniswapV2ToUniswapV2(
     secondPoolV2Info.pool.feeNumerator,
     secondPoolV2Info.pool.feeDenominator
   )
-  const amountIn = CurrencyAmount.fromRawAmount(tokenA, x)
-  const maxProfit = calculateProfit(firstPoolV2Info.pool, secondPoolV2Info.pool, amountIn)
+  // convert to an amount without a reminder - integer division problem
+  const amountInFalsy = CurrencyAmount.fromRawAmount(tokenA, x)
+  const amountIn = firstPoolV2Info.pool.getInputAmount(
+    firstPoolV2Info.pool.getOutputAmount(amountInFalsy)[0]
+  )[0]
+  const [maxProfit] = calculateProfit(firstPoolV2Info.pool, secondPoolV2Info.pool, amountIn)
+  /* 
+  const results = []
+  for (let i = 1; i < 10000; i++) {
+    const x_lower = CurrencyAmount.fromRawAmount(tokenA, `${i}00`).multiply(-1)
+    const x_upper = CurrencyAmount.fromRawAmount(tokenA, `${i}00`)
+
+    const [y_lower, amountB_lower] = calculateProfit(
+      firstPoolV2Info.pool,
+      secondPoolV2Info.pool,
+      amountIn.add(x_lower)
+    )
+    const [y_upper, amountB_upper] = calculateProfit(
+      firstPoolV2Info.pool,
+      secondPoolV2Info.pool,
+      amountIn.add(x_upper)
+    )
+
+    results.unshift({
+      x: x_lower.quotient.toString(),
+      y: y_lower.subtract(maxProfit).quotient.toString(),
+      z: amountB_lower.quotient.toString()
+    })
+    results.push({
+      x: x_upper.quotient.toString(),
+      y: y_upper.subtract(maxProfit).quotient.toString(),
+      z: amountB_upper.quotient.toString()
+    })
+  }
+
+  await fs.writeFile(
+    './out.csv',
+    results.map(({ x, y, z }) => `${x},${y},${z}\n`)
+  )  */
 
   console.log('Finished! Amount:', x.toString(), ' weiWETH')
   console.log('Finished! Profit:', maxProfit.toSignificant(), ' WETH')
