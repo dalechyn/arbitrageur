@@ -5,6 +5,7 @@
   "types": "module",
   "license": "MIT",
   "scripts": {
+    "postinstall": "yarn patch-package",
     "start:testnet": "tsc && node --enable-source-maps -r dotenv/config ./build/src/index.js dotenv_config_path=.env.testnet",
     "start:mainnet": "tsc && node --enable-source-maps -r dotenv/config ./build/src/index.js dotenv_config_path=.env.mainnet",
     "deploy:goerli": "yarn hardhat deploy --network goerli",
