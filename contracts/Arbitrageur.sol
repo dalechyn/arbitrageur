@@ -45,22 +45,18 @@ contract Arbitrageur is
     function arbitrage(
         uint blockNumber,
         uint amount,
-        // contains packed 2byte fee numerator, 2byte fee denominator and base token address
-        // contains packed pool types:
-        // 1 - UniV3 alike
-        // 2 - UniV2 alike
-        uint packedPoolTypesAndBaseTokenAndFeeInfo,
+        address baseToken,
         address poolA,
-        uint packedPoolBAndFeeInfo
+        address poolB,
+        uint8 inType,
+        uint8 outType
     ) external {
         require(block.number <= blockNumber, "block");
-        uint8 inType = uint8((packedPoolTypesAndBaseTokenAndFeeInfo >> 192) & 0x1);
-        uint8 outType = uint8((packedPoolTypesAndBaseTokenAndFeeInfo >> 191) & 0x1);
         if (inType == 0) {
-            if (outType == 1) return arbitrageV2toAny(amount, packedPoolTypesAndBaseTokenAndFeeInfo, poolA, packedPoolBAndFeeInfo, outType);
-        } else {
-            if (outType == 0) return arbitrageV3toV2(amount, packedPoolTypesAndBaseTokenAndFeeInfo, poolA, address(uint160(packedPoolBAndFeeInfo & 0x00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)));
-        }
+            if (outType == 1) return arbitrageV3toV2(amount, baseToken, poolA, poolB);        
+            else revert("NS");
+        } else if (inType == 1) return arbitrageV2toAny(amount, baseToken, poolA, poolB, outType);
+        else revert("NS");
     }
 
     // copy from uniswapv2 library with custom fees
@@ -105,42 +101,37 @@ contract Arbitrageur is
     // the callback before checking pair reserve balances
     function arbitrageV2toAny(
         uint amount,
-        uint packedBaseTokenAndFeeInfo, // fee num and den for dex0
+        address baseToken,
         address poolA,
-        uint packedPoolBAndFeeInfo, // fee num and den for dex1
+        address poolB, 
         uint8 outType
     ) internal {
         require(poolA != address(0), "!poolA");
-        // address is 20bytes*8=160bits, with encoded at the beginning 2 byte feeNum and feeDen
-        address baseToken = address(uint160(packedBaseTokenAndFeeInfo & 0x00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF));
-
         address token0 = IUniswapV2Pair(poolA).token0();
 
         // need to pass some data to trigger uniswapV2Call
         bytes memory data = abi.encode(
             FlashV2CallbackData({
                 baseToken: baseToken,
-                pool: address(uint160(packedPoolBAndFeeInfo & 0x00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)),
+                pool: poolB,
                 payer: msg.sender,
                 outType: outType,
                 // saving the amount of tokens to input (WETH for the current bot implementation)
                 // in order to check if the trade was profitable
-                amountA: amount,
+                amountA: amount/* ,
                 feeNumerator: uint16((packedPoolBAndFeeInfo >> 176) & 0xFFFF),
                 feeDenominator: uint16((packedPoolBAndFeeInfo >> 160) & 0xFFFF)
-            })
+ */            })
         );
 
         uint amount0Out; uint amount1Out;
         { 
-            uint feeNumerator = (packedBaseTokenAndFeeInfo >> 176) & 0xFFFF;
-            uint feeDenominator = (packedBaseTokenAndFeeInfo >> 160) & 0xFFFF;
             (uint _reserve0, uint _reserve1,) = IUniswapV2Pair(poolA).getReserves();
             amount0Out = baseToken == token0
             ? 0
-            : getAmountOut(amount, _reserve1, _reserve0, feeNumerator, feeDenominator);
+            : getAmountOut(amount, _reserve1, _reserve0, 997, 1000);
             amount1Out = baseToken == token0
-            ? getAmountOut(amount, _reserve0, _reserve1, feeNumerator, feeDenominator)
+            ? getAmountOut(amount, _reserve0, _reserve1, 997, 1000)
             : 0;
         }
 
@@ -153,18 +144,13 @@ contract Arbitrageur is
     // the callback before checking pool reserve balances
     function arbitrageV3toV2(
         uint amount,
-        uint packedFeeAndBaseToken,
+        address baseToken,
         address poolA,
         address poolB
     ) internal {
         address token0 = IUniswapV3Pool(poolA).token0();
         address token1 = IUniswapV3Pool(poolA).token1();
-        uint16 feeNumerator = uint16((packedFeeAndBaseToken >> 176) & 0xFFFF);
-        uint16 feeDenominator = uint16((packedFeeAndBaseToken >> 160) & 0xFFFF);
-        address baseToken = address(uint160(packedFeeAndBaseToken & 0x00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF));
         bool zeroForOne = baseToken < (baseToken == token0 ? token1 : token0);
-        console.log(uint(feeNumerator));
-        console.log(uint(feeDenominator));
         console.log(baseToken);
         console.log(zeroForOne);
         IUniswapV3Pool(poolA).swap(
@@ -180,9 +166,9 @@ contract Arbitrageur is
                 FlashV3CallbackData({
                     baseToken: baseToken,
                     pair: poolB,
-                    payer: msg.sender,
+                    payer: msg.sender/* ,
                     feeNumerator: feeNumerator,
-                    feeDenominator: feeDenominator
+                    feeDenominator: feeDenominator */
                 })
             )
         );
@@ -235,7 +221,7 @@ contract Arbitrageur is
             TransferHelper.safeTransferFrom(tokenB, address(this), decoded.pool, amountB);
 
             (uint _reserve0, uint _reserve1,) = IUniswapV2Pair(pair).getReserves();
-            amountC = getAmountOut(amountB, decoded.baseToken == token0 ? _reserve0 : _reserve1, decoded.baseToken == token0 ? _reserve1 : _reserve0, decoded.feeNumerator, decoded.feeDenominator);
+            amountC = getAmountOut(amountB, decoded.baseToken == token0 ? _reserve0 : _reserve1, decoded.baseToken == token0 ? _reserve1 : _reserve0, 997, 1000);
             IUniswapV2Pair(pair).swap(decoded.baseToken == token0 ? amountC : 0, decoded.baseToken == token1 ? amountC : 0, address(this), data);
         }
 
@@ -296,7 +282,7 @@ contract Arbitrageur is
             (uint _reserve0, uint _reserve1,) = IUniswapV2Pair(decoded.pair).getReserves();
             uint reserveIn = decoded.baseToken == token0 ? _reserve1 : _reserve0;
             uint reserveOut = decoded.baseToken == token0 ? _reserve0 : _reserve1;
-            amountC = getAmountOut(amountB, reserveIn, reserveOut, decoded.feeNumerator, decoded.feeDenominator);
+            amountC = getAmountOut(amountB, reserveIn, reserveOut, 997, 1000);
             console.log(amountC);
             IUniswapV2Pair(decoded.pair).swap(decoded.baseToken == token0 ? amountC : 0, decoded.baseToken == token1 ? amountC : 0, address(this), new bytes(0));
         }
