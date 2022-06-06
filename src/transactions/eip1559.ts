@@ -7,11 +7,11 @@ import { ethProvider } from '../utils'
 
 import { getPriorityFee } from './priorityFee'
 
-export const createEIP1559Transaction: (
+export const createEIP1559Transaction = async (
   blockNumber: number,
   to: string,
   data: string
-) => Promise<TransactionRequest> = async (blockNumber, to, data) => {
+): Promise<TransactionRequest> => {
   const block = await ethProvider.getBlock(blockNumber)
   if (!block.baseFeePerGas) throw new Error('Chain does not support EIP1559, write code for legacy')
   const maxBaseFeeInFutureBlock = FlashbotsBundleProvider.getMaxBaseFeeInFutureBlock(
@@ -22,10 +22,10 @@ export const createEIP1559Transaction: (
   return {
     to,
     type: 2,
-    data: '0x',
+    data: data ?? '0x',
     maxFeePerGas: priorityFee.add(maxBaseFeeInFutureBlock).toString(),
     maxPriorityFeePerGas: priorityFee.toString(),
-    gasLimit: 21000,
+    gasLimit: 200000,
     value: ethers.utils.parseEther('0.00000000001').toString(),
     chainId: CHAIN_ID
   }
