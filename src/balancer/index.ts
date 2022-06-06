@@ -1,21 +1,22 @@
-import { CurrencyAmount, Token } from '@uniswap/sdk-core'
+import { Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { Pool } from '@uniswap/v3-sdk'
 
-import { balanceUniswapV2ToUniswapV3, balanceUniswapV3ToUniswapV2 } from './uniswapV2-uniswapV3'
+import { BalanceResult } from './result'
 import { balanceUniswapV2ToUniswapV2 } from './uniswapV2-uniswapV2'
+import { balanceUniswapV2ToUniswapV3, balanceUniswapV3ToUniswapV2 } from './uniswapV2-uniswapV3'
 
-import { DEX } from '~constants'
+import { DEXType } from '~constants'
 import { SupportedPoolWithContract } from '~interfaces'
 
 const DEX_MODULE_ROUTER = {
-  [DEX.UNISWAPV2]: {
-    [DEX.UNISWAPV3]: balanceUniswapV2ToUniswapV3,
-    [DEX.UNISWAPV2]: balanceUniswapV2ToUniswapV2
+  [DEXType.UNISWAPV2]: {
+    [DEXType.UNISWAPV3]: balanceUniswapV2ToUniswapV3,
+    [DEXType.UNISWAPV2]: balanceUniswapV2ToUniswapV2
   },
-  [DEX.UNISWAPV3]: {
-    [DEX.UNISWAPV2]: balanceUniswapV3ToUniswapV2,
-    [DEX.UNISWAPV3]: null
+  [DEXType.UNISWAPV3]: {
+    [DEXType.UNISWAPV2]: balanceUniswapV3ToUniswapV2,
+    [DEXType.UNISWAPV3]: null
   }
 }
 
@@ -26,8 +27,8 @@ const DEX_MODULE_ROUTER = {
  DEXes, so a lookuper is written in constructor
  */
 export class Balancer {
-  private readonly p1DEX: DEX
-  private readonly p2DEX: DEX
+  private readonly p1DEX: DEXType
+  private readonly p2DEX: DEXType
   constructor(
     private readonly p1: SupportedPoolWithContract,
     private readonly p2: SupportedPoolWithContract,
@@ -37,16 +38,17 @@ export class Balancer {
     this.p2DEX = Balancer.findDEX(p2)
   }
 
-  private static findDEX(p: SupportedPoolWithContract): DEX {
-    if (p.pool instanceof Pool) return DEX.UNISWAPV3
-    if (p.pool instanceof Pair) return DEX.UNISWAPV2
+  private static findDEX(p: SupportedPoolWithContract): DEXType {
+    if (p.pool instanceof Pool) return DEXType.UNISWAPV3
+    if (p.pool instanceof Pair) return DEXType.UNISWAPV2
     throw new Error('DEX from one of the pools is not supported')
   }
 
-  public balance(): Promise<[string, string, CurrencyAmount<Token>]> {
+  public async balance(): Promise<BalanceResult> {
     const f = DEX_MODULE_ROUTER[this.p1DEX][this.p2DEX]
     if (!f) throw new Error(`${this.p1DEX}-${this.p2DEX} are not supported`)
     // @ts-expect-error Error is suppressed for easier typing.
-    return f(this.p1, this.p2, this.baseToken)
+    const amountIn = await f(this.p1, this.p2, this.baseToken)
+    return new BalanceResult(this.p1, this.p2, amountIn.quotient)
   }
 }

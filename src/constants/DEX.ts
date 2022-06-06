@@ -1,4 +1,4 @@
-export enum DEX {
+export enum DEXType {
   UNISWAPV2 = 'UNISWAPV2',
   UNISWAPV3 = 'UNISWAPV3'
 }

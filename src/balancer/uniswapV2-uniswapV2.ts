@@ -128,5 +128,5 @@ export async function balanceUniswapV2ToUniswapV2(
   console.log('Finished! Amount:', x.toString(), ' weiWETH')
   console.log('Finished! Profit:', maxProfit.toSignificant(), ' WETH')
 
-  return [secondPoolV2Info.contract.address, firstPoolV2Info.contract.address, amountIn]
+  return amountIn
 }

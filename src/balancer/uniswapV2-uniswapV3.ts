@@ -40,23 +40,17 @@ interface StepComputations {
  * so long story short - i.e. WETH-cDAI-WETH,
  *  for V2: WETH = baseToken; cDai = queryToken,
  *  and V3: cDAI = baseToken, WETH = queryToken
- * @param poolV2Info
- * @param poolV3Info
+ * @param fromPoolInfo
+ * @param toPoolInfo
  * @param baseToken
  */
 export const balanceUniswapV2ToUniswapV3 = async (
-  poolV2Info: SupportedPoolWithContract<Pair>,
-  poolV3Info: SupportedPoolWithContract<Pool>,
+  fromPoolInfo: SupportedPoolWithContract<Pair>,
+  toPoolInfo: SupportedPoolWithContract<Pool>,
   tokenA: Token
 ) => {
-  const {
-    pool,
-    contract: { address: poolAddress }
-  } = poolV3Info
-  const {
-    pool: initialPair,
-    contract: { address: pairAddress }
-  } = poolV2Info
+  const { pool } = toPoolInfo
+  const { pool: initialPair } = fromPoolInfo
   const tokenB = tokenA === pool.token0 ? pool.token1 : pool.token0
   const tokenC = tokenA
 
@@ -199,25 +193,19 @@ export const balanceUniswapV2ToUniswapV3 = async (
 
   console.log('Finished! Profit:', JSBI.subtract(state.amountC, state.amountA).toString(), 'weiETH')
 
-  return [pairAddress, poolAddress, CurrencyAmount.fromRawAmount(tokenA, state.amountA)]
+  return CurrencyAmount.fromRawAmount(tokenA, state.amountA)
 }
 
 // i.e: V3: WETH->CDAI; V2: CDAI->WETH
 // * @dev We are forced to use exactOutput type trade
 // TODO
 export const balanceUniswapV3ToUniswapV2 = async (
-  poolV3Info: SupportedPoolWithContract<Pool>,
-  poolV2Info: SupportedPoolWithContract<Pair>,
+  fromPoolInfo: SupportedPoolWithContract<Pool>,
+  toPoolInfo: SupportedPoolWithContract<Pair>,
   tokenA: Token
 ) => {
-  const {
-    pool,
-    contract: { address: poolAddress }
-  } = poolV3Info
-  const {
-    pool: initialPair,
-    contract: { address: pairAddress }
-  } = poolV2Info
+  const { pool } = fromPoolInfo
+  const { pool: initialPair } = toPoolInfo
   const tokenB = tokenA === pool.token0 ? pool.token1 : pool.token0
   const tokenC = tokenA
 
@@ -349,5 +337,5 @@ export const balanceUniswapV3ToUniswapV2 = async (
 
   console.log('Finished! Profit:', JSBI.subtract(state.amountC, state.amountA).toString(), ' WETH')
 
-  return [pairAddress, poolAddress, CurrencyAmount.fromRawAmount(tokenA, state.amountA)]
+  return CurrencyAmount.fromRawAmount(tokenA, state.amountA)
 }

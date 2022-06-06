@@ -36,8 +36,27 @@ index d0e2c7c..44df36c 100644
      reserveOf(token: Token): CurrencyAmount<Token>;
      getOutputAmount(inputAmount: CurrencyAmount<Token>): [CurrencyAmount<Token>, Pair];
      getInputAmount(outputAmount: CurrencyAmount<Token>): [CurrencyAmount<Token>, Pair];
+diff --git a/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js b/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js
+index f1a6331..4f21a37 100644
+--- a/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js
++++ b/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js
+@@ -232,11 +232,13 @@ var computePairAddress = function computePairAddress(_ref) {
+   return address.getCreate2Address(factoryAddress, solidity.keccak256(['bytes'], [solidity.pack(['address', 'address'], [token0.address, token1.address])]), INIT_CODE_HASH);
+ };
+ var Pair = /*#__PURE__*/function () {
+-  function Pair(currencyAmountA, tokenAmountB) {
++  function Pair(currencyAmountA, tokenAmountB, feeNumerator, feeDenominator) {
+     var tokenAmounts = currencyAmountA.currency.sortsBefore(tokenAmountB.currency) // does safety checks
+     ? [currencyAmountA, tokenAmountB] : [tokenAmountB, currencyAmountA];
+     this.liquidityToken = new sdkCore.Token(tokenAmounts[0].currency.chainId, Pair.getAddress(tokenAmounts[0].currency, tokenAmounts[1].currency), 18, 'UNI-V2', 'Uniswap V2');
+     this.tokenAmounts = tokenAmounts;
++    this.feeNumerator = feeNumerator ?? JSBI.BigInt(997)
++    this.feeDenominator = feeDenominator ?? JSBI.BigInt(1000)
+   }
+ 
+   Pair.getAddress = function getAddress(tokenA, tokenB) {
 diff --git a/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js b/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js
-index 9a899ed..c984a6b 100644
+index 9a899ed..6eb1367 100644
 --- a/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js
 +++ b/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js
 @@ -11,8 +11,6 @@ var MINIMUM_LIQUIDITY = /*#__PURE__*/JSBI.BigInt(1000); // exports for internal
