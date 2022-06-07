@@ -8,7 +8,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deploy('Arbitrageur', {
     from: deployer,
-    args: ['0xE592427A0AEce92De3Edee1F18E0157C05861564'],
+    args: [],
     log: true,
     autoMine: true // speed up deployment on local network (ganache, hardhat), no effect on live networks
   })
