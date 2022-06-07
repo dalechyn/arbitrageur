@@ -22,25 +22,23 @@ import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
 // Callback data
 import "./libraries/UniswapCallbackData.sol";
-import "./periphery/PeripheryPayments14.sol";
+// import "./periphery/PeripheryPayments14.sol";
 import "./libraries/TickMath14.sol";
 
 // debugging
 import "hardhat/console.sol";
+// import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Arbitrageur is
     IUniswapV2Callee,
-    IUniswapV3SwapCallback,
-    PeripheryPayments14
+    IUniswapV3SwapCallback
 {
     using LowGasSafeMath for uint;
     using LowGasSafeMath for int;
     using SafeCast for uint;
     using SafeCast for int;
 
-    constructor(ISwapRouterExtended _uniswapV3Router)
-        PeripheryImmutableState14(_uniswapV3Router.factory(), _uniswapV3Router.WETH9())
-    {}
+    constructor() {}
 
     function arbitrage(
         uint blockNumber,
@@ -61,8 +59,6 @@ contract Arbitrageur is
 
     // copy from uniswapv2 library with custom fees
     function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut, uint feeNumerator, uint feeDenominator) internal pure returns (uint amountOut) {
-        require(amountIn > 0, 'UniswapV2Library: INSUFFICIENT_INPUT_AMOUNT');
-        require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library: INSUFFICIENT_LIQUIDITY');
         uint amountInWithFee = amountIn.mul(feeNumerator);
         uint numerator = amountInWithFee.mul(reserveOut);
         uint denominator = reserveIn.mul(feeDenominator).add(amountInWithFee);
@@ -74,22 +70,16 @@ contract Arbitrageur is
     function swapV3Pool(
         address pool,
         uint256 amountIn,
-        address recipient,
-        uint160 sqrtPriceLimitX96,
-        bool zeroForOne
-    ) private returns (uint256 amountOut) {
-        // allow swapping to the router address with address 0
-        if (recipient == address(0)) recipient = address(this);
-
+        bool zeroForOne,
+        bytes memory data
+    ) internal returns (uint256 amountOut) {
         (int256 amount0, int256 amount1) =
             IUniswapV3Pool(pool).swap(
-                recipient,
+                address(this),
                 zeroForOne,
                 amountIn.toInt256(),
-                sqrtPriceLimitX96 == 0
-                    ? (zeroForOne ? TickMath14.MIN_SQRT_RATIO + 1 : TickMath14.MAX_SQRT_RATIO - 1)
-                    : sqrtPriceLimitX96,
-                new bytes(0)
+                (zeroForOne ? TickMath14.MIN_SQRT_RATIO + 1 : TickMath14.MAX_SQRT_RATIO - 1),
+                data
             );
 
         return uint256(-(zeroForOne ? amount1 : amount0));
@@ -106,15 +96,14 @@ contract Arbitrageur is
         address poolB, 
         uint8 outType
     ) internal {
-        require(poolA != address(0), "!poolA");
-        address token0 = IUniswapV2Pair(poolA).token0();
+        IUniswapV2Pair _poolA = IUniswapV2Pair(poolA);
+        address token0 = _poolA.token0();
 
         // need to pass some data to trigger uniswapV2Call
         bytes memory data = abi.encode(
             FlashV2CallbackData({
                 baseToken: baseToken,
                 pool: poolB,
-                payer: msg.sender,
                 outType: outType,
                 // saving the amount of tokens to input (WETH for the current bot implementation)
                 // in order to check if the trade was profitable
@@ -126,7 +115,7 @@ contract Arbitrageur is
 
         uint amount0Out; uint amount1Out;
         { 
-            (uint _reserve0, uint _reserve1,) = IUniswapV2Pair(poolA).getReserves();
+            (uint _reserve0, uint _reserve1,) = _poolA.getReserves();
             amount0Out = baseToken == token0
             ? 0
             : getAmountOut(amount, _reserve1, _reserve0, 997, 1000);
@@ -135,7 +124,7 @@ contract Arbitrageur is
             : 0;
         }
 
-        IUniswapV2Pair(poolA).swap(amount0Out, amount1Out, address(this), data);
+        _poolA.swap(amount0Out, amount1Out, address(this), data);
     }
 
     // initiates swap for V3 pool for any amount of tokens (a.k.a flash-swap),
@@ -148,13 +137,13 @@ contract Arbitrageur is
         address poolA,
         address poolB
     ) internal {
-        address token0 = IUniswapV3Pool(poolA).token0();
-        address token1 = IUniswapV3Pool(poolA).token1();
-        bool zeroForOne = baseToken < (baseToken == token0 ? token1 : token0);
-        console.log(baseToken);
-        console.log(zeroForOne);
-        IUniswapV3Pool(poolA).swap(
-            address(this),
+        IUniswapV3Pool _poolA = IUniswapV3Pool(poolA);
+        address token0 = _poolA.token0();
+        bool zeroForOne = baseToken < (baseToken == token0 ? _poolA.token1() : token0);
+        // console.log(baseToken);
+        // console.log(zeroForOne);
+        _poolA.swap(
+            poolB, // direct transfer, then swap after
             zeroForOne,
             amount.toInt256(),
             (
@@ -164,6 +153,7 @@ contract Arbitrageur is
             ),
             abi.encode(
                 FlashV3CallbackData({
+                    swapType: 0,
                     baseToken: baseToken,
                     pair: poolB,
                     payer: msg.sender/* ,
@@ -182,7 +172,6 @@ contract Arbitrageur is
     ) external override {
         IUniswapV2Pair pair = IUniswapV2Pair(msg.sender);
         address token0 = pair.token0();
-        address token1 = pair.token1();
         // decoding the encoded data
         FlashV2CallbackData memory decoded = abi.decode(
             data,
@@ -196,43 +185,46 @@ contract Arbitrageur is
         );*/
         // easier to read, so wrote it like that
         // swapping A->B->C
-        address tokenB = decoded.baseToken == token0 ? token1 : token0;
+        address tokenB = decoded.baseToken == token0 ? pair.token1() : token0;
 
         // figuring out if the amountB is in amount1 or amount0
         // as we swap only from one side to the other one of the amounts is always zero
         uint amountB = amount0 == 0 ? amount1 : amount0;
         uint amountC;
-
+        bool sortsBefore = decoded.baseToken == token0;
         if (decoded.outType == 0) {
             // approving tokenB and swapping tokenB to tokenC(=tokenA)
-            TransferHelper.safeApprove(tokenB, decoded.pool, amountB);
-
             amountC = swapV3Pool(
                 decoded.pool,
                 amountB,
-                address(this),
-                0,
-                tokenB < decoded.baseToken
+                tokenB < decoded.baseToken,
+                abi.encode(
+                    NoFlashV3CallbackData({
+                        swapType: 1,
+                        tokenIn: tokenB
+                    })
+                )
             );
         } else if (decoded.outType == 1) {
-            TransferHelper.safeApprove(tokenB, decoded.pool, amountB);
-
             // first we need to transfer then swap
-            TransferHelper.safeTransferFrom(tokenB, address(this), decoded.pool, amountB);
+            TransferHelper.safeTransfer(tokenB, decoded.pool, amountB);
 
-            (uint _reserve0, uint _reserve1,) = IUniswapV2Pair(pair).getReserves();
-            amountC = getAmountOut(amountB, decoded.baseToken == token0 ? _reserve0 : _reserve1, decoded.baseToken == token0 ? _reserve1 : _reserve0, 997, 1000);
-            IUniswapV2Pair(pair).swap(decoded.baseToken == token0 ? amountC : 0, decoded.baseToken == token1 ? amountC : 0, address(this), data);
+            (uint _reserve0, uint _reserve1,) = IUniswapV2Pair(decoded.pool).getReserves();
+            // console.log(_reserve0);
+            // console.log(_reserve1);
+            amountC = getAmountOut(amountB, sortsBefore ? _reserve1 : _reserve0, sortsBefore ? _reserve0 : _reserve1, 997, 1000);
+            // console.log(amountC);
+            IUniswapV2Pair(decoded.pool).swap(sortsBefore ? amountC : 0, sortsBefore ? 0 : amountC, address(this), new bytes(0));
         }
 
         // check for the profit, if negative - revert
         require(amountC > decoded.amountA, "!profit");
         // transfering owed tokens back to the v2 pair
-        TransferHelper.safeTransfer(decoded.baseToken, address(pair), decoded.amountA);
+        TransferHelper.safeTransfer(decoded.baseToken, msg.sender, decoded.amountA);
         // transferring profit!
         TransferHelper.safeTransfer(
             decoded.baseToken,
-            decoded.payer,
+            _sender,
             amountC - decoded.amountA
         );
     }
@@ -240,14 +232,26 @@ contract Arbitrageur is
     function uniswapV3SwapCallback(
         int amount0Delta,
         int amount1Delta,
-        bytes calldata data
+        bytes memory data
     ) external override {
+        // uint8 will be encoded as uint256, therefore we are checking 32nd byte
+        if (data[31] == 0x01) {
+            // treat as no flash swap
+            NoFlashV3CallbackData memory decodedNoFlash = abi.decode(
+                data,
+                (NoFlashV3CallbackData)
+            );
+            TransferHelper.safeTransfer(decodedNoFlash.tokenIn, msg.sender, amount0Delta > 0
+                    ? uint256(amount0Delta)
+                    : uint256(amount1Delta));
+            return;
+        }
+
         FlashV3CallbackData memory decoded = abi.decode(
             data,
             (FlashV3CallbackData)
         );
         address token0 = IUniswapV3Pool(msg.sender).token0();
-        address token1 = IUniswapV3Pool(msg.sender).token1();
         // making sure the caller is v3 pool
         // edit: no verifies, we use pools directly
         /* CallbackValidation.verifyCallback(
@@ -255,49 +259,42 @@ contract Arbitrageur is
             PoolAddress.PoolKey({token0: token0, token1: token1, fee: fee})
         );*/
 
+        bool sortsBefore = decoded.baseToken == token0;
+
         uint amountA = uint(
-            decoded.baseToken == token0 ? amount0Delta : amount1Delta
+            sortsBefore ? amount0Delta : amount1Delta
         );
         uint amountB = uint(
-            decoded.baseToken == token0 ? -amount1Delta : -amount0Delta
+            sortsBefore ? -amount1Delta : -amount0Delta
         );
-        console.log(amount0Delta > 0, amountA);
-        console.log(amount1Delta > 0, amountB);
+        // console.log(amount0Delta > 0, amountA);
+        // console.log(amount1Delta > 0, amountB);
         
-        // approving the tokenB and swapping amountB to tokenC(=tokenA)
-        TransferHelper.safeApprove(
-            decoded.baseToken == token0 ? token1 : token0,
-            decoded.pair,
-            amountB
-        );
-
-        TransferHelper.safeTransfer(
-            decoded.baseToken == token0 ? token1 : token0,
-            decoded.pair,
-            amountB
-        );
-
         uint amountC;
         {
-            (uint _reserve0, uint _reserve1,) = IUniswapV2Pair(decoded.pair).getReserves();
-            uint reserveIn = decoded.baseToken == token0 ? _reserve1 : _reserve0;
-            uint reserveOut = decoded.baseToken == token0 ? _reserve0 : _reserve1;
+            IUniswapV2Pair pair = IUniswapV2Pair(decoded.pair);
+            (uint _reserve0, uint _reserve1,) = pair.getReserves();
+            uint reserveIn = sortsBefore ? _reserve1 : _reserve0;
+            uint reserveOut = sortsBefore ? _reserve0 : _reserve1;
             amountC = getAmountOut(amountB, reserveIn, reserveOut, 997, 1000);
-            console.log(amountC);
-            IUniswapV2Pair(decoded.pair).swap(decoded.baseToken == token0 ? amountC : 0, decoded.baseToken == token1 ? amountC : 0, address(this), new bytes(0));
+            // console.log(amountC);
+            pair.swap(sortsBefore ? amountC : 0, sortsBefore ? 0 : amountC, address(this), new bytes(0));
         }
 
         // profit check
         require(amountC > amountA, "!profit");
-        TransferHelper.safeApprove(decoded.baseToken, address(this), amountA);
+        // TransferHelper.safeApprove(decoded.baseToken, address(this), amountA);
 
         // return tokens back
-        pay(decoded.baseToken, address(this), msg.sender, amountA);
+        TransferHelper.safeTransfer(decoded.baseToken, msg.sender, amountA);
+        // not gas-friendly, replaced with above
+        // pay(decoded.baseToken, address(this), msg.sender, amountA);
 
         // return the profit
         uint profit = LowGasSafeMath.sub(amountC, amountA);
 
-        TransferHelper.safeApprove(decoded.baseToken, address(this), profit);
-        pay(decoded.baseToken, address(this), decoded.payer, profit);
+        // TransferHelper.safeApprove(decoded.baseToken, address(this), profit);
+        TransferHelper.safeTransfer(decoded.baseToken, decoded.payer, profit);
+        // pay(decoded.baseToken, address(this), decoded.payer, profit);
     }
 }
