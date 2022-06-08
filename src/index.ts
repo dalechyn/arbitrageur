@@ -32,7 +32,7 @@ const main = async () => {
         results.map((r) =>
           createEIP1559Transaction(
             blockNumber,
-            '0xf987d3EF8CE323bc5a4b05191EE49eaceC2b2767',
+            '0xB6aD438a80249caB2771991169dB834Db79BA7F6',
             r.prepareCallData(blockNumber + BLOCKS_IN_THE_FUTURE)
           )
         )
