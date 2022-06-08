@@ -17,8 +17,8 @@ const TOKENS_TO_SPOT = {
     // new Token(Chain.GOERLI, '0xdc31ee1784292379fbb2964b3b9c4124d8f89c60', 18, 'DAI')
     // new Token(Chain.GOERLI, '0x70cba46d2e933030e2f274ae58c951c800548aef', 18, 'BAT')
     // new Token(Chain.GOERLI, '0x822397d9a55d0fefd20F5c4bCaB33C5F65bd28Eb', 8, 'cDAI')
-    // new Token(Chain.GOERLI, '0xd87ba7a50b2e7e660f678a895e4b72e7cb4ccd9c', 6, 'USDC')
-    new Token(Chain.GOERLI, '0xC04B0d3107736C32e19F1c62b2aF67BE61d63a05', 8, 'WBTC')
+    new Token(Chain.GOERLI, '0xd87ba7a50b2e7e660f678a895e4b72e7cb4ccd9c', 6, 'USDC')
+    // new Token(Chain.GOERLI, '0xC04B0d3107736C32e19F1c62b2aF67BE61d63a05', 8, 'WBTC')
     // new Token(Chain.GOERLI, '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6', 18, 'WETH')
   ],
   [Chain.MAINNET]: [
@@ -26,7 +26,7 @@ const TOKENS_TO_SPOT = {
   ]
 }
 
-const SWAPS: GetPriceWithPool[] = [/* UniswapV3 */ UniswapV2, Sushiswap]
+const SWAPS: GetPriceWithPool[] = [UniswapV3, UniswapV2 /*, Sushiswap */]
 
 export const getProfitableOpportunities = async (blockNumber: number) => {
   // TODO: create an array of two non-identical pairs from SWAPS array

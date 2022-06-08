@@ -43,14 +43,51 @@ export class BalanceResult {
 
   prepareCallData(blockNumber: number): string {
     const iface = new ethers.utils.Interface(Arbitrageur.abi)
+
+    let feeNumeratorA: JSBI
+    let feeDenominatorA: JSBI
+    let feeNumeratorB: JSBI
+    let feeDenominatorB: JSBI
+    if (this.from.pool instanceof Pair) {
+      feeNumeratorA = (this.from.pool as Pair).feeNumerator
+      feeDenominatorA = (this.from.pool as Pair).feeDenominator
+    } else if (this.from.pool instanceof Pool) {
+      feeNumeratorA = JSBI.BigInt(0)
+      feeDenominatorA = JSBI.BigInt(0)
+    }
+    if (this.to.pool instanceof Pair) {
+      feeNumeratorB = (this.to.pool as Pair).feeNumerator
+      feeDenominatorB = (this.to.pool as Pair).feeDenominator
+    } else if (this.to.pool instanceof Pool) {
+      feeNumeratorB = JSBI.BigInt(0)
+      feeDenominatorB = JSBI.BigInt(0)
+    }
+
+    const packedFeesAndTypesAndBaseToken = JSBI.bitwiseOr(
+      JSBI.BigInt(BASE_TOKEN.address),
+      JSBI.bitwiseOr(
+        JSBI.leftShift(JSBI.BigInt(this.dexB), JSBI.BigInt(160)),
+        JSBI.bitwiseOr(
+          JSBI.leftShift(JSBI.BigInt(this.dexA), JSBI.BigInt(164)),
+          JSBI.bitwiseOr(
+            JSBI.leftShift(JSBI.BigInt(feeDenominatorB!), JSBI.BigInt(168)),
+            JSBI.bitwiseOr(
+              JSBI.leftShift(JSBI.BigInt(feeNumeratorB!), JSBI.BigInt(184)),
+              JSBI.bitwiseOr(
+                JSBI.leftShift(JSBI.BigInt(feeDenominatorA!), JSBI.BigInt(200)),
+                JSBI.leftShift(JSBI.BigInt(feeNumeratorA!), JSBI.BigInt(216))
+              )
+            )
+          )
+        )
+      )
+    )
     return iface.encodeFunctionData(this.arbMethodName, [
       blockNumber.toString(),
       this.amount.toString(),
-      BASE_TOKEN.address,
+      packedFeesAndTypesAndBaseToken.toString(),
       this.from.contract.address,
-      this.to.contract.address,
-      this.dexA,
-      this.dexB
+      this.to.contract.address
     ])
   }
 }
