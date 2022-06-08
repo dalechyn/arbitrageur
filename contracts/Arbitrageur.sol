@@ -32,27 +32,41 @@ contract Arbitrageur is IUniswapV2Callee, IUniswapV3SwapCallback {
     /// @dev When you're playing with the method by hands don't forget to increase the target block
     /// @param blockNumber Block number to target, revert if current block is bigger
     /// @param amount Amount of tokens to run
-    /// @param baseToken Base token of arbitrage (i.e WETH->???->WETH)
+    /// @param packedFeesAndTypesAndBaseToken Packed variable which consumes
+    /// 32 bytes, with the next perspective from the back:
+    /// 20byte base token address
+    /// 1byte - packed with 4bit typeA and 4bit typeB (0 - UniswapV3, 1 - UniswapV2)
+    /// 2byte feeDenominatorB, 2byte feeNumeratorB,
+    /// 2byte feeDenominatorA, 2byte feeNumeratorA.
+    /// 3 bytes are left and can be used in next versions ofthe contract
     /// @param poolA First pool to swap (A->???->A)
     /// @param poolB Second pool to swap (???->B->???)
-    /// @param typeA Type of the DEX (0 - UniswapV3, 1 - UniswapV2)
     function arbitrage(
         uint blockNumber,
         uint amount,
-        address baseToken,
+        uint packedFeesAndTypesAndBaseToken,
         address poolA,
-        address poolB,
-        uint8 typeA,
-        uint8 typeB
+        address poolB
     ) external {
         require(block.number <= blockNumber, "block");
-        if (typeA == 0) {
-            if (typeB == 1)
-                return arbitrageV3toV2(amount, baseToken, poolA, poolB);
+        if ((packedFeesAndTypesAndBaseToken >> 164) & 0xF == 0) {
+            if ((packedFeesAndTypesAndBaseToken >> 160) & 0xF == 1)
+                return
+                    arbitrageV3toV2(
+                        amount,
+                        packedFeesAndTypesAndBaseToken,
+                        poolA,
+                        poolB
+                    );
             else revert("NS");
-        } else if (typeA == 1)
-            return arbitrageV2toAny(amount, baseToken, poolA, poolB, typeB);
-        else revert("NS");
+        } else
+            return
+                arbitrageV2toAny(
+                    amount,
+                    packedFeesAndTypesAndBaseToken,
+                    poolA,
+                    poolB
+                );
     }
 
     /// @notice Modified getAmountOut method from UniswapV2 with fees
@@ -69,8 +83,8 @@ contract Arbitrageur is IUniswapV2Callee, IUniswapV3SwapCallback {
         uint amountIn,
         uint reserveIn,
         uint reserveOut,
-        uint feeNumerator,
-        uint feeDenominator
+        uint16 feeNumerator,
+        uint16 feeDenominator
     ) internal pure returns (uint amountOut) {
         uint amountInWithFee = amountIn.mul(feeNumerator);
         uint numerator = amountInWithFee.mul(reserveOut);
@@ -98,11 +112,9 @@ contract Arbitrageur is IUniswapV2Callee, IUniswapV3SwapCallback {
             zeroForOne,
             amountIn.toInt256(),
             (
-                zeroForOne
-                    ? /*MIN_SQRT_RATIO+1*/
-                    4295128740
-                    : /*MAX_SQRT_RATIO-1*/
-                    1461446703485210103287273052203988822378723970341
+                zeroForOne /*MIN_SQRT_RATIO+1*/
+                    ? 4295128740 /*MAX_SQRT_RATIO-1*/
+                    : 1461446703485210103287273052203988822378723970341
             ),
             data
         );
@@ -112,32 +124,47 @@ contract Arbitrageur is IUniswapV2Callee, IUniswapV3SwapCallback {
 
     /// @notice initiates arbitrage from UniswapV2 to UniswapV{3,2}
     /// @param amount amount to arbitrage with
-    /// @param baseToken address of the base token
+    /// @param packedFeesAndTypesAndBaseToken Packed variable which consumes
+    /// 32 bytes, with the next perspective from the back:
+    /// 20byte base token address
+    /// 1byte - packed with 4bit typeA and 4bit typeB (0 - UniswapV3, 1 - UniswapV2)
+    /// 2byte feeDenominatorB, 2byte feeNumeratorB,
+    /// 2byte feeDenominatorA, 2byte feeNumeratorA.
+    /// 3 bytes are left and can be used in next versions ofthe contract
     /// @param poolA Pool A (Contract->A->???->Contract)
     /// @param poolB Pool B (Contract->???->B->Contract)
-    /// @param typeB Type of the Pool B (0 - UniswapV3, 1 - UniswapV2)
     function arbitrageV2toAny(
         uint amount,
-        address baseToken,
+        uint packedFeesAndTypesAndBaseToken,
         address poolA,
-        address poolB,
-        uint8 typeB
+        address poolB
     ) internal {
         // sstore poolA for gas savings
         IUniswapV2Pair _poolA = IUniswapV2Pair(poolA);
         address token0 = _poolA.token0();
+        address baseToken = address(
+            uint160(
+                packedFeesAndTypesAndBaseToken &
+                    0x00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+            )
+        );
+        uint16 feeNumeratorA = uint16(packedFeesAndTypesAndBaseToken >> 216);
+        uint16 feeDenominatorA = uint16((packedFeesAndTypesAndBaseToken >> 200) & 0xFFFF);
 
         // pack needed data to catch in uniswapV2Call
         bytes memory data = abi.encode(
             FlashV2CallbackData({
                 baseToken: baseToken,
                 poolB: poolB,
-                typeB: typeB,
+                typeB: uint8((packedFeesAndTypesAndBaseToken >> 160) & 0xF),
                 eoa: msg.sender,
-                amountA: amount /* ,
-                feeNumerator: uint16((packedPoolBAndFeeInfo >> 176) & 0xFFFF),
-                feeDenominator: uint16((packedPoolBAndFeeInfo >> 160) & 0xFFFF)
- */
+                amountA: amount,
+                feeNumeratorB: uint16(
+                    (packedFeesAndTypesAndBaseToken >> 184) & 0xFFFF
+                ),
+                feeDenominatorB: uint16(
+                    (packedFeesAndTypesAndBaseToken >> 168) & 0xFFFF
+                )
             })
         );
 
@@ -148,9 +175,21 @@ contract Arbitrageur is IUniswapV2Callee, IUniswapV3SwapCallback {
             (uint _reserve0, uint _reserve1, ) = _poolA.getReserves();
             amount0Out = baseToken == token0
                 ? 0
-                : getAmountOut(amount, _reserve1, _reserve0, 997, 1000);
+                : getAmountOut(
+                    amount,
+                    _reserve1,
+                    _reserve0,
+                    feeNumeratorA,
+                    feeDenominatorA
+                );
             amount1Out = baseToken == token0
-                ? getAmountOut(amount, _reserve0, _reserve1, 997, 1000)
+                ? getAmountOut(
+                    amount,
+                    _reserve0,
+                    _reserve1,
+                    feeNumeratorA,
+                    feeDenominatorA
+                )
                 : 0;
         }
 
@@ -160,18 +199,30 @@ contract Arbitrageur is IUniswapV2Callee, IUniswapV3SwapCallback {
 
     /// @notice initiates arbitrage from UniswapV3 to UniswapV2 (V3-V3 not supported)
     /// @param amount amount to arbitrage with
-    /// @param baseToken address of the base token
+    /// @param packedFeesAndTypesAndBaseToken Packed variable which consumes
+    /// 32 bytes, with the next perspective from the back:
+    /// 20byte base token address
+    /// 1byte - packed with 4bit typeA and 4bit typeB (0 - UniswapV3, 1 - UniswapV2)
+    /// 2byte feeDenominatorB, 2byte feeNumeratorB,
+    /// 2byte feeDenominatorA, 2byte feeNumeratorA.
+    /// 3 bytes are left and can be used in next versions ofthe contract
     /// @param poolA Pool A (Contract->A->???->Contract)
     /// @param poolB Pool B (Contract->???->B->Contract)
     function arbitrageV3toV2(
         uint amount,
-        address baseToken,
+        uint packedFeesAndTypesAndBaseToken,
         address poolA,
         address poolB
     ) internal {
         // sstore _poolA for gas savings
         IUniswapV3Pool _poolA = IUniswapV3Pool(poolA);
         address token0 = _poolA.token0();
+        address baseToken = address(
+            uint160(
+                packedFeesAndTypesAndBaseToken &
+                    0x00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+            )
+        );
         bool zeroForOne = baseToken <
             (baseToken == token0 ? _poolA.token1() : token0);
         // trigger the V3 swap and catch in uniswapV3SwapCallback
@@ -185,9 +236,13 @@ contract Arbitrageur is IUniswapV2Callee, IUniswapV3SwapCallback {
                     swapType: 0,
                     baseToken: baseToken,
                     poolB: poolB,
-                    eoa: msg.sender /* ,
-                    feeNumerator: feeNumerator,
-                    feeDenominator: feeDenominator */
+                    eoa: msg.sender,
+                    feeNumeratorB: uint16(
+                        (packedFeesAndTypesAndBaseToken >> 184) & 0xFFFF
+                    ),
+                    feeDenominatorB: uint16(
+                        (packedFeesAndTypesAndBaseToken >> 168) & 0xFFFF
+                    )
                 })
             )
         );
@@ -240,8 +295,8 @@ contract Arbitrageur is IUniswapV2Callee, IUniswapV3SwapCallback {
                 amountB,
                 sortsBefore ? _reserve1 : _reserve0,
                 sortsBefore ? _reserve0 : _reserve1,
-                997,
-                1000
+                decoded.feeNumeratorB,
+                decoded.feeDenominatorB
             );
             IUniswapV2Pair(decoded.poolB).swap(
                 sortsBefore ? amountC : 0,
@@ -306,7 +361,13 @@ contract Arbitrageur is IUniswapV2Callee, IUniswapV3SwapCallback {
             (uint _reserve0, uint _reserve1, ) = poolB.getReserves();
             uint reserveIn = sortsBefore ? _reserve1 : _reserve0;
             uint reserveOut = sortsBefore ? _reserve0 : _reserve1;
-            amountC = getAmountOut(amountB, reserveIn, reserveOut, 997, 1000);
+            amountC = getAmountOut(
+                amountB,
+                reserveIn,
+                reserveOut,
+                decoded.feeNumeratorB,
+                decoded.feeDenominatorB
+            );
             poolB.swap(
                 sortsBefore ? amountC : 0,
                 sortsBefore ? 0 : amountC,
