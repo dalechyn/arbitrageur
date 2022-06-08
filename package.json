@@ -19,7 +19,7 @@
     "@flashbots/ethers-provider-bundle": "^0.4.3",
     "@nomiclabs/hardhat-etherscan": "^3.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
-    "@openzeppelin/contracts": "3.4.2-solc-0.7",
+    "@openzeppelin/contracts": "^4.6.0",
     "@uniswap/sdk-core": "^3.0.1",
     "@uniswap/swap-router-contracts": "^1.2.1",
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
@@ -54,7 +54,8 @@
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-standard": "^5.0.0",
     "hardhat-deploy": "^0.11.4",
-    "prettier": "^2.6.2"
+    "prettier": "^2.6.2",
+    "prettier-plugin-solidity": "^1.0.0-beta.19"
   },
   "_moduleAliases": {
     "~constants": "./build/src/constants",

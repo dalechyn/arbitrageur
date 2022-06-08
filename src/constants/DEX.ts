@@ -1,4 +1,5 @@
-export enum DEX {
-  UNISWAPV2 = 'UNISWAPV2',
-  UNISWAPV3 = 'UNISWAPV3'
+// currently only 16 enums are supported
+export enum DEXType {
+  UNISWAPV3,
+  UNISWAPV2
 }

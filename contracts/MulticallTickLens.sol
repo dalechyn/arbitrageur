@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity =0.7.6;
-pragma abicoder v2;
+pragma solidity =0.8.14;
 
 import "@uniswap/v3-periphery/contracts/interfaces/ITickLens.sol";
 import "hardhat/console.sol";
@@ -14,15 +13,21 @@ contract MulticallTickLens {
         lens = ITickLens(_lens);
     }
 
-    function concat(ITickLens.PopulatedTick[] memory arr1, ITickLens.PopulatedTick[] memory arr2) internal pure returns(ITickLens.PopulatedTick[] memory) {
-        ITickLens.PopulatedTick[] memory returnArr = new ITickLens.PopulatedTick[](arr1.length + arr2.length);
+    function concat(
+        ITickLens.PopulatedTick[] memory arr1,
+        ITickLens.PopulatedTick[] memory arr2
+    ) internal pure returns (ITickLens.PopulatedTick[] memory) {
+        ITickLens.PopulatedTick[]
+            memory returnArr = new ITickLens.PopulatedTick[](
+                arr1.length + arr2.length
+            );
 
-        uint i=0;
+        uint i = 0;
         for (; i < arr1.length; i++) {
             returnArr[i] = arr1[i];
         }
 
-        uint j=0;
+        uint j = 0;
         while (j < arr2.length) {
             returnArr[i++] = arr2[j++];
         }
@@ -35,10 +40,13 @@ contract MulticallTickLens {
         int16 tickBitmapIndexStart,
         int16 tickBitmapIndexEnd
     ) external view returns (ITickLens.PopulatedTick[] memory populatedTicks) {
-        for (; tickBitmapIndexStart <= tickBitmapIndexEnd; tickBitmapIndexStart++) {
-            ITickLens.PopulatedTick[] memory ticks = lens.getPopulatedTicksInWord(
-                pool,
-                tickBitmapIndexStart);
+        for (
+            ;
+            tickBitmapIndexStart <= tickBitmapIndexEnd;
+            tickBitmapIndexStart++
+        ) {
+            ITickLens.PopulatedTick[] memory ticks = lens
+                .getPopulatedTicksInWord(pool, tickBitmapIndexStart);
             populatedTicks = concat(populatedTicks, ticks);
         }
         return populatedTicks;
