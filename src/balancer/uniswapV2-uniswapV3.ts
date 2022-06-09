@@ -85,13 +85,13 @@ export const balanceUniswapV2ToUniswapV3 = async (
     )} ⬇️`
   )
   while (true) {
-    logger.debug(
+    /*     logger.debug(
       `Balancing pools, V2 price: ${state.pair
         .priceOf(tokenB)
         .toSignificant(6)} ⬆️, V3 price: ${tickToPrice(tokenB, tokenC, state.tick).toSignificant(
         6
       )} ⬇️`
-    )
+    ) */
     const step: Partial<StepComputations> = {}
     step.sqrtPriceStartX96 = state.sqrtPriceX96
 
@@ -245,11 +245,11 @@ export const balanceUniswapV3ToUniswapV2 = async (
   )
   // The next code is a copy of Pool.swap, except for final price calculation
   while (true) {
-    logger.debug(
+    /*   logger.debug(
       `Balancing pools, V3 price: ${tickToPrice(tokenB, tokenA, state.tick).toSignificant(
         6
       )} ⬆️, V2 price: ${state.pair.priceOf(tokenB).toSignificant(6)} ⬇️`
-    )
+    ) */
     const step: Partial<StepComputations> = {}
     step.sqrtPriceStartX96 = state.sqrtPriceX96
 
