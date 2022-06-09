@@ -18,4 +18,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   })
 }
 export default func
-export const tags = ['MulticallTickLens']
+func.tags = ['MulticallTickLens']

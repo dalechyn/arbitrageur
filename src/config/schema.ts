@@ -69,7 +69,7 @@ export default {
   multiCallTickerLensAddress: {
     doc: 'MultiCall TickerLens Address',
     format: String,
-    default: '0xACb6b805f86D68900e3C5eabe871eAe8687E4a16',
+    default: '0xFAd707E7A61B280beA15Df44018725D941d91B33',
     env: 'MULTICALL_TICKERLENS_ADDRESS'
   },
   dexes: {
@@ -80,11 +80,11 @@ export default {
         default: 0, // UniswapV3
         env: 'DEX_FIRST_TYPE'
       },
-      factoryAddress: {
-        doc: 'First DEX Factory Address',
+      poolAddress: {
+        doc: 'First DEX Pool Address',
         format: formatEth,
-        default: '0x1F98431c8aD98523631AE4a59f267346ea31F984',
-        env: 'DEX_FIRST_FACTORY_ADDRESS'
+        default: '0xe979387E6dAD7D4a92F9aC88e42C6e6461DB8b64', // UniswapV3 WETH-USDC 1%
+        env: 'DEX_FIRST_POOL_ADDRESS'
       },
       fee: {
         numerator: {
@@ -108,11 +108,11 @@ export default {
         default: 1, // UniswapV2
         env: 'DEX_SECOND_TYPE'
       },
-      factoryAddress: {
-        doc: 'Second DEX Factory Address',
+      poolAddress: {
+        doc: 'Second DEX Pool Address',
         format: formatEth,
-        default: '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
-        env: 'DEX_SECOND_FACTORY_ADDRESS'
+        default: '0x00B64e468d2C705A0907F58505536a6C8c49Ab26',
+        env: 'DEX_SECOND_POOLZ_ADDRESS'
       },
       fee: {
         numerator: {

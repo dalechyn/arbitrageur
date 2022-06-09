@@ -1,6 +1,4 @@
 import { Token } from '@uniswap/sdk-core'
-import JSBI from 'jsbi'
-import pino from 'pino'
 
 import { BalancerResult } from './result'
 import { balanceUniswapV2ToUniswapV2 } from './uniswapV2-uniswapV2'
@@ -8,8 +6,6 @@ import { balanceUniswapV2ToUniswapV3, balanceUniswapV3ToUniswapV2 } from './unis
 
 import { SupportedPoolWithContract } from '~interfaces'
 import { DEXType } from '~utils'
-
-const logger = pino()
 
 const DEX_MODULE_ROUTER = {
   [DEXType.UNISWAPV2]: {
@@ -33,13 +29,10 @@ export class Balancer {
    * @param baseToken baseToken
    */
   constructor(
-    private readonly firstPools: SupportedPoolWithContract[],
-    private readonly secondPools: SupportedPoolWithContract[],
+    private readonly firstPool: SupportedPoolWithContract,
+    private readonly secondPool: SupportedPoolWithContract,
     private readonly baseToken: Token
-  ) {
-    if (firstPools.length === 0 || secondPools.length === 0)
-      throw new Error('Insufficient prices to compare')
-  }
+  ) {}
 
   /**
    *
@@ -66,30 +59,10 @@ export class Balancer {
   public async getMostProfitableArbitrage(): Promise<BalancerResult> {
     // We can only find the direction of the trades - by comparing the prices
     // and there is no sense in running an arbitrafe if from price is less than to price
-    const allBalanceResults = (
-      await Promise.all(
-        this.firstPools.map(async (from) => {
-          const results = []
-
-          for (const to of this.secondPools) {
-            const zeroForOne = from.price.lessThan(to.price)
-            try {
-              const result = await this.balance(zeroForOne ? from : to, zeroForOne ? to : from)
-              results.push(result)
-            } catch (e) {
-              logger.error(e)
-            }
-          }
-
-          return results
-        })
-      )
-    ).flat()
-
-    const sortedBalanceResults = allBalanceResults.sort((a, b) =>
-      JSBI.lessThan(a.profit, b.profit) ? 1 : -1
+    const zeroForOne = this.firstPool.price.lessThan(this.secondPool.price)
+    return await this.balance(
+      zeroForOne ? this.firstPool : this.secondPool,
+      zeroForOne ? this.secondPool : this.firstPool
     )
-
-    return sortedBalanceResults[0]
   }
 }

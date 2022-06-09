@@ -1,9 +1,7 @@
 import { Provider } from '@ethersproject/abstract-provider'
 import { Token, CurrencyAmount } from '@uniswap/sdk-core'
-import UniswapV2Factory from '@uniswap/v2-core/build/UniswapV2Factory.json'
 import UniswapV2Pair from '@uniswap/v2-core/build/UniswapV2Pair.json'
 import { Pair } from '@uniswap/v2-sdk'
-import { ADDRESS_ZERO } from '@uniswap/v3-sdk'
 import { Contract } from 'ethers'
 import pino from 'pino'
 
@@ -14,22 +12,13 @@ import { DEXType } from '~utils'
 const logger = pino()
 
 export const getUniswapV2PairWithPrices: GetPoolWithPricesFn = async (
-  factoryAddress: string,
+  poolAddress: string,
   baseToken: Token,
   quoteToken: Token,
   provider: Provider
 ) => {
-  const factory = new Contract(factoryAddress, UniswapV2Factory.abi, provider)
-
-  const pairAddress = await factory.getPair(baseToken.address, quoteToken.address)
-
-  if (pairAddress === ADDRESS_ZERO) {
-    logger.warn(`UniswapV2: ${baseToken.symbol}-${quoteToken.symbol} pair does not exist`)
-    return []
-  }
-
-  logger.info(`UniswapV2: Checking ${baseToken.symbol}-${quoteToken.symbol}: ${pairAddress}`)
-  const pairContract = new Contract(pairAddress, UniswapV2Pair.abi, provider)
+  logger.info(`UniswapV2: Checking ${baseToken.symbol}-${quoteToken.symbol}: ${poolAddress}`)
+  const pairContract = new Contract(poolAddress, UniswapV2Pair.abi, provider)
   const { _reserve0, _reserve1 } = await pairContract.getReserves()
   const [reserveA, reserveB] = baseToken.sortsBefore(quoteToken)
     ? [_reserve0, _reserve1]
@@ -38,12 +27,10 @@ export const getUniswapV2PairWithPrices: GetPoolWithPricesFn = async (
     CurrencyAmount.fromRawAmount(baseToken, reserveA),
     CurrencyAmount.fromRawAmount(quoteToken, reserveB)
   )
-  return [
-    {
-      price: pair.priceOf(quoteToken),
-      contract: pairContract,
-      pool: pair,
-      type: DEXType.UNISWAPV2
-    }
-  ]
+  return {
+    price: pair.priceOf(quoteToken),
+    contract: pairContract,
+    pool: pair,
+    type: DEXType.UNISWAPV2
+  }
 }

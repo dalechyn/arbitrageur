@@ -1,5 +1,7 @@
 import { Provider, TransactionRequest } from '@ethersproject/abstract-provider'
 import { FlashbotsBundleProvider } from '@flashbots/ethers-provider-bundle'
+import { BigNumber } from 'ethers'
+import JSBI from 'jsbi'
 
 export const createEIP1559Transaction = async (
   blockNumber: number,
@@ -7,6 +9,7 @@ export const createEIP1559Transaction = async (
   data: string,
   blocksInFuture: number,
   chainId: number,
+  tipToMiner: JSBI,
   provider: Provider
 ): Promise<TransactionRequest> => {
   const block = await provider.getBlock(blockNumber)
@@ -15,13 +18,17 @@ export const createEIP1559Transaction = async (
     block.baseFeePerGas,
     blocksInFuture
   )
-  return {
+  const transaction = {
     to,
     type: 2,
     data: data ?? '0x',
-    maxFeePerGas: maxBaseFeeInFutureBlock,
-    maxPriorityFeePerGas: 0,
     gasLimit: 1000000,
     chainId
+  }
+  const totalGas = await provider.estimateGas(transaction)
+  return {
+    ...transaction,
+    maxFeePerGas: maxBaseFeeInFutureBlock.add(BigNumber.from(tipToMiner.toString()).div(totalGas)),
+    maxPriorityFeePerGas: 2
   }
 }

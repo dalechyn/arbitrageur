@@ -22,7 +22,7 @@ export class Fetcher {
     baseToken: Token,
     quoteToken: Token,
     provider: Provider
-  ): Promise<[SupportedPoolWithContract[], SupportedPoolWithContract[]]> {
+  ): Promise<[SupportedPoolWithContract, SupportedPoolWithContract]> {
     return [
       await this.dexRecord[this.dexTypeA](factoryAddressA, baseToken, quoteToken, provider),
       await this.dexRecord[this.dexTypeB](factoryAddressB, baseToken, quoteToken, provider)
