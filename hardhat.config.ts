@@ -45,7 +45,7 @@ const config: HardhatUserConfig = {
     },
     goerli: {
       url: 'https://eth-goerli.alchemyapi.io/v2/oKG7sMevlL_ZQgGcZCOTEsaksS_nM922',
-      accounts: [process.env.KEY]
+      accounts: [process.env.KEY as string]
     }
   },
   etherscan: {

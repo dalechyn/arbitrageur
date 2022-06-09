@@ -1,7 +1,7 @@
 import JSBI from 'jsbi'
 import invariant from 'tiny-invariant'
 
-export abstract class MathUtils {
+export abstract class JSBIUtils {
   public static sqrt(value: JSBI) {
     invariant(JSBI.greaterThan(value, JSBI.BigInt(2)), 'NEGATIVE')
     if (JSBI.lessThanOrEqual(value, JSBI.BigInt(2))) {

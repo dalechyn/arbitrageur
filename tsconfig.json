@@ -19,8 +19,6 @@
     "sourceMap": true,
     "baseUrl": "./src/",
     "paths": {
-      "~constants": ["constants"],
-      "~constants/*": ["constants/*"],
       "~balancer": ["balancer"],
       "~balancer/*": ["balancer/*"],
       "~fetcher": ["fetcher"],
@@ -29,10 +27,10 @@
       "~interfaces/*": ["interfaces/*"],
       "~transactions": ["transactions"],
       "~transactions/*": ["transactions/*"],
-      "~units": ["units"],
-      "~units/*": ["units/*"],
       "~utils": ["utils"],
-      "~utils/*": ["utils/*"]
+      "~utils/*": ["utils/*"],
+      "~config": ["config"],
+      "~config/*": ["config/*"]
     }
   },
   "include": [

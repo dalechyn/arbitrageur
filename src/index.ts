@@ -3,49 +3,70 @@ import {
   FlashbotsBundleProvider,
   FlashbotsBundleResolution
 } from '@flashbots/ethers-provider-bundle'
+import { Token } from '@uniswap/sdk-core'
+import { Wallet } from 'ethers'
 
-import { BLOCKS_IN_THE_FUTURE, CHAIN_ID } from './constants'
-import { getProfitableOpportunities } from './fetcher'
+import { Fetcher } from './fetcher'
 import { createEIP1559Transaction } from './transactions'
-import { ethProvider } from './utils'
-import { authSigner } from './wallet'
+import { createProvider } from './utils'
 
-// Standard json rpc provider directly from ethers.js (NOT Flashbots)
+import { Balancer } from '~balancer'
+import { config } from '~config'
 
-// `authSigner` is an Ethereum private key that does NOT store funds and is NOT your bot's primary key.
-// This is an identifying key for signing payloads to establish reputation and whitelisting
-// In production, this should be used across multiple bundles to build relationship. In this example, we generate a new wallet each time
+const baseToken = new Token(
+  config.get('network.chainId'),
+  config.get('baseToken.address'),
+  config.get('baseToken.decimals'),
+  config.get('baseToken.name')
+)
 
-// Flashbots provider requires passing in a standard provider
+const quoteToken = new Token(
+  config.get('network.chainId'),
+  config.get('quoteToken.address'),
+  config.get('quoteToken.decimals'),
+  config.get('quoteToken.name')
+)
+
+const authSigner = new Wallet(config.get('key'))
+const ethProvider = createProvider(config.get('network.rpcUrl'), config.get('network.chainId'))
 const main = async () => {
   const flashbotsProvider = await FlashbotsBundleProvider.create(
-    ethProvider, // a normal ethers.js provider, to perform gas estimiations and nonce lookups
-    authSigner, // ethers.js signer wallet, only for signing request payloads, not transactions
-    ...(CHAIN_ID === 5 ? ['https://relay-goerli.flashbots.net'] : [])
+    ethProvider,
+    authSigner,
+    ...(config.get('network.chainId') === 5 ? ['https://relay-goerli.flashbots.net'] : [])
   )
 
   ethProvider.on('block', async (blockNumber) => {
     try {
-      const results = await getProfitableOpportunities(blockNumber)
-
-      const transactions = await Promise.all(
-        results.map((r) =>
-          createEIP1559Transaction(
-            blockNumber,
-            '0xB6aD438a80249caB2771991169dB834Db79BA7F6',
-            r.prepareCallData(blockNumber + BLOCKS_IN_THE_FUTURE)
-          )
-        )
+      const fetcher = new Fetcher(config.get('dexes.first.type'), config.get('dexes.second.type'))
+      const [firstPools, secondPools] = await fetcher.fetch(
+        config.get('dexes.first.factoryAddress'),
+        config.get('dexes.second.factoryAddress'),
+        baseToken,
+        quoteToken,
+        ethProvider
       )
 
-      const signedTransactions = await flashbotsProvider.signBundle(
-        transactions.map((transaction) => ({
+      const balancer = new Balancer(firstPools, secondPools, baseToken)
+      const result = await balancer.getMostProfitableArbitrage()
+
+      const targetBlock = blockNumber + config.get('network.blocksInFuture')
+      const transaction = await createEIP1559Transaction(
+        targetBlock,
+        config.get('arbitrageur.address'),
+        result.prepareCallData(targetBlock, baseToken.address),
+        config.get('network.blocksInFuture'),
+        config.get('network.chainId'),
+        ethProvider
+      )
+
+      const signedTransactions = await flashbotsProvider.signBundle([
+        {
           signer: authSigner,
           transaction
-        }))
-      )
+        }
+      ])
 
-      const targetBlock = blockNumber + BLOCKS_IN_THE_FUTURE
       const simulation = await flashbotsProvider.simulate(signedTransactions, targetBlock)
       if ('error' in simulation) {
         console.warn(`Simulation Error: ${simulation.error.message}`)

@@ -3,7 +3,8 @@ import { Pair } from '@uniswap/v2-sdk'
 import { LiquidityMath, Pool, priceToClosestTick, TickMath, tickToPrice } from '@uniswap/v3-sdk'
 import JSBI from 'jsbi'
 
-import { SwapToPriceMath } from '~fetcher/uniswapV3/swapToPriceMath'
+import { SwapToPriceMath } from './swapToPriceMath'
+
 import { SupportedPoolWithContract } from '~interfaces'
 import { FractionUtils } from '~utils'
 
@@ -191,9 +192,10 @@ export const balanceUniswapV2ToUniswapV3 = async (
   // REQ -> NODE -> SYNC (ETH)
   // LOCAL REQ -> NODE -> SYNC
 
-  console.log('Finished! Profit:', JSBI.subtract(state.amountC, state.amountA).toString(), 'weiETH')
+  const profit = JSBI.subtract(state.amountC, state.amountA)
+  console.log('Finished! Profit:', profit.toString(), 'weiETH')
 
-  return CurrencyAmount.fromRawAmount(tokenA, state.amountA)
+  return [state.amountA, profit]
 }
 
 // i.e: V3: WETH->CDAI; V2: CDAI->WETH
@@ -335,7 +337,8 @@ export const balanceUniswapV3ToUniswapV2 = async (
     }
   }
 
-  console.log('Finished! Profit:', JSBI.subtract(state.amountC, state.amountA).toString(), ' WETH')
+  const profit = JSBI.subtract(state.amountC, state.amountA)
+  console.log('Finished! Profit:', profit.toString(), ' WETH')
 
-  return CurrencyAmount.fromRawAmount(tokenA, state.amountA)
+  return [state.amountA, profit]
 }
