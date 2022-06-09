@@ -1,13 +1,12 @@
 import { Token } from '@uniswap/sdk-core'
-import { Pair } from '@uniswap/v2-sdk'
-import { Pool } from '@uniswap/v3-sdk'
+import JSBI from 'jsbi'
 
-import { BalanceResult } from './result'
+import { BalancerResult } from './result'
 import { balanceUniswapV2ToUniswapV2 } from './uniswapV2-uniswapV2'
 import { balanceUniswapV2ToUniswapV3, balanceUniswapV3ToUniswapV2 } from './uniswapV2-uniswapV3'
 
-import { DEXType } from '~constants'
 import { SupportedPoolWithContract } from '~interfaces'
+import { DEXType } from '~utils'
 
 const DEX_MODULE_ROUTER = {
   [DEXType.UNISWAPV2]: {
@@ -20,35 +19,74 @@ const DEX_MODULE_ROUTER = {
   }
 }
 
-// noinspection SuspiciousTypeOfGuard
-/***
- @description Implementations of finding up equilibrium are different for all
-
- DEXes, so a lookuper is written in constructor
+/**
+ * @description finds and balances the most profitable arbitrage opportunities
  */
 export class Balancer {
-  private readonly p1DEX: DEXType
-  private readonly p2DEX: DEXType
+  /**
+   * Creates Balancer entity
+   * @param firstPools pools from the first DEX that have quote token
+   * @param secondPools pools from the second DEX that have quote token
+   * @param baseToken baseToken
+   */
   constructor(
-    private readonly p1: SupportedPoolWithContract,
-    private readonly p2: SupportedPoolWithContract,
+    private readonly firstPools: SupportedPoolWithContract[],
+    private readonly secondPools: SupportedPoolWithContract[],
     private readonly baseToken: Token
   ) {
-    this.p1DEX = Balancer.findDEX(p1)
-    this.p2DEX = Balancer.findDEX(p2)
+    if (firstPools.length === 0 || secondPools.length === 0)
+      throw new Error('Insufficient prices to compare')
   }
 
-  private static findDEX(p: SupportedPoolWithContract): DEXType {
-    if (p.pool instanceof Pool) return DEXType.UNISWAPV3
-    if (p.pool instanceof Pair) return DEXType.UNISWAPV2
-    throw new Error('DEX from one of the pools is not supported')
-  }
-
-  public async balance(): Promise<BalanceResult> {
-    const f = DEX_MODULE_ROUTER[this.p1DEX][this.p2DEX]
-    if (!f) throw new Error(`${this.p1DEX}-${this.p2DEX} are not supported`)
+  /**
+   *
+   * @param from pool to balance from
+   * @param to pool to balance to
+   * @returns BalanceResult - result of the balancing
+   */
+  private async balance(
+    from: SupportedPoolWithContract,
+    to: SupportedPoolWithContract
+  ): Promise<BalancerResult> {
+    const f = DEX_MODULE_ROUTER[from.type][to.type]
+    if (!f) throw new Error(`${from.type}-${to.type} is not supported`)
     // @ts-expect-error Error is suppressed for easier typing.
-    const amountIn = await f(this.p1, this.p2, this.baseToken)
-    return new BalanceResult(this.p1, this.p2, amountIn.quotient)
+    const [amountIn, profit] = await f(from, to, this.baseToken)
+    return new BalancerResult(from, to, amountIn, profit)
+  }
+
+  /**
+   * @description Gets most profitable arbitrage opportunity.
+   * As we don't know how much profit can be extracted from liquidity difference,
+   * we have to run and check by hands all combinations of pools from and to
+   */
+  public async getMostProfitableArbitrage(): Promise<BalancerResult> {
+    // We can only find the direction of the trades - by comparing the prices
+    // and there is no sense in running an arbitrafe if from price is less than to price
+    const allBalanceResults = (
+      await Promise.all(
+        this.firstPools.map(async (from) => {
+          const results = []
+
+          for (const to of this.secondPools) {
+            const zeroForOne = from.price.lessThan(to.price)
+            try {
+              const result = await this.balance(zeroForOne ? from : to, zeroForOne ? to : from)
+              results.push(result)
+            } catch (e) {
+              console.log(e)
+            }
+          }
+
+          return results
+        })
+      )
+    ).flat()
+
+    const sortedBalanceResults = allBalanceResults.sort((a, b) =>
+      JSBI.lessThan(a.profit, b.profit) ? 1 : -1
+    )
+
+    return sortedBalanceResults[0]
   }
 }

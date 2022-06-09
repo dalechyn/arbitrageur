@@ -2,16 +2,11 @@ import { CurrencyAmount, Fraction, Token } from '@uniswap/sdk-core'
 import { FeeAmount, FullMath, SqrtPriceMath } from '@uniswap/v3-sdk'
 import JSBI from 'jsbi'
 
-import { MathUtils } from '~utils'
+import { JSBIUtils } from '~utils'
 
 const MAX_FEE = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(6))
 
 export abstract class SwapToPriceMath {
-  /**
-   * Cannot be constructed.
-   */
-  private constructor() {}
-
   public static computeSwapStep(
     sqrtRatioCurrentX96: JSBI,
     sqrtRatioTargetX96: JSBI,
@@ -97,7 +92,7 @@ export abstract class SwapToPriceMath {
       tNumerator
     )
 
-    const numeratorRightSide = MathUtils.sqrt(
+    const numeratorRightSide = JSBIUtils.sqrt(
       JSBI.multiply(
         tNumerator,
         JSBI.multiply(

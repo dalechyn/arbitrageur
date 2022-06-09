@@ -5,15 +5,16 @@ import JSBI from 'jsbi'
 
 import Arbitrageur from '../../deployments/goerli/Arbitrageur.json'
 
-import { BASE_TOKEN, DEXType } from '~constants'
 import { SupportedPoolWithContract } from '~interfaces'
+import { DEXType } from '~utils'
 
-export class BalanceResult {
+export class BalancerResult {
   private readonly arbMethodName = 'arbitrage'
   constructor(
-    private readonly from: SupportedPoolWithContract,
-    private readonly to: SupportedPoolWithContract,
-    private readonly amount: JSBI
+    public readonly from: SupportedPoolWithContract,
+    public readonly to: SupportedPoolWithContract,
+    public readonly amount: JSBI,
+    public readonly profit: JSBI
   ) {}
 
   log() {
@@ -41,7 +42,7 @@ export class BalanceResult {
     return this.findDex(this.to)
   }
 
-  prepareCallData(blockNumber: number): string {
+  prepareCallData(blockNumber: number, baseTokenAdddress: string): string {
     const iface = new ethers.utils.Interface(Arbitrageur.abi)
 
     let feeNumeratorA: JSBI
@@ -64,7 +65,7 @@ export class BalanceResult {
     }
 
     const packedFeesAndTypesAndBaseToken = JSBI.bitwiseOr(
-      JSBI.BigInt(BASE_TOKEN.address),
+      JSBI.BigInt(baseTokenAdddress),
       JSBI.bitwiseOr(
         JSBI.leftShift(JSBI.BigInt(this.dexB), JSBI.BigInt(160)),
         JSBI.bitwiseOr(

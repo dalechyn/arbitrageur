@@ -3,7 +3,7 @@ import { Pair } from '@uniswap/v2-sdk'
 import JSBI from 'jsbi'
 
 import { SupportedPoolWithContract } from '~interfaces'
-import { MathUtils } from '~utils/mathUtils'
+import { JSBIUtils } from '~utils/jsbiUtils'
 
 function getReserves(
   token: Token,
@@ -28,7 +28,7 @@ function calculateMaxPoint(
   FEE_DENOMINATOR_1: JSBI
 ) {
   const numerator = JSBI.subtract(
-    MathUtils.sqrt(
+    JSBIUtils.sqrt(
       [
         reservesIn0,
         reservesOut0,
@@ -128,5 +128,5 @@ export async function balanceUniswapV2ToUniswapV2(
   console.log('Finished! Amount:', x.toString(), ' weiWETH')
   console.log('Finished! Profit:', maxProfit.toSignificant(), ' WETH')
 
-  return amountIn
+  return [amountIn.quotient, maxProfit.quotient]
 }
