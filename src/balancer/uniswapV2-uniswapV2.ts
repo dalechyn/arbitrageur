@@ -1,9 +1,12 @@
 import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import JSBI from 'jsbi'
+import pino from 'pino'
 
 import { SupportedPoolWithContract } from '~interfaces'
 import { JSBIUtils } from '~utils/jsbiUtils'
+
+const logger = pino()
 
 function getReserves(
   token: Token,
@@ -72,6 +75,11 @@ export async function balanceUniswapV2ToUniswapV2(
   secondPoolV2Info: SupportedPoolWithContract<Pair>,
   tokenA: Token
 ) {
+  logger.info(
+    `Balancing pools, V2 price: ${firstPoolV2Info.pool
+      .priceOf(tokenA)
+      .toSignificant(6)}, V2 price:${secondPoolV2Info.pool.priceOf(tokenA).toSignificant(6)}`
+  )
   const [reservesIn0, reservesOut0] = getReserves(tokenA, firstPoolV2Info).map((r) => r.quotient)
   const [reservesOut1, reservesIn1] = getReserves(tokenA, secondPoolV2Info).map((r) => r.quotient)
 
@@ -125,8 +133,8 @@ export async function balanceUniswapV2ToUniswapV2(
     results.map(({ x, y, z }) => `${x},${y},${z}\n`)
   )  */
 
-  console.log('Finished! Amount:', x.toString(), ' weiWETH')
-  console.log('Finished! Profit:', maxProfit.toSignificant(), ' WETH')
+  logger.info('Finished! Amount:', x.toString(), ' weiWETH')
+  logger.info('Finished! Profit:', maxProfit.toSignificant(), ' WETH')
 
   return [amountIn.quotient, maxProfit.quotient]
 }

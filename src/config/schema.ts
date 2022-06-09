@@ -134,7 +134,7 @@ export default {
     address: {
       doc: 'Arbitrageur Address',
       format: formatEth,
-      default: '0xB6aD438a80249caB2771991169dB834Db79BA7F6',
+      default: '0xf425006e4032f5639a0e892bfd7381e7b27f2db6',
       env: 'ARBITRAGEUR_ADDRESS'
     }
   },

@@ -5,10 +5,13 @@ import UniswapV2Pair from '@uniswap/v2-core/build/UniswapV2Pair.json'
 import { Pair } from '@uniswap/v2-sdk'
 import { ADDRESS_ZERO } from '@uniswap/v3-sdk'
 import { Contract } from 'ethers'
+import pino from 'pino'
 
 import { GetPoolWithPricesFn } from '../interfaces'
 
 import { DEXType } from '~utils'
+
+const logger = pino()
 
 export const getUniswapV2PairWithPrices: GetPoolWithPricesFn = async (
   factoryAddress: string,
@@ -21,11 +24,11 @@ export const getUniswapV2PairWithPrices: GetPoolWithPricesFn = async (
   const pairAddress = await factory.getPair(baseToken.address, quoteToken.address)
 
   if (pairAddress === ADDRESS_ZERO) {
-    console.warn(`UniswapV2: ${baseToken.symbol}-${quoteToken.symbol} pair does not exist`)
+    logger.warn(`UniswapV2: ${baseToken.symbol}-${quoteToken.symbol} pair does not exist`)
     return []
   }
 
-  console.info(`UniswapV2: Checking ${baseToken.symbol}-${quoteToken.symbol}: ${pairAddress}`)
+  logger.info(`UniswapV2: Checking ${baseToken.symbol}-${quoteToken.symbol}: ${pairAddress}`)
   const pairContract = new Contract(pairAddress, UniswapV2Pair.abi, provider)
   const { _reserve0, _reserve1 } = await pairContract.getReserves()
   const [reserveA, reserveB] = baseToken.sortsBefore(quoteToken)

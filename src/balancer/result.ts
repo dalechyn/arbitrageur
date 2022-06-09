@@ -2,11 +2,14 @@ import { Pair } from '@uniswap/v2-sdk'
 import { Pool } from '@uniswap/v3-sdk'
 import { ethers } from 'ethers'
 import JSBI from 'jsbi'
+import pino from 'pino'
 
 import Arbitrageur from '../../deployments/goerli/Arbitrageur.json'
 
 import { SupportedPoolWithContract } from '~interfaces'
 import { DEXType } from '~utils'
+
+const logger = pino()
 
 export class BalancerResult {
   private readonly arbMethodName = 'arbitrage'
@@ -18,7 +21,7 @@ export class BalancerResult {
   ) {}
 
   log() {
-    console.log(
+    logger.info(
       'Start arbitrage from',
       this.from.contract.address,
       'to',

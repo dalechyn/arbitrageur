@@ -5,6 +5,7 @@ import {
 } from '@flashbots/ethers-provider-bundle'
 import { Token } from '@uniswap/sdk-core'
 import { Wallet } from 'ethers'
+import { pino } from 'pino'
 
 import { Fetcher } from './fetcher'
 import { createEIP1559Transaction } from './transactions'
@@ -12,6 +13,8 @@ import { createProvider } from './utils'
 
 import { Balancer } from '~balancer'
 import { config } from '~config'
+
+const logger = pino()
 
 const baseToken = new Token(
   config.get('network.chainId'),
@@ -27,6 +30,8 @@ const quoteToken = new Token(
   config.get('quoteToken.name')
 )
 
+let skipToBlock: undefined | number
+
 const authSigner = new Wallet(config.get('key'))
 const ethProvider = createProvider(config.get('network.rpcUrl'), config.get('network.chainId'))
 const main = async () => {
@@ -37,6 +42,12 @@ const main = async () => {
   )
 
   ethProvider.on('block', async (blockNumber) => {
+    logger.warn(`New block arrived: ${blockNumber}`)
+    if (skipToBlock && skipToBlock <= blockNumber) {
+      logger.warn(`Skipping block ${blockNumber}, waiting for ${skipToBlock}`)
+      return
+    }
+
     try {
       const fetcher = new Fetcher(config.get('dexes.first.type'), config.get('dexes.second.type'))
       const [firstPools, secondPools] = await fetcher.fetch(
@@ -52,7 +63,7 @@ const main = async () => {
 
       const targetBlock = blockNumber + config.get('network.blocksInFuture')
       const transaction = await createEIP1559Transaction(
-        targetBlock,
+        blockNumber,
         config.get('arbitrageur.address'),
         result.prepareCallData(targetBlock, baseToken.address),
         config.get('network.blocksInFuture'),
@@ -69,34 +80,35 @@ const main = async () => {
 
       const simulation = await flashbotsProvider.simulate(signedTransactions, targetBlock)
       if ('error' in simulation) {
-        console.warn(`Simulation Error: ${simulation.error.message}`)
+        logger.warn(`Simulation Error: ${simulation.error.message}`)
         process.exit(1)
       } else {
-        console.log(`Simulation Success: ${JSON.stringify(simulation, null, 2)}`)
+        logger.info(`Simulation Success: ${JSON.stringify(simulation, null, 2)}`)
       }
       const bundleSubmission = await flashbotsProvider.sendRawBundle(
         signedTransactions,
         targetBlock
       )
-      console.log('bundle submitted, waiting')
+      logger.info('Bundle submitted, waiting')
       if ('error' in bundleSubmission) {
         throw new Error(bundleSubmission.error.message)
       }
       const waitResponse = await bundleSubmission.wait()
-      console.log(`Wait Response: ${FlashbotsBundleResolution[waitResponse]}`)
+      logger.info(`Wait Response: ${FlashbotsBundleResolution[waitResponse]}`)
       if (
         waitResponse === FlashbotsBundleResolution.BundleIncluded ||
         waitResponse === FlashbotsBundleResolution.AccountNonceTooHigh
       ) {
         process.exit(0)
       } else {
-        console.log({
+        logger.info({
           bundleStats: await flashbotsProvider.getBundleStats(simulation.bundleHash, targetBlock),
           userStats: await flashbotsProvider.getUserStats()
         })
+        skipToBlock = targetBlock
       }
     } catch (e) {
-      console.error(e)
+      logger.error(e)
     }
   })
 }

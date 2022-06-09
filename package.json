@@ -6,8 +6,8 @@
   "license": "MIT",
   "scripts": {
     "postinstall": "yarn patch-package",
-    "start:testnet": "tsc && node --enable-source-maps -r dotenv/config ./build/src/index.js dotenv_config_path=.env.testnet",
-    "start:mainnet": "tsc && node --enable-source-maps -r dotenv/config ./build/src/index.js dotenv_config_path=.env.mainnet",
+    "start:testnet": "tsc && node --enable-source-maps -r dotenv/config ./build/src/index.js dotenv_config_path=.env.testnet | pino-pretty -t",
+    "start:mainnet": "tsc && node --enable-source-maps -r dotenv/config ./build/src/index.js dotenv_config_path=.env.mainnet | pino-pretty -t",
     "deploy:goerli": "yarn hardhat deploy --network goerli",
     "console:goerli": "yarn hardhat console --network goerli",
     "fork:console": "HARDHAT_FORK=goerli yarn hardhat console",
@@ -36,6 +36,8 @@
     "jsbi": "^3.1.4",
     "module-alias": "^2.2.2",
     "multicoin-address-validator": "^0.5.10",
+    "pino": "^8.0.0",
+    "pino-pretty": "^8.0.0",
     "tiny-invariant": "^1.2.0",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3"
