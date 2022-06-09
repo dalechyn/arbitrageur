@@ -2,6 +2,7 @@ import { CurrencyAmount, Price, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { LiquidityMath, Pool, priceToClosestTick, TickMath, tickToPrice } from '@uniswap/v3-sdk'
 import JSBI from 'jsbi'
+import pino from 'pino'
 
 import { SwapToPriceMath } from './swapToPriceMath'
 
@@ -9,6 +10,8 @@ import { SupportedPoolWithContract } from '~interfaces'
 import { FractionUtils } from '~utils'
 
 const NEGATIVE_ONE = JSBI.BigInt(-1)
+
+const logger = pino()
 
 // same as priceToClosestTick, but selects not the one that equal or the less,
 // but the one which has the minimum between the price given and nearest upper
@@ -74,13 +77,20 @@ export const balanceUniswapV2ToUniswapV3 = async (
   }
 
   // The next code is a copy of Pool.swap, except for final price calculation
+  logger.info(
+    `Balancing pools, V2 price: ${state.pair
+      .priceOf(tokenB)
+      .toSignificant(6)} ⬆️, V3 price: ${tickToPrice(tokenB, tokenC, state.tick).toSignificant(
+      6
+    )} ⬇️`
+  )
   while (true) {
-    console.log(
-      'Balancing pools, V2 price:',
-      state.pair.priceOf(tokenB).toSignificant(6),
-      '⬆️, V3 price:',
-      tickToPrice(tokenB, tokenC, state.tick).toSignificant(6),
-      '⬇️'
+    logger.debug(
+      `Balancing pools, V2 price: ${state.pair
+        .priceOf(tokenB)
+        .toSignificant(6)} ⬆️, V3 price: ${tickToPrice(tokenB, tokenC, state.tick).toSignificant(
+        6
+      )} ⬇️`
     )
     const step: Partial<StepComputations> = {}
     step.sqrtPriceStartX96 = state.sqrtPriceX96
@@ -134,7 +144,7 @@ export const balanceUniswapV2ToUniswapV3 = async (
       pairUpdated.priceOf(tokenB).greaterThan(nextV3Price) &&
       JSBI.notEqual(step.sqrtPriceNextX96, sqrtPriceFinalX96)
     ) {
-      console.log('Last step! V3 reached, pulling V2 price to match V3')
+      logger.debug('Last step! V3 reached, pulling V2 price to match V3')
       const amountIn = SwapToPriceMath.computeAmountOfTokensToPrice(
         initialPair.reserveOf(tokenA),
         initialPair.reserveOf(tokenB),
@@ -150,9 +160,9 @@ export const balanceUniswapV2ToUniswapV3 = async (
     state.pair = pairUpdated
 
     if (JSBI.equal(sqrtPriceFinalX96, state.sqrtPriceX96)) {
-      console.log('Equillibrim met')
+      logger.debug('Equillibrim met')
       if (JSBI.lessThan(state.amountC, state.amountA)) {
-        console.log('But it`s not profitable. Fees eat up too much.')
+        logger.debug('But it`s not profitable. Fees eat up too much.')
       }
       break
     }
@@ -193,7 +203,7 @@ export const balanceUniswapV2ToUniswapV3 = async (
   // LOCAL REQ -> NODE -> SYNC
 
   const profit = JSBI.subtract(state.amountC, state.amountA)
-  console.log('Finished! Profit:', profit.toString(), 'weiETH')
+  logger.info(`Finished! Profit: ${profit.toString()} weiETH`)
 
   return [state.amountA, profit]
 }
@@ -228,14 +238,17 @@ export const balanceUniswapV3ToUniswapV2 = async (
     pair: initialPair
   }
 
+  logger.info(
+    `Balancing pools, V3 price: ${tickToPrice(tokenB, tokenA, state.tick).toSignificant(
+      6
+    )} ⬆️, V2 price: ${state.pair.priceOf(tokenB).toSignificant(6)} ⬇️`
+  )
   // The next code is a copy of Pool.swap, except for final price calculation
   while (true) {
-    console.log(
-      'Balancing pools, V3 price:',
-      tickToPrice(tokenB, tokenA, state.tick).toSignificant(6),
-      '⬆️, V2 price:',
-      state.pair.priceOf(tokenB).toSignificant(6),
-      '⬇️'
+    logger.debug(
+      `Balancing pools, V3 price: ${tickToPrice(tokenB, tokenA, state.tick).toSignificant(
+        6
+      )} ⬆️, V2 price: ${state.pair.priceOf(tokenB).toSignificant(6)} ⬇️`
     )
     const step: Partial<StepComputations> = {}
     step.sqrtPriceStartX96 = state.sqrtPriceX96
@@ -280,7 +293,7 @@ export const balanceUniswapV3ToUniswapV2 = async (
     // bumped too much
     // So here we look how much liquidity is needed to push V2 price to the current V3 price
     if (pairUpdated.priceOf(tokenB).lessThan(nextV3Price)) {
-      console.log('Last step! V3 reached, pulling V2 price to match V3')
+      logger.debug('Last step! V3 reached, pulling V2 price to match V3')
       const amountIn = SwapToPriceMath.computeAmountOfTokensToPrice(
         initialPair.reserveOf(tokenB),
         initialPair.reserveOf(tokenC),
@@ -297,9 +310,9 @@ export const balanceUniswapV3ToUniswapV2 = async (
     state.pair = pairUpdated
 
     if (JSBI.equal(sqrtPriceFinalX96, state.sqrtPriceX96)) {
-      console.log('Equillibrium met')
+      logger.debug('Equillibrium met')
       if (JSBI.lessThan(state.amountC, state.amountA)) {
-        console.log('But it`s not profitable. Fees eat up too much.')
+        logger.debug('But it`s not profitable. Fees eat up too much.')
       }
       break
     }
@@ -338,7 +351,7 @@ export const balanceUniswapV3ToUniswapV2 = async (
   }
 
   const profit = JSBI.subtract(state.amountC, state.amountA)
-  console.log('Finished! Profit:', profit.toString(), ' WETH')
+  logger.info(`Finished! Profit: ${profit.toString()} WETH`)
 
   return [state.amountA, profit]
 }

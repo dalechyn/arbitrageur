@@ -4,6 +4,7 @@ import UniswapV3Factory from '@uniswap/v3-core/artifacts/contracts/UniswapV3Fact
 import UniswapV3Pool from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json'
 import { ADDRESS_ZERO, FeeAmount, Pool, Tick, TICK_SPACINGS, TickMath } from '@uniswap/v3-sdk'
 import { Contract } from 'ethers'
+import pino from 'pino'
 
 import MultiCallTickLens from '../../../deployments/goerli/MulticallTickLens.json'
 
@@ -13,6 +14,8 @@ import { config } from '~config'
 import { GetPoolWithPricesFn } from '~fetcher/interfaces'
 import { TickLensDataProvider } from '~fetcher/uniswapV3/tickLensDataProvider'
 import { DEXType } from '~utils'
+
+const logger = pino()
 
 const bitmapIndex = (tick: number, tickSpacing: number) => {
   return Math.floor(tick / tickSpacing / 256)
@@ -37,7 +40,7 @@ export const getUniswapV3PoolWithPrices: GetPoolWithPricesFn = async (
   ).filter(({ address }) => address !== ADDRESS_ZERO)
 
   if (poolAddressesWithFees.length === 0) {
-    console.warn(
+    logger.warn(
       `UniswapV3: Any pool with pair ${baseToken.symbol}-${queryToken.symbol} does not exist`
     )
     return []
@@ -45,7 +48,7 @@ export const getUniswapV3PoolWithPrices: GetPoolWithPricesFn = async (
 
   return await Promise.all(
     poolAddressesWithFees.map(async ({ fee, address }) => {
-      console.info(
+      logger.info(
         `UniswapV3: Checking ${baseToken.symbol}-${queryToken.symbol} (${
           fee / 10_000
         }% Fee): ${address}`

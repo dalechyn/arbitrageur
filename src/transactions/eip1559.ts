@@ -1,6 +1,5 @@
 import { Provider, TransactionRequest } from '@ethersproject/abstract-provider'
 import { FlashbotsBundleProvider } from '@flashbots/ethers-provider-bundle'
-import { ethers } from 'ethers'
 
 export const createEIP1559Transaction = async (
   blockNumber: number,
@@ -22,8 +21,7 @@ export const createEIP1559Transaction = async (
     data: data ?? '0x',
     maxFeePerGas: maxBaseFeeInFutureBlock,
     maxPriorityFeePerGas: 0,
-    gasLimit: 200000,
-    value: ethers.utils.parseEther('0.00000000001').toString(),
+    gasLimit: 1000000,
     chainId
   }
 }

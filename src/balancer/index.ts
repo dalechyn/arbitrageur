@@ -1,5 +1,6 @@
 import { Token } from '@uniswap/sdk-core'
 import JSBI from 'jsbi'
+import pino from 'pino'
 
 import { BalancerResult } from './result'
 import { balanceUniswapV2ToUniswapV2 } from './uniswapV2-uniswapV2'
@@ -7,6 +8,8 @@ import { balanceUniswapV2ToUniswapV3, balanceUniswapV3ToUniswapV2 } from './unis
 
 import { SupportedPoolWithContract } from '~interfaces'
 import { DEXType } from '~utils'
+
+const logger = pino()
 
 const DEX_MODULE_ROUTER = {
   [DEXType.UNISWAPV2]: {
@@ -74,7 +77,7 @@ export class Balancer {
               const result = await this.balance(zeroForOne ? from : to, zeroForOne ? to : from)
               results.push(result)
             } catch (e) {
-              console.log(e)
+              logger.error(e)
             }
           }
 
