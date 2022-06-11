@@ -47,7 +47,7 @@ const main = async () => {
 
   ethProvider.on('block', async (blockNumber: number) => {
     logger.warn(`New block arrived: ${blockNumber}`)
-    if (blockSkipTo ?? blockNumber - 1 > blockNumber) {
+    if ((blockSkipTo ?? blockNumber - 1) > blockNumber) {
       logger.warn(`Block skipped, waiting for ${blockSkipTo}`)
       return
     }
@@ -101,6 +101,7 @@ const main = async () => {
       if ('error' in bundleSubmission) {
         throw new Error(bundleSubmission.error.message)
       }
+      logger.info(bundleSubmission.bundleHash)
       const waitResponse = await bundleSubmission.wait()
       logger.info(`Wait Response: ${FlashbotsBundleResolution[waitResponse]}`)
       if (

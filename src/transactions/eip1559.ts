@@ -2,6 +2,9 @@ import { Provider, TransactionRequest } from '@ethersproject/abstract-provider'
 import { FlashbotsBundleProvider } from '@flashbots/ethers-provider-bundle'
 import { BigNumber } from 'ethers'
 import JSBI from 'jsbi'
+import pino from 'pino'
+
+const logger = pino()
 
 export const createEIP1559Transaction = async (
   blockNumber: number,
@@ -26,9 +29,19 @@ export const createEIP1559Transaction = async (
     chainId
   }
   const totalGas = await provider.estimateGas(transaction)
+  const minerTip = BigNumber.from(tipToMiner.toString()).div(totalGas)
+  logger.info(`Will tip miner with ${tipToMiner.toString()} wei through gas price manipulation`)
+  logger.info(
+    'gasEstimate: ' +
+      totalGas.toString() +
+      ' | baseFeePerGas: ' +
+      maxBaseFeeInFutureBlock.toString() +
+      ' | maxFeePerGas ' +
+      maxBaseFeeInFutureBlock.add(minerTip).toString()
+  )
   return {
     ...transaction,
-    maxFeePerGas: maxBaseFeeInFutureBlock.add(BigNumber.from(tipToMiner.toString()).div(totalGas)),
-    maxPriorityFeePerGas: 2
+    maxFeePerGas: maxBaseFeeInFutureBlock.add(minerTip),
+    maxPriorityFeePerGas: maxBaseFeeInFutureBlock.add(minerTip)
   }
 }
