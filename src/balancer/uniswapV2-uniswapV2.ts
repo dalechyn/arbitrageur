@@ -133,6 +133,7 @@ export async function balanceUniswapV2ToUniswapV2(
     results.map(({ x, y, z }) => `${x},${y},${z}\n`)
   )  */
 
+  if (maxProfit.lessThan(0)) throw new Error('not profitable')
   logger.info('Finished! Amount:', x.toString(), ' weiWETH')
   logger.info('Finished! Profit:', maxProfit.toSignificant(), ' WETH')
 

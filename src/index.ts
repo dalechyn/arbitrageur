@@ -46,6 +46,7 @@ const main = async () => {
   let blockSkipTo: number | undefined
 
   ethProvider.on('block', async (blockNumber: number) => {
+    // logger.info(await flashbotsProvider.fetchBlocksApi(14949852))
     logger.warn(`New block arrived: ${blockNumber}`)
     if ((blockSkipTo ?? blockNumber - 1) > blockNumber) {
       logger.warn(`Block skipped, waiting for ${blockSkipTo}`)

@@ -84,6 +84,7 @@ export const balanceUniswapV2ToUniswapV3 = async (
       6
     )} ⬇️`
   )
+  let previousProfit = CurrencyAmount.fromRawAmount(tokenA, 0)
   while (true) {
     /*     logger.debug(
       `Balancing pools, V2 price: ${state.pair
@@ -137,6 +138,12 @@ export const balanceUniswapV2ToUniswapV3 = async (
       CurrencyAmount.fromRawAmount(tokenB, state.amountB)
     )
     state.amountA = currencyAmountA.quotient
+    const profit = CurrencyAmount.fromRawAmount(tokenA, JSBI.subtract(state.amountC, state.amountA))
+    if (previousProfit.greaterThan(profit)) {
+      logger.debug('Profit from previous step was higher, finished')
+      return [state.amountA, previousProfit.quotient]
+    }
+    previousProfit = profit
     // if the next is true - tick crossing will take so much liquidity that V2 price will be
     // bumped too much
     // So here we look how much liquidity is needed to push V2 price to the current V3 price
@@ -243,6 +250,7 @@ export const balanceUniswapV3ToUniswapV2 = async (
       6
     )} ⬆️, V2 price: ${state.pair.priceOf(tokenB).toSignificant(6)} ⬇️`
   )
+  let previousProfit = CurrencyAmount.fromRawAmount(tokenA, 0)
   // The next code is a copy of Pool.swap, except for final price calculation
   while (true) {
     /*   logger.debug(
@@ -289,6 +297,12 @@ export const balanceUniswapV3ToUniswapV2 = async (
       CurrencyAmount.fromRawAmount(tokenB, state.amountB)
     )
     state.amountC = currencyAmountC.quotient
+    const profit = CurrencyAmount.fromRawAmount(tokenA, JSBI.subtract(state.amountC, state.amountA))
+    if (previousProfit.greaterThan(profit)) {
+      logger.debug('Profit from previous step was higher, finished')
+      return [state.amountA, previousProfit.quotient]
+    }
+    previousProfit = profit
     // if the next is true - tick crossing will take so much liquidity that V2 price will be
     // bumped too much
     // So here we look how much liquidity is needed to push V2 price to the current V3 price
@@ -351,6 +365,7 @@ export const balanceUniswapV3ToUniswapV2 = async (
   }
 
   const profit = JSBI.subtract(state.amountC, state.amountA)
+  if (JSBI.lessThanOrEqual(profit, JSBI.BigInt(0))) throw new Error('not profitable')
   logger.info(`Finished! Profit: ${profit.toString()} WETH`)
 
   return [state.amountA, profit]
