@@ -41,7 +41,7 @@ contract Arbitrageur is IUniswapV2Callee, IUniswapV3SwapCallback {
     /// 3 bytes are left and can be used in next versions ofthe contract
     /// @param poolA First pool to swap (A->???->A)
     /// @param poolB Second pool to swap (???->B->???)
-    function arbitrage(
+    function arbitrage_0018jPzz(
         uint blockNumber,
         uint amount,
         uint packedFeesAndTypesAndBaseToken,
