@@ -4,7 +4,7 @@ import { ethers } from 'ethers'
 import JSBI from 'jsbi'
 import pino from 'pino'
 
-import Arbitrageur from '../../deployments/goerli/Arbitrageur.json'
+import Arbitrageur from '../../deployments/mainnet/Arbitrageur.json'
 
 import { SupportedPoolWithContract } from '~interfaces'
 import { DEXType } from '~utils'
@@ -12,7 +12,7 @@ import { DEXType } from '~utils'
 const logger = pino()
 
 export class BalancerResult {
-  private readonly arbMethodName = 'arbitrage'
+  private readonly arbMethodName = 'arbitrage_003xYAO9'
   constructor(
     public readonly from: SupportedPoolWithContract,
     public readonly to: SupportedPoolWithContract,

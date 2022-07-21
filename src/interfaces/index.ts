@@ -1,1 +1,2 @@
-export * from './supportedPoolType'
+export * from './SupportedPoolType'
+export * from './ArbitrageInfo'

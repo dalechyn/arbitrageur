@@ -7,7 +7,7 @@ import pino from 'pino'
 
 import { GetPoolWithPricesFn } from '../interfaces'
 
-import { DEXType } from '~utils'
+import { DEXType, PoolDoesNotExistsError } from '~utils'
 
 const logger = pino()
 
@@ -19,18 +19,22 @@ export const getUniswapV2PairWithPrices: GetPoolWithPricesFn = async (
 ) => {
   logger.info(`UniswapV2: Checking ${baseToken.symbol}-${quoteToken.symbol}: ${poolAddress}`)
   const pairContract = new Contract(poolAddress, UniswapV2Pair.abi, provider)
-  const { _reserve0, _reserve1 } = await pairContract.getReserves()
-  const [reserveA, reserveB] = baseToken.sortsBefore(quoteToken)
-    ? [_reserve0, _reserve1]
-    : [_reserve1, _reserve0]
-  const pair = new Pair(
-    CurrencyAmount.fromRawAmount(baseToken, reserveA),
-    CurrencyAmount.fromRawAmount(quoteToken, reserveB)
-  )
-  return {
-    price: pair.priceOf(quoteToken),
-    contract: pairContract,
-    pool: pair,
-    type: DEXType.UNISWAPV2
+  try {
+    const { _reserve0, _reserve1 } = await pairContract.getReserves()
+    const [reserveA, reserveB] = baseToken.sortsBefore(quoteToken)
+      ? [_reserve0, _reserve1]
+      : [_reserve1, _reserve0]
+    const pair = new Pair(
+      CurrencyAmount.fromRawAmount(baseToken, reserveA),
+      CurrencyAmount.fromRawAmount(quoteToken, reserveB)
+    )
+    return {
+      price: pair.priceOf(quoteToken),
+      contract: pairContract,
+      pool: pair,
+      type: DEXType.UNISWAPV2
+    }
+  } catch {
+    throw new PoolDoesNotExistsError(poolAddress)
   }
 }

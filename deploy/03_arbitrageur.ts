@@ -3,15 +3,17 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre
-  const { deploy } = deployments
+  const { deterministic } = deployments
   const { deployer } = await getNamedAccounts()
 
-  await deploy('Arbitrageur', {
+  const { deploy, address } = await deterministic('Arbitrageur', {
     from: deployer,
+    salt: '0x15051d0239c659db6888f46fdf46871b86a7dbec954c9e8e4f66194f82e04521',
     args: [],
-    log: true,
-    autoMine: true // speed up deployment on local network (ganache, hardhat), no effect on live networks
+    log: true
   })
+  console.log('Will deploy to', address)
+  await deploy()
 }
 export default func
 func.tags = ['Arbitrageur']

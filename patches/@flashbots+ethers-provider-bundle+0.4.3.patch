@@ -1,0 +1,39 @@
+diff --git a/node_modules/@flashbots/ethers-provider-bundle/build/index.d.ts b/node_modules/@flashbots/ethers-provider-bundle/build/index.d.ts
+index d317e49..471aead 100644
+--- a/node_modules/@flashbots/ethers-provider-bundle/build/index.d.ts
++++ b/node_modules/@flashbots/ethers-provider-bundle/build/index.d.ts
+@@ -153,9 +153,9 @@ export interface FlashbotsBundleConflictWithGasPricing extends FlashbotsBundleCo
+     conflictingBundleGasPricing?: FlashbotsGasPricing;
+ }
+ export declare class FlashbotsBundleProvider extends providers.JsonRpcProvider {
+-    private genericProvider;
+-    private authSigner;
+-    private connectionInfo;
++    protected genericProvider;
++    protected authSigner;
++    protected connectionInfo;
+     constructor(genericProvider: BaseProvider, authSigner: Signer, connectionInfoOrUrl: ConnectionInfo, network: Networkish);
+     static throttleCallback(): Promise<boolean>;
+     static create(genericProvider: BaseProvider, authSigner: Signer, connectionInfoOrUrl?: ConnectionInfo | string, network?: Networkish): Promise<FlashbotsBundleProvider>;
+@@ -165,16 +165,16 @@ export declare class FlashbotsBundleProvider extends providers.JsonRpcProvider {
+     sendRawBundle(signedBundledTransactions: Array<string>, targetBlockNumber: number, opts?: FlashbotsOptions): Promise<FlashbotsTransaction>;
+     sendBundle(bundledTransactions: Array<FlashbotsBundleTransaction | FlashbotsBundleRawTransaction>, targetBlockNumber: number, opts?: FlashbotsOptions): Promise<FlashbotsTransaction>;
+     signBundle(bundledTransactions: Array<FlashbotsBundleTransaction | FlashbotsBundleRawTransaction>): Promise<Array<string>>;
+-    private wait;
++    protected wait;
+     getUserStats(): Promise<GetUserStatsResponse>;
+     getBundleStats(bundleHash: string, blockNumber: number): Promise<GetBundleStatsResponse>;
+     simulate(signedBundledTransactions: Array<string>, blockTag: BlockTag, stateBlockTag?: BlockTag, blockTimestamp?: number): Promise<SimulationResponse>;
+-    private calculateBundlePricing;
++    protected calculateBundlePricing;
+     getConflictingBundle(targetSignedBundledTransactions: Array<string>, targetBlockNumber: number): Promise<FlashbotsBundleConflictWithGasPricing>;
+     getConflictingBundleWithoutGasPricing(targetSignedBundledTransactions: Array<string>, targetBlockNumber: number): Promise<FlashbotsBundleConflict>;
+     fetchBlocksApi(blockNumber: number): Promise<BlocksApiResponse>;
+-    private request;
+-    private fetchReceipts;
+-    private prepareBundleRequest;
++    protected request;
++    protected fetchReceipts;
++    protected prepareBundleRequest;
+ }
+ export {};
