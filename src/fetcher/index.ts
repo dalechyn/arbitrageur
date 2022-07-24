@@ -1,5 +1,6 @@
 import { Provider } from '@ethersproject/abstract-provider'
 import { Token } from '@uniswap/sdk-core'
+import { Logger } from 'pino'
 
 import { GetPoolWithPricesFn } from './interfaces'
 import { getUniswapV2PairWithPrices } from './uniswapV2'
@@ -14,7 +15,11 @@ export class Fetcher {
     [DEXType.UNISWAPV3]: getUniswapV3PoolWithPrices
   }
 
-  constructor(private readonly dexTypeA: DEXType, private readonly dexTypeB: DEXType) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly dexTypeA: DEXType,
+    private readonly dexTypeB: DEXType
+  ) {}
 
   async fetch(
     factoryAddressA: string,
@@ -24,8 +29,20 @@ export class Fetcher {
     provider: Provider
   ): Promise<[SupportedPoolWithContract, SupportedPoolWithContract]> {
     return [
-      await this.dexRecord[this.dexTypeA](factoryAddressA, baseToken, quoteToken, provider),
-      await this.dexRecord[this.dexTypeB](factoryAddressB, baseToken, quoteToken, provider)
+      await this.dexRecord[this.dexTypeA](
+        this.logger,
+        factoryAddressA,
+        baseToken,
+        quoteToken,
+        provider
+      ),
+      await this.dexRecord[this.dexTypeB](
+        this.logger,
+        factoryAddressB,
+        baseToken,
+        quoteToken,
+        provider
+      )
     ]
   }
 }

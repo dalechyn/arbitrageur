@@ -74,13 +74,18 @@ const main = async () => {
       logger.warn(`Worker ${process.pid} will check ${arbitrageInfo.arbs.length} opportunities`)
       Promise.all(
         arbitrageInfo.arbs.map(async (info) => {
+          const asyncLogger = pino({
+            name: `Worker ${process.pid}`,
+            ...pino.destination({ sync: false })
+          })
           if ((info.skip ?? blockNumber - 1) > blockNumber) {
-            logger.warn(`Block skipped, waiting for ${info.skip}`)
+            asyncLogger.warn(`Block skipped, waiting for ${info.skip}`)
+            asyncLogger.flush()
             return
           }
 
           try {
-            const fetcher = new Fetcher(info.typeA, info.typeB)
+            const fetcher = new Fetcher(asyncLogger, info.typeA, info.typeB)
             const [firstPools, secondPools] = await fetcher.fetch(
               info.poolA,
               info.poolB,
@@ -89,7 +94,7 @@ const main = async () => {
               ethProvider
             )
 
-            const balancer = new Balancer(firstPools, secondPools, info.baseToken)
+            const balancer = new Balancer(asyncLogger, firstPools, secondPools, info.baseToken)
             const result = await balancer.getMostProfitableArbitrage()
 
             const targetBlock = blockNumber + config.get('network.blocksInFuture')
@@ -113,16 +118,18 @@ const main = async () => {
 
             const simulation = await flashbotsProvider.simulate(preSignedTransactions, targetBlock)
             if ('error' in simulation) {
-              logger.warn(`Simulation Error: ${simulation.error.message}`)
+              asyncLogger.warn(`Simulation Error: ${simulation.error.message}`)
+              asyncLogger.flush()
               return
             } else {
               if (simulation.firstRevert) {
-                logger.warn(
+                asyncLogger.warn(
                   `Simulation Reverted: ${JSON.stringify(simulation.firstRevert, null, 2)}`
                 )
+                asyncLogger.flush()
                 return
               }
-              logger.info(`Simulation Success: ${JSON.stringify(simulation, null, 2)}`)
+              asyncLogger.info(`Simulation Success: ${JSON.stringify(simulation, null, 2)}`)
             }
 
             const minerTipPerGas = BigNumber.from(minerReward.toString()).div(
@@ -144,26 +151,27 @@ const main = async () => {
                 .mul(simulation.totalGasUsed)
                 .gt(BigNumber.from(result.profit.toString()).sub(minerReward.toString()))
             ) {
-              logger.warn(
+              asyncLogger.warn(
                 'The transaction was dropped because the net profit is less than total gas fee'
               )
+              asyncLogger.flush()
               return
             }
 
             info.skip = targetBlock
-            logger.info('Will skip all blocks till ' + info.skip)
+            asyncLogger.info('Will skip all blocks till ' + info.skip)
 
             const bundleSubmission = await flashbotsProvider.sendRawBundle(
               signedTransactions,
               targetBlock
             )
-            logger.info('Bundle submitted, waiting')
+            asyncLogger.info('Bundle submitted, waiting')
             if ('error' in bundleSubmission) {
               throw new Error(bundleSubmission.error.message)
             }
-            logger.info(bundleSubmission.bundleHash)
+            asyncLogger.info(bundleSubmission.bundleHash)
             const waitResponse = await bundleSubmission.wait()
-            logger.info(`Wait Response: ${FlashbotsBundleResolution[waitResponse]}`)
+            asyncLogger.info(`Wait Response: ${FlashbotsBundleResolution[waitResponse]}`)
             if (
               waitResponse === FlashbotsBundleResolution.BundleIncluded ||
               waitResponse === FlashbotsBundleResolution.AccountNonceTooHigh
@@ -189,7 +197,9 @@ const main = async () => {
                 (i) => i.poolA !== e.pool && i.poolB !== e.pool
               )
             }
-            logger.error(e.message)
+            asyncLogger.error(e.message)
+          } finally {
+            asyncLogger.flush()
           }
         })
       )

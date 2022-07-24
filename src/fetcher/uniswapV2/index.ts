@@ -3,15 +3,14 @@ import { Token, CurrencyAmount } from '@uniswap/sdk-core'
 import UniswapV2Pair from '@uniswap/v2-core/build/UniswapV2Pair.json'
 import { Pair } from '@uniswap/v2-sdk'
 import { Contract } from 'ethers'
-import pino from 'pino'
+import { Logger } from 'pino'
 
 import { GetPoolWithPricesFn } from '../interfaces'
 
 import { DEXType, PoolDoesNotExistsError } from '~utils'
 
-const logger = pino()
-
 export const getUniswapV2PairWithPrices: GetPoolWithPricesFn = async (
+  logger: Logger,
   poolAddress: string,
   baseToken: Token,
   quoteToken: Token,

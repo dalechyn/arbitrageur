@@ -2,7 +2,7 @@ import { CurrencyAmount, Price, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { LiquidityMath, Pool, priceToClosestTick, TickMath, tickToPrice } from '@uniswap/v3-sdk'
 import JSBI from 'jsbi'
-import pino from 'pino'
+import { Logger } from 'pino'
 
 import { SwapToPriceMath } from './swapToPriceMath'
 
@@ -10,8 +10,6 @@ import { SupportedPoolWithContract } from '~interfaces'
 import { FractionUtils } from '~utils'
 
 const NEGATIVE_ONE = JSBI.BigInt(-1)
-
-const logger = pino()
 
 // same as priceToClosestTick, but selects not the one that equal or the less,
 // but the one which has the minimum between the price given and nearest upper
@@ -44,11 +42,13 @@ interface StepComputations {
  * so long story short - i.e. WETH-cDAI-WETH,
  *  for V2: WETH = baseToken; cDai = queryToken,
  *  and V3: cDAI = baseToken, WETH = queryToken
+ * @param logger
  * @param fromPoolInfo
  * @param toPoolInfo
  * @param baseToken
  */
 export const balanceUniswapV2ToUniswapV3 = async (
+  logger: Logger,
   fromPoolInfo: SupportedPoolWithContract<Pair>,
   toPoolInfo: SupportedPoolWithContract<Pool>,
   tokenA: Token
@@ -219,6 +219,7 @@ export const balanceUniswapV2ToUniswapV3 = async (
 // * @dev We are forced to use exactOutput type trade
 // TODO
 export const balanceUniswapV3ToUniswapV2 = async (
+  logger: Logger,
   fromPoolInfo: SupportedPoolWithContract<Pool>,
   toPoolInfo: SupportedPoolWithContract<Pair>,
   tokenA: Token

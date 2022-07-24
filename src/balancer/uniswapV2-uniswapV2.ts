@@ -1,12 +1,10 @@
 import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
+import { Logger } from 'ethers/lib/utils'
 import JSBI from 'jsbi'
-import pino from 'pino'
 
 import { SupportedPoolWithContract } from '~interfaces'
 import { JSBIUtils } from '~utils/jsbiUtils'
-
-const logger = pino()
 
 function getReserves(
   token: Token,
@@ -71,6 +69,7 @@ function calculateProfit(
 }
 
 export async function balanceUniswapV2ToUniswapV2(
+  logger: Logger,
   firstPoolV2Info: SupportedPoolWithContract<Pair>,
   secondPoolV2Info: SupportedPoolWithContract<Pair>,
   tokenA: Token

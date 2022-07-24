@@ -3,7 +3,7 @@ import { BigintIsh, Token } from '@uniswap/sdk-core'
 import UniswapV3Pool from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json'
 import { Pool, Tick, TICK_SPACINGS, TickMath } from '@uniswap/v3-sdk'
 import { Contract } from 'ethers'
-import pino from 'pino'
+import { Logger } from 'pino'
 
 import MultiCallTickLens from '../../../deployments/goerli/MulticallTickLens.json'
 
@@ -12,13 +12,12 @@ import { GetPoolWithPricesFn } from '~fetcher/interfaces'
 import { TickLensDataProvider } from '~fetcher/uniswapV3/tickLensDataProvider'
 import { DEXType } from '~utils'
 
-const logger = pino()
-
 const bitmapIndex = (tick: number, tickSpacing: number) => {
   return Math.floor(tick / tickSpacing / 256)
 }
 
 export const getUniswapV3PoolWithPrices: GetPoolWithPricesFn = async (
+  logger: Logger,
   poolAddress: string,
   baseToken: Token,
   queryToken: Token,

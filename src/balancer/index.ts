@@ -1,4 +1,5 @@
 import { Token } from '@uniswap/sdk-core'
+import { Logger } from 'pino'
 
 import { BalancerResult } from './result'
 import { balanceUniswapV2ToUniswapV2 } from './uniswapV2-uniswapV2'
@@ -29,6 +30,7 @@ export class Balancer {
    * @param baseToken baseToken
    */
   constructor(
+    private readonly logger: Logger,
     private readonly firstPool: SupportedPoolWithContract,
     private readonly secondPool: SupportedPoolWithContract,
     private readonly baseToken: Token
@@ -47,7 +49,7 @@ export class Balancer {
     const f = DEX_MODULE_ROUTER[from.type][to.type]
     if (!f) throw new Error(`${from.type}-${to.type} is not supported`)
     // @ts-expect-error Error is suppressed for easier typing.
-    const [amountIn, profit] = await f(from, to, this.baseToken)
+    const [amountIn, profit] = await f(this.logger, from, to, this.baseToken)
     return new BalancerResult(from, to, amountIn, profit)
   }
 
