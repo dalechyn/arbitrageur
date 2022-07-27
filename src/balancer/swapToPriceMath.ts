@@ -1,7 +1,6 @@
 import { CurrencyAmount, Fraction, Token } from '@uniswap/sdk-core'
 import { FeeAmount, FullMath, SqrtPriceMath } from '@uniswap/v3-sdk'
 import JSBI from 'jsbi'
-
 import { JSBIUtils } from '~utils'
 
 const MAX_FEE = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(6))

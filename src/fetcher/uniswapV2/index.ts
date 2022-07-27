@@ -1,12 +1,11 @@
+import { GetPoolWithPricesFn } from '../interfaces'
+
 import { Provider } from '@ethersproject/abstract-provider'
 import { Token, CurrencyAmount } from '@uniswap/sdk-core'
 import UniswapV2Pair from '@uniswap/v2-core/build/UniswapV2Pair.json'
 import { Pair } from '@uniswap/v2-sdk'
 import { Contract } from 'ethers'
 import { Logger } from 'pino'
-
-import { GetPoolWithPricesFn } from '../interfaces'
-
 import { DEXType, PoolDoesNotExistsError } from '~utils'
 
 export const getUniswapV2PairWithPrices: GetPoolWithPricesFn = async (

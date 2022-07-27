@@ -2,7 +2,6 @@ import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { Logger } from 'ethers/lib/utils'
 import JSBI from 'jsbi'
-
 import { SupportedPoolWithContract } from '~interfaces'
 import { JSBIUtils } from '~utils/jsbiUtils'
 

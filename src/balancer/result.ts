@@ -1,11 +1,10 @@
+import Arbitrageur from '../../deployments/mainnet/Arbitrageur.json'
+
 import { Pair } from '@uniswap/v2-sdk'
 import { Pool } from '@uniswap/v3-sdk'
 import { ethers } from 'ethers'
 import JSBI from 'jsbi'
 import pino from 'pino'
-
-import Arbitrageur from '../../deployments/mainnet/Arbitrageur.json'
-
 import { SupportedPoolWithContract } from '~interfaces'
 import { DEXType } from '~utils'
 

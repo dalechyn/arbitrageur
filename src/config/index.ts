@@ -1,4 +1,5 @@
+import schema from './schema'
+
 import convict from 'convict'
 
-import schema from './schema'
 export const config = convict(schema, { env: process.env })

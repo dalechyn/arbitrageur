@@ -1,11 +1,10 @@
+import { SwapToPriceMath } from './swapToPriceMath'
+
 import { CurrencyAmount, Price, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { LiquidityMath, Pool, priceToClosestTick, TickMath, tickToPrice } from '@uniswap/v3-sdk'
 import JSBI from 'jsbi'
 import { Logger } from 'pino'
-
-import { SwapToPriceMath } from './swapToPriceMath'
-
 import { SupportedPoolWithContract } from '~interfaces'
 import { FractionUtils } from '~utils'
 

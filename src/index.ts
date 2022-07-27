@@ -3,6 +3,10 @@ import 'module-alias/register'
 import cluster from 'cluster'
 import os from 'os'
 
+import { Fetcher } from './fetcher'
+import { createEIP1559Transaction } from './transactions'
+import { createProvider, FlashbotsBundleMultiProvider, PoolDoesNotExistsError } from './utils'
+
 import { FlashbotsBundleResolution } from '@flashbots/ethers-provider-bundle'
 import { Token } from '@uniswap/sdk-core'
 import { BigNumber, Wallet } from 'ethers'
@@ -10,11 +14,6 @@ import express from 'express'
 import JSBI from 'jsbi'
 import fetch from 'node-fetch'
 import { pino } from 'pino'
-
-import { Fetcher } from './fetcher'
-import { createEIP1559Transaction } from './transactions'
-import { createProvider, FlashbotsBundleMultiProvider, PoolDoesNotExistsError } from './utils'
-
 import { Balancer } from '~balancer'
 import { config } from '~config'
 import { ArbitrageInfo } from '~interfaces'

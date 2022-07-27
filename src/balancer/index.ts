@@ -1,10 +1,9 @@
-import { Token } from '@uniswap/sdk-core'
-import { Logger } from 'pino'
-
 import { BalancerResult } from './result'
 import { balanceUniswapV2ToUniswapV2 } from './uniswapV2-uniswapV2'
 import { balanceUniswapV2ToUniswapV3, balanceUniswapV3ToUniswapV2 } from './uniswapV2-uniswapV3'
 
+import { Token } from '@uniswap/sdk-core'
+import { Logger } from 'pino'
 import { SupportedPoolWithContract } from '~interfaces'
 import { DEXType } from '~utils'
 

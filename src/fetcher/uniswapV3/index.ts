@@ -1,12 +1,11 @@
+import MultiCallTickLens from '../../../deployments/goerli/MulticallTickLens.json'
+
 import { Provider } from '@ethersproject/abstract-provider'
 import { BigintIsh, Token } from '@uniswap/sdk-core'
 import UniswapV3Pool from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json'
 import { Pool, Tick, TICK_SPACINGS, TickMath } from '@uniswap/v3-sdk'
 import { Contract } from 'ethers'
 import { Logger } from 'pino'
-
-import MultiCallTickLens from '../../../deployments/goerli/MulticallTickLens.json'
-
 import { config } from '~config'
 import { GetPoolWithPricesFn } from '~fetcher/interfaces'
 import { TickLensDataProvider } from '~fetcher/uniswapV3/tickLensDataProvider'
