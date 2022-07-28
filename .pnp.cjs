@@ -39,14 +39,23 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@ethersproject/providers", "npm:5.6.8"],\
             ["@ethersproject/web", "npm:5.6.1"],\
             ["@flashbots/ethers-provider-bundle", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#patch:@flashbots/ethers-provider-bundle@npm%3A0.4.3#.yarn/patches/@flashbots-ethers-provider-bundle-npm-0.4.3-767bbc7067.patch::version=0.4.3&hash=49fc89&locator=arbitrage%40workspace%3A."],\
+            ["@koa/cors", "npm:3.3.0"],\
             ["@nomiclabs/hardhat-etherscan", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:3.1.0"],\
             ["@nomiclabs/hardhat-waffle", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:2.0.3"],\
             ["@openzeppelin/contracts", "npm:4.7.1"],\
+            ["@space-it-blockchain/framework-application", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-application%2F-%2F%40space-it-blockchain%2Fframework-application-1.3.3.tgz"],\
+            ["@space-it-blockchain/framework-exit-listener", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-exit-listener%2F-%2F%40space-it-blockchain%2Fframework-exit-listener-1.3.1.tgz"],\
+            ["@space-it-blockchain/framework-koa", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-koa%2F-%2F%40space-it-blockchain%2Fframework-koa-1.3.3.tgz"],\
+            ["@space-it-blockchain/framework-logger", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-logger%2F-%2F%40space-it-blockchain%2Fframework-logger-1.3.1.tgz"],\
+            ["@space-it-blockchain/framework-module", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-module%2F-%2F%40space-it-blockchain%2Fframework-module-1.3.2.tgz"],\
+            ["@space-it-blockchain/framework-web", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-web%2F-%2F%40space-it-blockchain%2Fframework-web-1.3.2.tgz"],\
             ["@types/convict", "npm:6.1.1"],\
             ["@types/express", "npm:4.17.13"],\
+            ["@types/koa-cookie", "npm:1.0.0"],\
+            ["@types/koa__cors", "npm:3.3.0"],\
             ["@types/mocha", "npm:9.1.1"],\
             ["@types/multicoin-address-validator", "npm:0.5.0"],\
-            ["@types/node", "npm:16.4.2"],\
+            ["@types/node", "npm:17.0.45"],\
             ["@types/node-fetch", "npm:2.6.2"],\
             ["@typescript-eslint/eslint-plugin", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:5.31.0"],\
             ["@typescript-eslint/parser", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:5.31.0"],\
@@ -59,6 +68,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@uniswap/v3-periphery", "npm:1.4.1"],\
             ["@uniswap/v3-sdk", "npm:3.9.0"],\
             ["bignumber.js", "npm:9.0.2"],\
+            ["bunyan", "npm:1.8.15"],\
             ["chai", "npm:4.3.6"],\
             ["convict", "npm:6.2.3"],\
             ["dotenv", "npm:16.0.1"],\
@@ -76,7 +86,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["express", "npm:4.18.1"],\
             ["hardhat", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:2.10.1"],\
             ["hardhat-deploy", "npm:0.11.12"],\
+            ["inversify", "npm:5.1.1"],\
             ["jsbi", "npm:3.2.5"],\
+            ["koa-body", "npm:4.2.0"],\
+            ["koa-cookie", "npm:1.0.0"],\
             ["module-alias", "npm:2.2.2"],\
             ["multicoin-address-validator", "npm:0.5.10"],\
             ["node-fetch", "virtual:6ad6d6a2150b7bdfbdf32622ed5849929cfae3024c1517ed35465977933e0f142a3dbd48c675b171c3f1aadc975b55f25814c1c29edb9c8ce617e232df83f606#npm:2.6.7"],\
@@ -84,6 +97,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["pino-pretty", "npm:8.1.0"],\
             ["prettier", "npm:2.7.1"],\
             ["prettier-plugin-solidity", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.0.0-dev.23"],\
+            ["reflect-metadata", "npm:0.1.13"],\
+            ["source-map-support", "npm:0.5.21"],\
             ["tiny-invariant", "npm:1.2.0"],\
             ["ts-node", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:10.9.1"],\
             ["typescript", "patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=f456af"]\
@@ -901,6 +916,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@koa/cors", [\
+        ["npm:3.3.0", {\
+          "packageLocation": "./.yarn/cache/@koa-cors-npm-3.3.0-0564248a2f-bb49c680e0.zip/node_modules/@koa/cors/",\
+          "packageDependencies": [\
+            ["@koa/cors", "npm:3.3.0"],\
+            ["vary", "npm:1.1.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@metamask/eth-sig-util", [\
         ["npm:4.0.1", {\
           "packageLocation": "./.yarn/cache/@metamask-eth-sig-util-npm-4.0.1-27d55ec43e-740df4c92a.zip/node_modules/@metamask/eth-sig-util/",\
@@ -1267,6 +1292,235 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@space-it-blockchain/framework-application", [\
+        ["npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-application%2F-%2F%40space-it-blockchain%2Fframework-application-1.3.3.tgz", {\
+          "packageLocation": "./.yarn/cache/@space-it-blockchain-framework-application-npm-1.3.3-55cd013d06-6d87498e8f.zip/node_modules/@space-it-blockchain/framework-application/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-application", "npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-application%2F-%2F%40space-it-blockchain%2Fframework-application-1.3.3.tgz"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-application%2F-%2F%40space-it-blockchain%2Fframework-application-1.3.3.tgz", {\
+          "packageLocation": "./.yarn/__virtual__/@space-it-blockchain-framework-application-virtual-84e904782d/0/cache/@space-it-blockchain-framework-application-npm-1.3.3-55cd013d06-6d87498e8f.zip/node_modules/@space-it-blockchain/framework-application/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-application", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-application%2F-%2F%40space-it-blockchain%2Fframework-application-1.3.3.tgz"],\
+            ["@space-it-blockchain/framework-utils", "virtual:84e904782d2a7e37d0fe871e858e098492e718a686709cbfdb7d3813e23d745da682ee2f08fed13c0030f2fed720acbe5c2fd7641e6fba4a4e2c5b21328166c7#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-utils%2F-%2F%40space-it-blockchain%2Fframework-utils-1.3.1.tgz"],\
+            ["@types/inversify", null],\
+            ["@types/reflect-metadata", null],\
+            ["inversify", "npm:5.1.1"],\
+            ["map-obj", "npm:4.3.0"],\
+            ["reflect-metadata", "npm:0.1.13"],\
+            ["type-fest", "npm:0.18.0"]\
+          ],\
+          "packagePeers": [\
+            "@types/inversify",\
+            "@types/reflect-metadata",\
+            "inversify",\
+            "reflect-metadata"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@space-it-blockchain/framework-exit-listener", [\
+        ["npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-exit-listener%2F-%2F%40space-it-blockchain%2Fframework-exit-listener-1.3.1.tgz", {\
+          "packageLocation": "./.yarn/cache/@space-it-blockchain-framework-exit-listener-npm-1.3.1-e6842e1c36-7a013c7e80.zip/node_modules/@space-it-blockchain/framework-exit-listener/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-exit-listener", "npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-exit-listener%2F-%2F%40space-it-blockchain%2Fframework-exit-listener-1.3.1.tgz"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-exit-listener%2F-%2F%40space-it-blockchain%2Fframework-exit-listener-1.3.1.tgz", {\
+          "packageLocation": "./.yarn/__virtual__/@space-it-blockchain-framework-exit-listener-virtual-dafd0946df/0/cache/@space-it-blockchain-framework-exit-listener-npm-1.3.1-e6842e1c36-7a013c7e80.zip/node_modules/@space-it-blockchain/framework-exit-listener/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-exit-listener", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-exit-listener%2F-%2F%40space-it-blockchain%2Fframework-exit-listener-1.3.1.tgz"],\
+            ["@space-it-blockchain/framework-logger", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-logger%2F-%2F%40space-it-blockchain%2Fframework-logger-1.3.1.tgz"],\
+            ["@space-it-blockchain/framework-module", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-module%2F-%2F%40space-it-blockchain%2Fframework-module-1.3.2.tgz"],\
+            ["@types/inversify", null],\
+            ["@types/reflect-metadata", null],\
+            ["@types/space-it-blockchain__framework-logger", null],\
+            ["@types/space-it-blockchain__framework-module", null],\
+            ["async-exit-hook", "npm:2.0.1"],\
+            ["inversify", "npm:5.1.1"],\
+            ["reflect-metadata", "npm:0.1.13"],\
+            ["type-fest", "npm:0.18.0"]\
+          ],\
+          "packagePeers": [\
+            "@space-it-blockchain/framework-logger",\
+            "@space-it-blockchain/framework-module",\
+            "@types/inversify",\
+            "@types/reflect-metadata",\
+            "@types/space-it-blockchain__framework-logger",\
+            "@types/space-it-blockchain__framework-module",\
+            "inversify",\
+            "reflect-metadata"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@space-it-blockchain/framework-koa", [\
+        ["npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-koa%2F-%2F%40space-it-blockchain%2Fframework-koa-1.3.3.tgz", {\
+          "packageLocation": "./.yarn/cache/@space-it-blockchain-framework-koa-npm-1.3.3-69cb387179-39022c3bf8.zip/node_modules/@space-it-blockchain/framework-koa/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-koa", "npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-koa%2F-%2F%40space-it-blockchain%2Fframework-koa-1.3.3.tgz"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-koa%2F-%2F%40space-it-blockchain%2Fframework-koa-1.3.3.tgz", {\
+          "packageLocation": "./.yarn/__virtual__/@space-it-blockchain-framework-koa-virtual-f28a066624/0/cache/@space-it-blockchain-framework-koa-npm-1.3.3-69cb387179-39022c3bf8.zip/node_modules/@space-it-blockchain/framework-koa/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-koa", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-koa%2F-%2F%40space-it-blockchain%2Fframework-koa-1.3.3.tgz"],\
+            ["@space-it-blockchain/framework-application", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-application%2F-%2F%40space-it-blockchain%2Fframework-application-1.3.3.tgz"],\
+            ["@space-it-blockchain/framework-logger", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-logger%2F-%2F%40space-it-blockchain%2Fframework-logger-1.3.1.tgz"],\
+            ["@space-it-blockchain/framework-module", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-module%2F-%2F%40space-it-blockchain%2Fframework-module-1.3.2.tgz"],\
+            ["@space-it-blockchain/framework-web", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-web%2F-%2F%40space-it-blockchain%2Fframework-web-1.3.2.tgz"],\
+            ["@types/inversify", null],\
+            ["@types/koa", "npm:2.13.5"],\
+            ["@types/koa-router", "npm:7.4.4"],\
+            ["@types/space-it-blockchain__framework-application", null],\
+            ["@types/space-it-blockchain__framework-logger", null],\
+            ["@types/space-it-blockchain__framework-module", null],\
+            ["@types/space-it-blockchain__framework-web", null],\
+            ["inversify", "npm:5.1.1"],\
+            ["koa", "npm:2.13.0"],\
+            ["koa-compose", "npm:4.1.0"],\
+            ["koa-router", "npm:9.4.0"]\
+          ],\
+          "packagePeers": [\
+            "@space-it-blockchain/framework-application",\
+            "@space-it-blockchain/framework-logger",\
+            "@space-it-blockchain/framework-module",\
+            "@space-it-blockchain/framework-web",\
+            "@types/inversify",\
+            "@types/space-it-blockchain__framework-application",\
+            "@types/space-it-blockchain__framework-logger",\
+            "@types/space-it-blockchain__framework-module",\
+            "@types/space-it-blockchain__framework-web",\
+            "inversify"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@space-it-blockchain/framework-logger", [\
+        ["npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-logger%2F-%2F%40space-it-blockchain%2Fframework-logger-1.3.1.tgz", {\
+          "packageLocation": "./.yarn/cache/@space-it-blockchain-framework-logger-npm-1.3.1-680a2ed6db-162ac7d4b4.zip/node_modules/@space-it-blockchain/framework-logger/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-logger", "npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-logger%2F-%2F%40space-it-blockchain%2Fframework-logger-1.3.1.tgz"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-logger%2F-%2F%40space-it-blockchain%2Fframework-logger-1.3.1.tgz", {\
+          "packageLocation": "./.yarn/__virtual__/@space-it-blockchain-framework-logger-virtual-5ef2ea93f4/0/cache/@space-it-blockchain-framework-logger-npm-1.3.1-680a2ed6db-162ac7d4b4.zip/node_modules/@space-it-blockchain/framework-logger/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-logger", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-logger%2F-%2F%40space-it-blockchain%2Fframework-logger-1.3.1.tgz"],\
+            ["@space-it-blockchain/framework-module", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-module%2F-%2F%40space-it-blockchain%2Fframework-module-1.3.2.tgz"],\
+            ["@space-it-blockchain/framework-utils", "virtual:84e904782d2a7e37d0fe871e858e098492e718a686709cbfdb7d3813e23d745da682ee2f08fed13c0030f2fed720acbe5c2fd7641e6fba4a4e2c5b21328166c7#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-utils%2F-%2F%40space-it-blockchain%2Fframework-utils-1.3.1.tgz"],\
+            ["@types/inversify", null],\
+            ["@types/reflect-metadata", null],\
+            ["@types/space-it-blockchain__framework-module", null],\
+            ["bunyan", "npm:1.8.15"],\
+            ["inversify", "npm:5.1.1"],\
+            ["reflect-metadata", "npm:0.1.13"]\
+          ],\
+          "packagePeers": [\
+            "@space-it-blockchain/framework-module",\
+            "@types/inversify",\
+            "@types/reflect-metadata",\
+            "@types/space-it-blockchain__framework-module",\
+            "inversify",\
+            "reflect-metadata"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@space-it-blockchain/framework-module", [\
+        ["npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-module%2F-%2F%40space-it-blockchain%2Fframework-module-1.3.2.tgz", {\
+          "packageLocation": "./.yarn/cache/@space-it-blockchain-framework-module-npm-1.3.2-460b3f7387-5151eecb87.zip/node_modules/@space-it-blockchain/framework-module/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-module", "npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-module%2F-%2F%40space-it-blockchain%2Fframework-module-1.3.2.tgz"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-module%2F-%2F%40space-it-blockchain%2Fframework-module-1.3.2.tgz", {\
+          "packageLocation": "./.yarn/__virtual__/@space-it-blockchain-framework-module-virtual-08ef3b4d9a/0/cache/@space-it-blockchain-framework-module-npm-1.3.2-460b3f7387-5151eecb87.zip/node_modules/@space-it-blockchain/framework-module/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-module", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-module%2F-%2F%40space-it-blockchain%2Fframework-module-1.3.2.tgz"],\
+            ["@types/inversify", null],\
+            ["@types/reflect-metadata", null],\
+            ["async-exit-hook", "npm:2.0.1"],\
+            ["inversify", "npm:5.1.1"],\
+            ["reflect-metadata", "npm:0.1.13"],\
+            ["type-fest", "npm:0.18.0"]\
+          ],\
+          "packagePeers": [\
+            "@types/inversify",\
+            "@types/reflect-metadata",\
+            "inversify",\
+            "reflect-metadata"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@space-it-blockchain/framework-utils", [\
+        ["npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-utils%2F-%2F%40space-it-blockchain%2Fframework-utils-1.3.1.tgz", {\
+          "packageLocation": "./.yarn/cache/@space-it-blockchain-framework-utils-npm-1.3.1-b1220bd2ae-1f6f3c84d7.zip/node_modules/@space-it-blockchain/framework-utils/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-utils", "npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-utils%2F-%2F%40space-it-blockchain%2Fframework-utils-1.3.1.tgz"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:84e904782d2a7e37d0fe871e858e098492e718a686709cbfdb7d3813e23d745da682ee2f08fed13c0030f2fed720acbe5c2fd7641e6fba4a4e2c5b21328166c7#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-utils%2F-%2F%40space-it-blockchain%2Fframework-utils-1.3.1.tgz", {\
+          "packageLocation": "./.yarn/__virtual__/@space-it-blockchain-framework-utils-virtual-ead2372ebe/0/cache/@space-it-blockchain-framework-utils-npm-1.3.1-b1220bd2ae-1f6f3c84d7.zip/node_modules/@space-it-blockchain/framework-utils/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-utils", "virtual:84e904782d2a7e37d0fe871e858e098492e718a686709cbfdb7d3813e23d745da682ee2f08fed13c0030f2fed720acbe5c2fd7641e6fba4a4e2c5b21328166c7#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-utils%2F-%2F%40space-it-blockchain%2Fframework-utils-1.3.1.tgz"],\
+            ["@types/inversify", null],\
+            ["@types/reflect-metadata", null],\
+            ["inversify", "npm:5.1.1"],\
+            ["reflect-metadata", "npm:0.1.13"]\
+          ],\
+          "packagePeers": [\
+            "@types/inversify",\
+            "@types/reflect-metadata",\
+            "inversify",\
+            "reflect-metadata"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@space-it-blockchain/framework-web", [\
+        ["npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-web%2F-%2F%40space-it-blockchain%2Fframework-web-1.3.2.tgz", {\
+          "packageLocation": "./.yarn/cache/@space-it-blockchain-framework-web-npm-1.3.2-453cd0f1e8-98e1745df9.zip/node_modules/@space-it-blockchain/framework-web/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-web", "npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-web%2F-%2F%40space-it-blockchain%2Fframework-web-1.3.2.tgz"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-web%2F-%2F%40space-it-blockchain%2Fframework-web-1.3.2.tgz", {\
+          "packageLocation": "./.yarn/__virtual__/@space-it-blockchain-framework-web-virtual-f6ecb1dc25/0/cache/@space-it-blockchain-framework-web-npm-1.3.2-453cd0f1e8-98e1745df9.zip/node_modules/@space-it-blockchain/framework-web/",\
+          "packageDependencies": [\
+            ["@space-it-blockchain/framework-web", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-web%2F-%2F%40space-it-blockchain%2Fframework-web-1.3.2.tgz"],\
+            ["@space-it-blockchain/framework-application", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-application%2F-%2F%40space-it-blockchain%2Fframework-application-1.3.3.tgz"],\
+            ["@space-it-blockchain/framework-logger", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-logger%2F-%2F%40space-it-blockchain%2Fframework-logger-1.3.1.tgz"],\
+            ["@space-it-blockchain/framework-module", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-module%2F-%2F%40space-it-blockchain%2Fframework-module-1.3.2.tgz"],\
+            ["@types/inversify", null],\
+            ["@types/space-it-blockchain__framework-application", null],\
+            ["@types/space-it-blockchain__framework-logger", null],\
+            ["@types/space-it-blockchain__framework-module", null],\
+            ["inversify", "npm:5.1.1"],\
+            ["type-fest", "npm:0.18.0"]\
+          ],\
+          "packagePeers": [\
+            "@space-it-blockchain/framework-application",\
+            "@space-it-blockchain/framework-logger",\
+            "@space-it-blockchain/framework-module",\
+            "@types/inversify",\
+            "@types/space-it-blockchain__framework-application",\
+            "@types/space-it-blockchain__framework-logger",\
+            "@types/space-it-blockchain__framework-module",\
+            "inversify"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@szmarczak/http-timer", [\
         ["npm:1.1.2", {\
           "packageLocation": "./.yarn/cache/@szmarczak-http-timer-npm-1.1.2-ea82ca2d55-4d9158061c.zip/node_modules/@szmarczak/http-timer/",\
@@ -1357,6 +1611,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@types/accepts", [\
+        ["npm:1.3.5", {\
+          "packageLocation": "./.yarn/cache/@types-accepts-npm-1.3.5-1d59cd2a7a-590b758057.zip/node_modules/@types/accepts/",\
+          "packageDependencies": [\
+            ["@types/accepts", "npm:1.3.5"],\
+            ["@types/node", "npm:18.6.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@types/bn.js", [\
         ["npm:4.11.6", {\
           "packageLocation": "./.yarn/cache/@types-bn.js-npm-4.11.6-85f0d125f5-7f66f2c7b7.zip/node_modules/@types/bn.js/",\
@@ -1405,11 +1669,33 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@types/content-disposition", [\
+        ["npm:0.5.5", {\
+          "packageLocation": "./.yarn/cache/@types-content-disposition-npm-0.5.5-2219aba782-fdf7379db1.zip/node_modules/@types/content-disposition/",\
+          "packageDependencies": [\
+            ["@types/content-disposition", "npm:0.5.5"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@types/convict", [\
         ["npm:6.1.1", {\
           "packageLocation": "./.yarn/cache/@types-convict-npm-6.1.1-531a6ce375-0150048098.zip/node_modules/@types/convict/",\
           "packageDependencies": [\
             ["@types/convict", "npm:6.1.1"],\
+            ["@types/node", "npm:18.6.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/cookies", [\
+        ["npm:0.7.7", {\
+          "packageLocation": "./.yarn/cache/@types-cookies-npm-0.7.7-0fbdd53be5-d3759efc11.zip/node_modules/@types/cookies/",\
+          "packageDependencies": [\
+            ["@types/cookies", "npm:0.7.7"],\
+            ["@types/connect", "npm:3.4.35"],\
+            ["@types/express", "npm:4.17.13"],\
+            ["@types/keygrip", "npm:1.0.2"],\
             ["@types/node", "npm:18.6.1"]\
           ],\
           "linkType": "HARD"\
@@ -1440,6 +1726,34 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@types/formidable", [\
+        ["npm:1.2.5", {\
+          "packageLocation": "./.yarn/cache/@types-formidable-npm-1.2.5-34e2090efa-2e4eea700f.zip/node_modules/@types/formidable/",\
+          "packageDependencies": [\
+            ["@types/formidable", "npm:1.2.5"],\
+            ["@types/node", "npm:18.6.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/http-assert", [\
+        ["npm:1.5.3", {\
+          "packageLocation": "./.yarn/cache/@types-http-assert-npm-1.5.3-d45bf58309-9553e5a0b8.zip/node_modules/@types/http-assert/",\
+          "packageDependencies": [\
+            ["@types/http-assert", "npm:1.5.3"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/http-errors", [\
+        ["npm:1.8.2", {\
+          "packageLocation": "./.yarn/cache/@types-http-errors-npm-1.8.2-1208ef5c6d-ecc365eea9.zip/node_modules/@types/http-errors/",\
+          "packageDependencies": [\
+            ["@types/http-errors", "npm:1.8.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@types/json-schema", [\
         ["npm:7.0.11", {\
           "packageLocation": "./.yarn/cache/@types-json-schema-npm-7.0.11-79462ae5ca-527bddfe62.zip/node_modules/@types/json-schema/",\
@@ -1458,12 +1772,78 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@types/keygrip", [\
+        ["npm:1.0.2", {\
+          "packageLocation": "./.yarn/cache/@types-keygrip-npm-1.0.2-2e57be51bc-60bc2738a4.zip/node_modules/@types/keygrip/",\
+          "packageDependencies": [\
+            ["@types/keygrip", "npm:1.0.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@types/keyv", [\
         ["npm:3.1.4", {\
           "packageLocation": "./.yarn/cache/@types-keyv-npm-3.1.4-a8082ea56b-e009a2bfb5.zip/node_modules/@types/keyv/",\
           "packageDependencies": [\
             ["@types/keyv", "npm:3.1.4"],\
             ["@types/node", "npm:18.6.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/koa", [\
+        ["npm:2.13.5", {\
+          "packageLocation": "./.yarn/cache/@types-koa-npm-2.13.5-ee6d93204c-e3b634d934.zip/node_modules/@types/koa/",\
+          "packageDependencies": [\
+            ["@types/koa", "npm:2.13.5"],\
+            ["@types/accepts", "npm:1.3.5"],\
+            ["@types/content-disposition", "npm:0.5.5"],\
+            ["@types/cookies", "npm:0.7.7"],\
+            ["@types/http-assert", "npm:1.5.3"],\
+            ["@types/http-errors", "npm:1.8.2"],\
+            ["@types/keygrip", "npm:1.0.2"],\
+            ["@types/koa-compose", "npm:3.2.5"],\
+            ["@types/node", "npm:18.6.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/koa-compose", [\
+        ["npm:3.2.5", {\
+          "packageLocation": "./.yarn/cache/@types-koa-compose-npm-3.2.5-b9ab25d904-5d1147c4b0.zip/node_modules/@types/koa-compose/",\
+          "packageDependencies": [\
+            ["@types/koa-compose", "npm:3.2.5"],\
+            ["@types/koa", "npm:2.13.5"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/koa-cookie", [\
+        ["npm:1.0.0", {\
+          "packageLocation": "./.yarn/cache/@types-koa-cookie-npm-1.0.0-30d6274290-9536bdac09.zip/node_modules/@types/koa-cookie/",\
+          "packageDependencies": [\
+            ["@types/koa-cookie", "npm:1.0.0"],\
+            ["@types/koa", "npm:2.13.5"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/koa-router", [\
+        ["npm:7.4.4", {\
+          "packageLocation": "./.yarn/cache/@types-koa-router-npm-7.4.4-ea72843f67-23ff5b725d.zip/node_modules/@types/koa-router/",\
+          "packageDependencies": [\
+            ["@types/koa-router", "npm:7.4.4"],\
+            ["@types/koa", "npm:2.13.5"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/koa__cors", [\
+        ["npm:3.3.0", {\
+          "packageLocation": "./.yarn/cache/@types-koa__cors-npm-3.3.0-d247b76272-c1aeb10b07.zip/node_modules/@types/koa__cors/",\
+          "packageDependencies": [\
+            ["@types/koa__cors", "npm:3.3.0"],\
+            ["@types/koa", "npm:2.13.5"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -1543,10 +1923,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],\
           "linkType": "HARD"\
         }],\
-        ["npm:16.4.2", {\
-          "packageLocation": "./.yarn/cache/@types-node-npm-16.4.2-9f96b643d7-d9b02aeb2b.zip/node_modules/@types/node/",\
+        ["npm:17.0.45", {\
+          "packageLocation": "./.yarn/cache/@types-node-npm-17.0.45-fdb38d1624-aa04366b91.zip/node_modules/@types/node/",\
           "packageDependencies": [\
-            ["@types/node", "npm:16.4.2"]\
+            ["@types/node", "npm:17.0.45"]\
           ],\
           "linkType": "HARD"\
         }],\
@@ -2443,6 +2823,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["any-promise", [\
+        ["npm:1.3.0", {\
+          "packageLocation": "./.yarn/cache/any-promise-npm-1.3.0-f34eeaa7e7-0ee8a9bdbe.zip/node_modules/any-promise/",\
+          "packageDependencies": [\
+            ["any-promise", "npm:1.3.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["anymatch", [\
         ["npm:3.1.2", {\
           "packageLocation": "./.yarn/cache/anymatch-npm-3.1.2-1d5471acfa-985163db22.zip/node_modules/anymatch/",\
@@ -2474,14 +2863,23 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@ethersproject/providers", "npm:5.6.8"],\
             ["@ethersproject/web", "npm:5.6.1"],\
             ["@flashbots/ethers-provider-bundle", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#patch:@flashbots/ethers-provider-bundle@npm%3A0.4.3#.yarn/patches/@flashbots-ethers-provider-bundle-npm-0.4.3-767bbc7067.patch::version=0.4.3&hash=49fc89&locator=arbitrage%40workspace%3A."],\
+            ["@koa/cors", "npm:3.3.0"],\
             ["@nomiclabs/hardhat-etherscan", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:3.1.0"],\
             ["@nomiclabs/hardhat-waffle", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:2.0.3"],\
             ["@openzeppelin/contracts", "npm:4.7.1"],\
+            ["@space-it-blockchain/framework-application", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-application%2F-%2F%40space-it-blockchain%2Fframework-application-1.3.3.tgz"],\
+            ["@space-it-blockchain/framework-exit-listener", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-exit-listener%2F-%2F%40space-it-blockchain%2Fframework-exit-listener-1.3.1.tgz"],\
+            ["@space-it-blockchain/framework-koa", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.3::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-koa%2F-%2F%40space-it-blockchain%2Fframework-koa-1.3.3.tgz"],\
+            ["@space-it-blockchain/framework-logger", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-logger%2F-%2F%40space-it-blockchain%2Fframework-logger-1.3.1.tgz"],\
+            ["@space-it-blockchain/framework-module", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-module%2F-%2F%40space-it-blockchain%2Fframework-module-1.3.2.tgz"],\
+            ["@space-it-blockchain/framework-web", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-web%2F-%2F%40space-it-blockchain%2Fframework-web-1.3.2.tgz"],\
             ["@types/convict", "npm:6.1.1"],\
             ["@types/express", "npm:4.17.13"],\
+            ["@types/koa-cookie", "npm:1.0.0"],\
+            ["@types/koa__cors", "npm:3.3.0"],\
             ["@types/mocha", "npm:9.1.1"],\
             ["@types/multicoin-address-validator", "npm:0.5.0"],\
-            ["@types/node", "npm:16.4.2"],\
+            ["@types/node", "npm:17.0.45"],\
             ["@types/node-fetch", "npm:2.6.2"],\
             ["@typescript-eslint/eslint-plugin", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:5.31.0"],\
             ["@typescript-eslint/parser", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:5.31.0"],\
@@ -2494,6 +2892,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@uniswap/v3-periphery", "npm:1.4.1"],\
             ["@uniswap/v3-sdk", "npm:3.9.0"],\
             ["bignumber.js", "npm:9.0.2"],\
+            ["bunyan", "npm:1.8.15"],\
             ["chai", "npm:4.3.6"],\
             ["convict", "npm:6.2.3"],\
             ["dotenv", "npm:16.0.1"],\
@@ -2511,7 +2910,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["express", "npm:4.18.1"],\
             ["hardhat", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:2.10.1"],\
             ["hardhat-deploy", "npm:0.11.12"],\
+            ["inversify", "npm:5.1.1"],\
             ["jsbi", "npm:3.2.5"],\
+            ["koa-body", "npm:4.2.0"],\
+            ["koa-cookie", "npm:1.0.0"],\
             ["module-alias", "npm:2.2.2"],\
             ["multicoin-address-validator", "npm:0.5.10"],\
             ["node-fetch", "virtual:6ad6d6a2150b7bdfbdf32622ed5849929cfae3024c1517ed35465977933e0f142a3dbd48c675b171c3f1aadc975b55f25814c1c29edb9c8ce617e232df83f606#npm:2.6.7"],\
@@ -2519,6 +2921,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["pino-pretty", "npm:8.1.0"],\
             ["prettier", "npm:2.7.1"],\
             ["prettier-plugin-solidity", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.0.0-dev.23"],\
+            ["reflect-metadata", "npm:0.1.13"],\
+            ["source-map-support", "npm:0.5.21"],\
             ["tiny-invariant", "npm:1.2.0"],\
             ["ts-node", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:10.9.1"],\
             ["typescript", "patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=f456af"]\
@@ -2766,6 +3170,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["async-eventemitter", "npm:0.2.4"],\
             ["async", "npm:2.6.4"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["async-exit-hook", [\
+        ["npm:2.0.1", {\
+          "packageLocation": "./.yarn/cache/async-exit-hook-npm-2.0.1-09570c5c6b-b72cbdd19e.zip/node_modules/async-exit-hook/",\
+          "packageDependencies": [\
+            ["async-exit-hook", "npm:2.0.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -3945,6 +4358,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["bunyan", [\
+        ["npm:1.8.15", {\
+          "packageLocation": "./.yarn/cache/bunyan-npm-1.8.15-e130eb0235-a479e0787c.zip/node_modules/bunyan/",\
+          "packageDependencies": [\
+            ["bunyan", "npm:1.8.15"],\
+            ["dtrace-provider", "npm:0.8.8"],\
+            ["moment", "npm:2.29.4"],\
+            ["mv", "npm:2.1.1"],\
+            ["safe-json-stringify", "npm:1.2.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["bytes", [\
         ["npm:3.1.2", {\
           "packageLocation": "./.yarn/cache/bytes-npm-3.1.2-28b8643004-e4bcd3948d.zip/node_modules/bytes/",\
@@ -4016,6 +4442,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["to-object-path", "npm:0.3.0"],\
             ["union-value", "npm:1.0.1"],\
             ["unset-value", "npm:1.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["cache-content-type", [\
+        ["npm:1.0.1", {\
+          "packageLocation": "./.yarn/cache/cache-content-type-npm-1.0.1-f709f8c309-18db4d5945.zip/node_modules/cache-content-type/",\
+          "packageDependencies": [\
+            ["cache-content-type", "npm:1.0.1"],\
+            ["mime-types", "npm:2.1.35"],\
+            ["ylru", "npm:1.3.2"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4349,6 +4786,28 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["co", [\
+        ["npm:4.6.0", {\
+          "packageLocation": "./.yarn/cache/co-npm-4.6.0-03f2d1feb6-5210d92230.zip/node_modules/co/",\
+          "packageDependencies": [\
+            ["co", "npm:4.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["co-body", [\
+        ["npm:5.2.0", {\
+          "packageLocation": "./.yarn/cache/co-body-npm-5.2.0-89daef6bfa-48e1ffe00b.zip/node_modules/co-body/",\
+          "packageDependencies": [\
+            ["co-body", "npm:5.2.0"],\
+            ["inflation", "npm:2.0.0"],\
+            ["qs", "npm:6.11.0"],\
+            ["raw-body", "npm:2.5.1"],\
+            ["type-is", "npm:1.6.18"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["code-point-at", [\
         ["npm:1.1.0", {\
           "packageLocation": "./.yarn/cache/code-point-at-npm-1.1.0-37de5fe566-17d5666611.zip/node_modules/code-point-at/",\
@@ -4601,6 +5060,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["cookies", [\
+        ["npm:0.8.0", {\
+          "packageLocation": "./.yarn/cache/cookies-npm-0.8.0-d7388cbd94-806055a44f.zip/node_modules/cookies/",\
+          "packageDependencies": [\
+            ["cookies", "npm:0.8.0"],\
+            ["depd", "npm:2.0.0"],\
+            ["keygrip", "npm:1.1.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["copy-descriptor", [\
         ["npm:0.1.1", {\
           "packageLocation": "./.yarn/cache/copy-descriptor-npm-0.1.1-864db4ab66-d4b7b57b14.zip/node_modules/copy-descriptor/",\
@@ -4825,6 +5295,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],\
           "linkType": "SOFT"\
         }],\
+        ["npm:3.1.0", {\
+          "packageLocation": "./.yarn/cache/debug-npm-3.1.0-9f0accb99b-0b52718ab9.zip/node_modules/debug/",\
+          "packageDependencies": [\
+            ["debug", "npm:3.1.0"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
         ["npm:3.2.6", {\
           "packageLocation": "./.yarn/cache/debug-npm-3.2.6-6214e40f12-07bc8b3a13.zip/node_modules/debug/",\
           "packageDependencies": [\
@@ -4845,6 +5322,20 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["debug", "npm:4.3.4"]\
           ],\
           "linkType": "SOFT"\
+        }],\
+        ["virtual:1a693cbdf41f6c76f18019cb77210859be16eef16627dac0e03e92b6d2ec98699c09dfca0638e23027cc025cfc583b1dd02ea5865067befc65c418929d1f00e3#npm:3.1.0", {\
+          "packageLocation": "./.yarn/__virtual__/debug-virtual-2f638cde4d/0/cache/debug-npm-3.1.0-9f0accb99b-0b52718ab9.zip/node_modules/debug/",\
+          "packageDependencies": [\
+            ["debug", "virtual:1a693cbdf41f6c76f18019cb77210859be16eef16627dac0e03e92b6d2ec98699c09dfca0638e23027cc025cfc583b1dd02ea5865067befc65c418929d1f00e3#npm:3.1.0"],\
+            ["@types/supports-color", null],\
+            ["ms", "npm:2.0.0"],\
+            ["supports-color", null]\
+          ],\
+          "packagePeers": [\
+            "@types/supports-color",\
+            "supports-color"\
+          ],\
+          "linkType": "HARD"\
         }],\
         ["virtual:2bcc47d217f870e3d52f0e55493dc34fd3da852877f7db32fa2940cc320151746026495daf6a34a974488cf5a949d93be1e2dc1ffba036faf081a9b15fcd2252#npm:2.6.9", {\
           "packageLocation": "./.yarn/__virtual__/debug-virtual-6cfa7ae8cd/0/cache/debug-npm-2.6.9-7d4cb597dc-d2f51589ca.zip/node_modules/debug/",\
@@ -4972,6 +5463,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["deep-equal", [\
+        ["npm:1.0.1", {\
+          "packageLocation": "./.yarn/cache/deep-equal-npm-1.0.1-f05565c4e5-5af8cbfceb.zip/node_modules/deep-equal/",\
+          "packageDependencies": [\
+            ["deep-equal", "npm:1.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
         ["npm:1.1.1", {\
           "packageLocation": "./.yarn/cache/deep-equal-npm-1.1.1-67ff9c29b9-f92686f2c5.zip/node_modules/deep-equal/",\
           "packageDependencies": [\
@@ -5241,6 +5739,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["dotignore", "npm:0.1.2"],\
             ["minimatch", "npm:3.1.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["dtrace-provider", [\
+        ["npm:0.8.8", {\
+          "packageLocation": "./.yarn/unplugged/dtrace-provider-npm-0.8.8-c06c6b4a53/node_modules/dtrace-provider/",\
+          "packageDependencies": [\
+            ["dtrace-provider", "npm:0.8.8"],\
+            ["nan", "npm:2.16.0"],\
+            ["node-gyp", "npm:9.1.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -7104,6 +7613,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["formidable", [\
+        ["npm:1.2.6", {\
+          "packageLocation": "./.yarn/cache/formidable-npm-1.2.6-68be5e1519-2b68ed07ba.zip/node_modules/formidable/",\
+          "packageDependencies": [\
+            ["formidable", "npm:1.2.6"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["forwarded", [\
         ["npm:0.2.0", {\
           "packageLocation": "./.yarn/cache/forwarded-npm-0.2.0-6473dabe35-fd27e2394d.zip/node_modules/forwarded/",\
@@ -7418,6 +7936,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["glob", [\
+        ["npm:6.0.4", {\
+          "packageLocation": "./.yarn/cache/glob-npm-6.0.4-dbb227ba4a-c4946c3d01.zip/node_modules/glob/",\
+          "packageDependencies": [\
+            ["glob", "npm:6.0.4"],\
+            ["inflight", "npm:1.0.6"],\
+            ["inherits", "npm:2.0.4"],\
+            ["minimatch", "npm:3.1.2"],\
+            ["once", "npm:1.4.0"],\
+            ["path-is-absolute", "npm:1.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
         ["npm:7.2.0", {\
           "packageLocation": "./.yarn/cache/glob-npm-7.2.0-bb4644d239-78a8ea9423.zip/node_modules/glob/",\
           "packageDependencies": [\
@@ -7663,6 +8193,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/hardhat-deploy-npm-0.11.12-c3bec99cab-43365d5133.zip/node_modules/hardhat-deploy/",\
           "packageDependencies": [\
             ["hardhat-deploy", "npm:0.11.12"],\
+            ["@ethersproject/abi", "npm:5.6.4"],\
+            ["@ethersproject/address", "npm:5.6.1"],\
+            ["@ethersproject/constants", "npm:5.6.1"],\
+            ["@ethersproject/contracts", "npm:5.6.2"],\
+            ["@ethersproject/hash", "npm:5.6.1"],\
+            ["@ethersproject/wallet", "npm:5.6.2"],\
             ["@types/qs", "npm:6.9.7"],\
             ["axios", "npm:0.21.4"],\
             ["chalk", "npm:4.1.2"],\
@@ -7945,6 +8481,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["http-assert", [\
+        ["npm:1.5.0", {\
+          "packageLocation": "./.yarn/cache/http-assert-npm-1.5.0-bf7ea4ffcf-69c9b3c14c.zip/node_modules/http-assert/",\
+          "packageDependencies": [\
+            ["http-assert", "npm:1.5.0"],\
+            ["deep-equal", "npm:1.0.1"],\
+            ["http-errors", "npm:1.8.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["http-cache-semantics", [\
         ["npm:4.1.0", {\
           "packageLocation": "./.yarn/cache/http-cache-semantics-npm-4.1.0-860520a31f-974de94a81.zip/node_modules/http-cache-semantics/",\
@@ -7955,6 +8502,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["http-errors", [\
+        ["npm:1.8.1", {\
+          "packageLocation": "./.yarn/cache/http-errors-npm-1.8.1-fb60d9f6ae-d3c7e7e776.zip/node_modules/http-errors/",\
+          "packageDependencies": [\
+            ["http-errors", "npm:1.8.1"],\
+            ["depd", "npm:1.1.2"],\
+            ["inherits", "npm:2.0.4"],\
+            ["setprototypeof", "npm:1.2.0"],\
+            ["statuses", "npm:1.5.0"],\
+            ["toidentifier", "npm:1.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
         ["npm:2.0.0", {\
           "packageLocation": "./.yarn/cache/http-errors-npm-2.0.0-3f1c503428-9b0a378266.zip/node_modules/http-errors/",\
           "packageDependencies": [\
@@ -8147,6 +8706,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["inflation", [\
+        ["npm:2.0.0", {\
+          "packageLocation": "./.yarn/cache/inflation-npm-2.0.0-e638c91672-a0494871b1.zip/node_modules/inflation/",\
+          "packageDependencies": [\
+            ["inflation", "npm:2.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["inflight", [\
         ["npm:1.0.6", {\
           "packageLocation": "./.yarn/cache/inflight-npm-1.0.6-ccedb4b908-f4f76aa072.zip/node_modules/inflight/",\
@@ -8185,6 +8753,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["invariant", "npm:2.2.4"],\
             ["loose-envify", "npm:1.4.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["inversify", [\
+        ["npm:5.1.1", {\
+          "packageLocation": "./.yarn/cache/inversify-npm-5.1.1-b7efd1fd77-22d201647b.zip/node_modules/inversify/",\
+          "packageDependencies": [\
+            ["inversify", "npm:5.1.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -8458,6 +9035,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/is-function-npm-1.0.2-90ac01927b-7d564562e0.zip/node_modules/is-function/",\
           "packageDependencies": [\
             ["is-function", "npm:1.0.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["is-generator-function", [\
+        ["npm:1.0.10", {\
+          "packageLocation": "./.yarn/cache/is-generator-function-npm-1.0.10-1d0f3809ef-d54644e7db.zip/node_modules/is-generator-function/",\
+          "packageDependencies": [\
+            ["is-generator-function", "npm:1.0.10"],\
+            ["has-tostringtag", "npm:1.0.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -9044,6 +9631,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["keygrip", [\
+        ["npm:1.1.0", {\
+          "packageLocation": "./.yarn/cache/keygrip-npm-1.1.0-8da030c3ff-078cd16a46.zip/node_modules/keygrip/",\
+          "packageDependencies": [\
+            ["keygrip", "npm:1.1.0"],\
+            ["tsscmp", "npm:1.0.6"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["keyv", [\
         ["npm:3.1.0", {\
           "packageLocation": "./.yarn/cache/keyv-npm-3.1.0-81c9ff4454-bb7e8f3acf.zip/node_modules/keyv/",\
@@ -9102,6 +9699,101 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["klaw-sync", "npm:6.0.0"],\
             ["graceful-fs", "npm:4.2.10"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["koa", [\
+        ["npm:2.13.0", {\
+          "packageLocation": "./.yarn/cache/koa-npm-2.13.0-1a693cbdf4-4b8da40824.zip/node_modules/koa/",\
+          "packageDependencies": [\
+            ["koa", "npm:2.13.0"],\
+            ["accepts", "npm:1.3.8"],\
+            ["cache-content-type", "npm:1.0.1"],\
+            ["content-disposition", "npm:0.5.4"],\
+            ["content-type", "npm:1.0.4"],\
+            ["cookies", "npm:0.8.0"],\
+            ["debug", "virtual:1a693cbdf41f6c76f18019cb77210859be16eef16627dac0e03e92b6d2ec98699c09dfca0638e23027cc025cfc583b1dd02ea5865067befc65c418929d1f00e3#npm:3.1.0"],\
+            ["delegates", "npm:1.0.0"],\
+            ["depd", "npm:1.1.2"],\
+            ["destroy", "npm:1.2.0"],\
+            ["encodeurl", "npm:1.0.2"],\
+            ["escape-html", "npm:1.0.3"],\
+            ["fresh", "npm:0.5.2"],\
+            ["http-assert", "npm:1.5.0"],\
+            ["http-errors", "npm:1.8.1"],\
+            ["is-generator-function", "npm:1.0.10"],\
+            ["koa-compose", "npm:4.1.0"],\
+            ["koa-convert", "npm:1.2.0"],\
+            ["on-finished", "npm:2.4.1"],\
+            ["only", "npm:0.0.2"],\
+            ["parseurl", "npm:1.3.3"],\
+            ["statuses", "npm:1.5.0"],\
+            ["type-is", "npm:1.6.18"],\
+            ["vary", "npm:1.1.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["koa-body", [\
+        ["npm:4.2.0", {\
+          "packageLocation": "./.yarn/cache/koa-body-npm-4.2.0-0de9888369-8da5eb00eb.zip/node_modules/koa-body/",\
+          "packageDependencies": [\
+            ["koa-body", "npm:4.2.0"],\
+            ["@types/formidable", "npm:1.2.5"],\
+            ["co-body", "npm:5.2.0"],\
+            ["formidable", "npm:1.2.6"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["koa-compose", [\
+        ["npm:3.2.1", {\
+          "packageLocation": "./.yarn/cache/koa-compose-npm-3.2.1-0020b997fa-ff8e5fc034.zip/node_modules/koa-compose/",\
+          "packageDependencies": [\
+            ["koa-compose", "npm:3.2.1"],\
+            ["any-promise", "npm:1.3.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:4.1.0", {\
+          "packageLocation": "./.yarn/cache/koa-compose-npm-4.1.0-b682d9324e-46cb16792d.zip/node_modules/koa-compose/",\
+          "packageDependencies": [\
+            ["koa-compose", "npm:4.1.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["koa-convert", [\
+        ["npm:1.2.0", {\
+          "packageLocation": "./.yarn/cache/koa-convert-npm-1.2.0-5a09e15433-a33944dbda.zip/node_modules/koa-convert/",\
+          "packageDependencies": [\
+            ["koa-convert", "npm:1.2.0"],\
+            ["co", "npm:4.6.0"],\
+            ["koa-compose", "npm:3.2.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["koa-cookie", [\
+        ["npm:1.0.0", {\
+          "packageLocation": "./.yarn/cache/koa-cookie-npm-1.0.0-482482cbe9-e7506c3913.zip/node_modules/koa-cookie/",\
+          "packageDependencies": [\
+            ["koa-cookie", "npm:1.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["koa-router", [\
+        ["npm:9.4.0", {\
+          "packageLocation": "./.yarn/cache/koa-router-npm-9.4.0-70203647cd-b924b650ee.zip/node_modules/koa-router/",\
+          "packageDependencies": [\
+            ["koa-router", "npm:9.4.0"],\
+            ["debug", "virtual:b86a9fb34323a98c6519528ed55faa0d9b44ca8879307c0b29aa384bde47ff59a7d0c9051b31246f14521dfb71ba3c5d6d0b35c29fffc17bf875aa6ad977d9e8#npm:4.3.4"],\
+            ["http-errors", "npm:1.8.1"],\
+            ["koa-compose", "npm:4.1.0"],\
+            ["methods", "npm:1.1.2"],\
+            ["path-to-regexp", "npm:6.2.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -9639,6 +10331,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["map-obj", [\
+        ["npm:4.3.0", {\
+          "packageLocation": "./.yarn/cache/map-obj-npm-4.3.0-d53e32935d-fbc554934d.zip/node_modules/map-obj/",\
+          "packageDependencies": [\
+            ["map-obj", "npm:4.3.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["map-visit", [\
         ["npm:1.0.0", {\
           "packageLocation": "./.yarn/cache/map-visit-npm-1.0.0-33a7988a9d-c27045a502.zip/node_modules/map-visit/",\
@@ -10154,6 +10855,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["moment", [\
+        ["npm:2.29.4", {\
+          "packageLocation": "./.yarn/cache/moment-npm-2.29.4-902943305d-0ec3f9c2bc.zip/node_modules/moment/",\
+          "packageDependencies": [\
+            ["moment", "npm:2.29.4"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["ms", [\
         ["npm:2.0.0", {\
           "packageLocation": "./.yarn/cache/ms-npm-2.0.0-9e1101a471-0e6a22b8b7.zip/node_modules/ms/",\
@@ -10258,6 +10968,28 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["mv", [\
+        ["npm:2.1.1", {\
+          "packageLocation": "./.yarn/cache/mv-npm-2.1.1-4c2aca3831-59d4b5ebff.zip/node_modules/mv/",\
+          "packageDependencies": [\
+            ["mv", "npm:2.1.1"],\
+            ["mkdirp", "npm:0.5.6"],\
+            ["ncp", "npm:2.0.0"],\
+            ["rimraf", "npm:2.4.5"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["nan", [\
+        ["npm:2.16.0", {\
+          "packageLocation": "./.yarn/unplugged/nan-npm-2.16.0-cac314a230/node_modules/nan/",\
+          "packageDependencies": [\
+            ["nan", "npm:2.16.0"],\
+            ["node-gyp", "npm:9.1.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["nano-json-stream-parser", [\
         ["npm:0.1.2", {\
           "packageLocation": "./.yarn/cache/nano-json-stream-parser-npm-0.1.2-1b11c4e9ae-5bfe146358.zip/node_modules/nano-json-stream-parser/",\
@@ -10301,6 +11033,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/natural-compare-npm-1.4.0-97b75b362d-23ad088b08.zip/node_modules/natural-compare/",\
           "packageDependencies": [\
             ["natural-compare", "npm:1.4.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["ncp", [\
+        ["npm:2.0.0", {\
+          "packageLocation": "./.yarn/cache/ncp-npm-2.0.0-2121969339-ea9b19221d.zip/node_modules/ncp/",\
+          "packageDependencies": [\
+            ["ncp", "npm:2.0.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -10675,6 +11416,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["only", [\
+        ["npm:0.0.2", {\
+          "packageLocation": "./.yarn/cache/only-npm-0.0.2-122402a3f9-d399710db8.zip/node_modules/only/",\
+          "packageDependencies": [\
+            ["only", "npm:0.0.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["open", [\
         ["npm:7.4.2", {\
           "packageLocation": "./.yarn/unplugged/open-npm-7.4.2-a378c23959/node_modules/open/",\
@@ -11015,6 +11765,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/path-to-regexp-npm-0.1.7-2605347373-69a14ea24d.zip/node_modules/path-to-regexp/",\
           "packageDependencies": [\
             ["path-to-regexp", "npm:0.1.7"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:6.2.1", {\
+          "packageLocation": "./.yarn/cache/path-to-regexp-npm-6.2.1-8ebfe03654-f0227af828.zip/node_modules/path-to-regexp/",\
+          "packageDependencies": [\
+            ["path-to-regexp", "npm:6.2.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -11723,6 +12480,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["reflect-metadata", [\
+        ["npm:0.1.13", {\
+          "packageLocation": "./.yarn/cache/reflect-metadata-npm-0.1.13-c525998e20-798d379a7b.zip/node_modules/reflect-metadata/",\
+          "packageDependencies": [\
+            ["reflect-metadata", "npm:0.1.13"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["regenerate", [\
         ["npm:1.4.2", {\
           "packageLocation": "./.yarn/cache/regenerate-npm-1.4.2-b296c5b63a-3317a09b2f.zip/node_modules/regenerate/",\
@@ -12002,6 +12768,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["rimraf", [\
+        ["npm:2.4.5", {\
+          "packageLocation": "./.yarn/cache/rimraf-npm-2.4.5-64bcf0249e-036793b405.zip/node_modules/rimraf/",\
+          "packageDependencies": [\
+            ["rimraf", "npm:2.4.5"],\
+            ["glob", "npm:6.0.4"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
         ["npm:2.7.1", {\
           "packageLocation": "./.yarn/cache/rimraf-npm-2.7.1-9a71f3cc37-cdc7f6eacb.zip/node_modules/rimraf/",\
           "packageDependencies": [\
@@ -12081,6 +12855,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["safe-event-emitter", "npm:1.0.1"],\
             ["events", "npm:3.3.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["safe-json-stringify", [\
+        ["npm:1.2.0", {\
+          "packageLocation": "./.yarn/cache/safe-json-stringify-npm-1.2.0-77cfd16d74-5bb32db6d6.zip/node_modules/safe-json-stringify/",\
+          "packageDependencies": [\
+            ["safe-json-stringify", "npm:1.2.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -12762,6 +13545,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["statuses", [\
+        ["npm:1.5.0", {\
+          "packageLocation": "./.yarn/cache/statuses-npm-1.5.0-f88f91b2e9-c469b9519d.zip/node_modules/statuses/",\
+          "packageDependencies": [\
+            ["statuses", "npm:1.5.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
         ["npm:2.0.1", {\
           "packageLocation": "./.yarn/cache/statuses-npm-2.0.1-81d2b97fee-18c7623fdb.zip/node_modules/statuses/",\
           "packageDependencies": [\
@@ -13401,7 +14191,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@tsconfig/node12", "npm:1.0.11"],\
             ["@tsconfig/node14", "npm:1.0.3"],\
             ["@tsconfig/node16", "npm:1.0.3"],\
-            ["@types/node", "npm:16.4.2"],\
+            ["@types/node", "npm:17.0.45"],\
             ["@types/swc__core", null],\
             ["@types/swc__wasm", null],\
             ["@types/typescript", null],\
@@ -13461,6 +14251,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/tsort-npm-0.0.1-940cbebb9c-581566c248.zip/node_modules/tsort/",\
           "packageDependencies": [\
             ["tsort", "npm:0.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["tsscmp", [\
+        ["npm:1.0.6", {\
+          "packageLocation": "./.yarn/cache/tsscmp-npm-1.0.6-3223087558-1512384def.zip/node_modules/tsscmp/",\
+          "packageDependencies": [\
+            ["tsscmp", "npm:1.0.6"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -13573,6 +14372,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["type-fest", [\
+        ["npm:0.18.0", {\
+          "packageLocation": "./.yarn/cache/type-fest-npm-0.18.0-ac93bc6cd8-dbbca72b6e.zip/node_modules/type-fest/",\
+          "packageDependencies": [\
+            ["type-fest", "npm:0.18.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
         ["npm:0.20.2", {\
           "packageLocation": "./.yarn/cache/type-fest-npm-0.20.2-b36432617f-4fb3272df2.zip/node_modules/type-fest/",\
           "packageDependencies": [\
@@ -14808,6 +15614,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["ylru", [\
+        ["npm:1.3.2", {\
+          "packageLocation": "./.yarn/cache/ylru-npm-1.3.2-81969d097f-b6bb393114.zip/node_modules/ylru/",\
+          "packageDependencies": [\
+            ["ylru", "npm:1.3.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["yn", [\
         ["npm:3.1.1", {\
           "packageLocation": "./.yarn/cache/yn-npm-3.1.1-8ad4259784-2c487b0e14.zip/node_modules/yn/",\
@@ -14838,6 +15653,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/__virtual__/zksync-web3-virtual-9ef509247c/0/cache/zksync-web3-npm-0.7.11-1dbabf4a43-bae8adfefe.zip/node_modules/zksync-web3/",\
           "packageDependencies": [\
             ["zksync-web3", "virtual:c3bec99cab967333f890e3d64be415d6844234301de5713ec0bb21ce4bb05840ddeb566f5e4688d285da8eeef25fbc4f8466ad98b0b7c0e9a4a18c1b728168cd#npm:0.7.11"],\
+            ["@ethersproject/hash", "npm:5.6.1"],\
             ["@types/ethers", null],\
             ["ethers", "npm:5.6.9"]\
           ],\
