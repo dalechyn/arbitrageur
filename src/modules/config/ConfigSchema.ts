@@ -15,17 +15,11 @@ export default {
       default: 5,
       env: 'NETWORK_CHAIN_ID'
     },
-    rpcOrIpcUrl: {
+    rpcUrl: {
       doc: 'Network RPC or IPC URL',
       format: String,
       default: 'https://eth-goerli.alchemyapi.io/v2/oKG7sMevlL_ZQgGcZCOTEsaksS_nM922',
       env: 'NETWORK_RPC_OR_IPC_URL'
-    },
-    isIPC: {
-      doc: 'Is IPC?',
-      format: Boolean,
-      default: false,
-      env: 'NETWORK_IS_IPC'
     },
     blocksInFuture: {
       doc: 'Blocks in future to target',
@@ -50,8 +44,8 @@ export default {
   },
   key: {
     doc: 'Private Key',
+    default: null,
     format: String,
-    default: '',
     env: 'KEY'
   },
   port: {

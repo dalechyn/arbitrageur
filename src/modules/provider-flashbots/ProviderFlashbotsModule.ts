@@ -9,8 +9,12 @@ import { InitModule, module } from '@space-it-blockchain/framework-module'
 @module({
   imports: [LoggerModule, ConfigModule, ProviderModule],
   deps: {
-    export(exported) {
-      exported.bind(ProviderFlashbotsService).toSelf().inSingletonScope()
+    init(local) {
+      local.options.skipBaseClassChecks = true
+      local.bind(ProviderFlashbotsService).toSelf().inSingletonScope()
+    },
+    export(exported, local) {
+      exported.bind(ProviderFlashbotsService).toConstantValue(local.get(ProviderFlashbotsService))
     }
   }
 })

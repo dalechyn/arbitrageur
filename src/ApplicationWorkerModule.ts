@@ -59,7 +59,7 @@ import cookie from 'koa-cookie'
     ExitListenerModule
   ]
 })
-export class ApplicationModule implements InitModule {
+export class ApplicationWorkerModule implements InitModule {
   constructor(
     private readonly app: WebApplication,
     private readonly loggerMiddleware: WebLoggerMiddleware,

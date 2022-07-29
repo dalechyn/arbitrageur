@@ -29,8 +29,9 @@ import { InitModule, module } from '@space-it-blockchain/framework-module'
   }
 })
 export class ArbitrageurModule implements InitModule {
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: Logger, private readonly arbitrageur: ArbitrageurService) {}
   init() {
+    this.arbitrageur.run()
     this.logger.info('ArbitrageurModule is ready')
   }
 }

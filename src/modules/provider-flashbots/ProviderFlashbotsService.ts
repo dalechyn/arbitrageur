@@ -33,7 +33,12 @@ export class ProviderFlashbotsService extends FlashbotsBundleProvider {
       name: ''
     }
 
-    super(providerService, new Wallet(configService.get('key')), connectionInfo, networkish)
+    super(
+      providerService,
+      new Wallet(configService.get('key') as unknown as string),
+      connectionInfo,
+      networkish
+    )
   }
 
   public async getUserStats(): Promise<GetUserStatsResponse> {

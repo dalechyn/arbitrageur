@@ -66,7 +66,7 @@ export class ArbitrageurService {
               chainId
             )
 
-            const authSigner = new Wallet(this.configService.get('key'))
+            const authSigner = new Wallet(this.configService.get('key') as unknown as string)
             const preSignedTransactions = await this.providerFlashbotsService.signBundle([
               {
                 signer: authSigner,
