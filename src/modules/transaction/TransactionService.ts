@@ -99,7 +99,7 @@ export class TransactionService {
     )
     return {
       ...transaction,
-      maxFeePerGas: maxBaseFeeInFutureBlock
+      maxPriorityFeePerGas: '1000000000'
     }
   }
 }
