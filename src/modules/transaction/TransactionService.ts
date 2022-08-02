@@ -76,8 +76,9 @@ export class TransactionService {
     blocksInFuture: number,
     chainId: number
   ): Promise<TransactionRequest> {
-    const data = this.prepareCallData(result, blockNumber)
+    const data = this.prepareCallData(result, blockNumber + blocksInFuture)
     const block = await this.providerService.getBlock(blockNumber)
+    console.log(block.baseFeePerGas?.toString())
     if (!block.baseFeePerGas)
       throw new Error('Chain does not support EIP1559, write code for legacy')
     const maxBaseFeeInFutureBlock = FlashbotsBundleProvider.getMaxBaseFeeInFutureBlock(
