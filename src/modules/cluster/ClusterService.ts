@@ -2,15 +2,15 @@ import cluster from 'cluster'
 
 import { ConfigService } from '../config'
 import { ArbitrageInfo } from '../interfaces'
+import { BunyanLogger } from '../logger'
 
-import { Logger } from '@space-it-blockchain/framework-logger'
 import { Token } from '@uniswap/sdk-core'
 import { injectable } from 'inversify'
 
 @injectable()
 export class ClusterService {
   private opportunities: ArbitrageInfo[]
-  constructor(private readonly configService: ConfigService, logger: Logger) {
+  constructor(private readonly configService: ConfigService, logger: BunyanLogger) {
     this.opportunities = []
     if (cluster.isPrimary) {
       const totalCPUs = configService.get('clusters')

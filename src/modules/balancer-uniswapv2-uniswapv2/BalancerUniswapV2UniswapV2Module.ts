@@ -1,10 +1,11 @@
+import { BunyanLogger, BunyanLoggerModule } from '../logger'
+
 import { BalancerUniswapV2UniswapV2Service } from './BalancerUniswapV2UniswapV2Service'
 
-import { Logger, LoggerModule } from '@space-it-blockchain/framework-logger'
 import { InitModule, module } from '@space-it-blockchain/framework-module'
 
 @module({
-  imports: [LoggerModule],
+  imports: [BunyanLoggerModule],
   deps: {
     export(exported) {
       exported.bind(BalancerUniswapV2UniswapV2Service).toSelf().inSingletonScope()
@@ -12,7 +13,7 @@ import { InitModule, module } from '@space-it-blockchain/framework-module'
   }
 })
 export class BalancerUniswapV2UniswapV2Module implements InitModule {
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: BunyanLogger) {}
   init() {
     this.logger.info('BalancerUniswapV2UniswapV2Service is ready')
   }

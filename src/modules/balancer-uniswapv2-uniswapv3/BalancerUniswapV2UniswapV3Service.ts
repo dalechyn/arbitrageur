@@ -5,11 +5,11 @@ import {
   BalancerWrongPoolsFedError
 } from '../balancer'
 import { DEXType, PoolV2WithContract, PoolV3WithContract, PoolWithContract } from '../interfaces'
+import { BunyanLogger } from '../logger'
 
 import { FractionUtils } from './utils'
 import { SwapToPriceMath } from './utils/SwapToPriceMath'
 
-import { Logger } from '@space-it-blockchain/framework-logger'
 import { CurrencyAmount, Price, Token } from '@uniswap/sdk-core'
 import { LiquidityMath, priceToClosestTick, TickMath, tickToPrice } from '@uniswap/v3-sdk'
 import { injectable } from 'inversify'
@@ -27,7 +27,7 @@ interface StepComputations {
 
 @injectable()
 export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: BunyanLogger) {}
   /**
    * Returns the closest tick to the price without a regard if pool's tick grows left or right.
    *

@@ -1,8 +1,8 @@
 import { AbstractBalancer, BalancerWrongPoolsFedError, BalanceResult } from '../balancer'
 import { PoolV2WithContract, PoolWithContract, DEXType } from '../interfaces'
+import { BunyanLogger } from '../logger'
 import { JSBIUtils } from '../utils'
 
-import { Logger } from '@space-it-blockchain/framework-logger'
 import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { injectable } from 'inversify'
@@ -10,7 +10,7 @@ import JSBI from 'jsbi'
 
 @injectable()
 export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: BunyanLogger) {}
 
   /**
    * Returns reserves by TokenIn

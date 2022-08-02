@@ -1,13 +1,13 @@
 import { ConfigModule } from '../config'
+import { BunyanLogger, BunyanLoggerModule } from '../logger'
 import { ProviderModule } from '../provider'
 
 import { ProviderFlashbotsService } from './ProviderFlashbotsService'
 
-import { Logger, LoggerModule } from '@space-it-blockchain/framework-logger'
 import { InitModule, module } from '@space-it-blockchain/framework-module'
 
 @module({
-  imports: [LoggerModule, ConfigModule, ProviderModule],
+  imports: [BunyanLoggerModule, ConfigModule, ProviderModule],
   deps: {
     init(local) {
       local.options.skipBaseClassChecks = true
@@ -19,7 +19,7 @@ import { InitModule, module } from '@space-it-blockchain/framework-module'
   }
 })
 export class ProviderFlashbotsModule implements InitModule {
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: BunyanLogger) {}
   init() {
     this.logger.info('ProviderFlashbotsModule is ready')
   }

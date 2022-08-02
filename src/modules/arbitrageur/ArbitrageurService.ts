@@ -2,12 +2,12 @@ import { BalancerService } from '../balancer'
 import { ClusterService } from '../cluster'
 import { ConfigService } from '../config'
 import { FetcherService } from '../fetcher'
+import { BunyanLogger } from '../logger'
 import { ProviderService } from '../provider'
 import { ProviderFlashbotsService } from '../provider-flashbots'
 import { TransactionService } from '../transaction'
 
 import { FlashbotsBundleResolution } from '@flashbots/ethers-provider-bundle'
-import { Logger } from '@space-it-blockchain/framework-logger'
 import { BigNumber, Wallet } from 'ethers'
 import { injectable } from 'inversify'
 import fetch from 'node-fetch'
@@ -15,7 +15,7 @@ import fetch from 'node-fetch'
 @injectable()
 export class ArbitrageurService {
   constructor(
-    private readonly logger: Logger,
+    private readonly logger: BunyanLogger,
     private readonly configService: ConfigService,
     private readonly ethProvider: ProviderService,
     private readonly clusterService: ClusterService,
@@ -104,7 +104,7 @@ export class ArbitrageurService {
                 }
               }
             ])
-            const gasPrice = await this.ethProvider.getGasPrice()
+            /* const gasPrice = await this.ethProvider.getGasPrice()
             if (
               gasPrice
                 .mul(simulation.totalGasUsed)
@@ -114,7 +114,7 @@ export class ArbitrageurService {
                 'The transaction was dropped because the net profit is less than total gas fee'
               )
               return
-            }
+            } */
 
             info.skip = targetBlock
             this.logger.info('Will skip all blocks till ' + info.skip)

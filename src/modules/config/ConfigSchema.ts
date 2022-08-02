@@ -1,4 +1,5 @@
 import os from 'os'
+import path from 'path'
 
 import { validate } from 'multicoin-address-validator'
 
@@ -70,5 +71,10 @@ export default {
     format: String,
     default: 'arbitrage_003xYAO9',
     env: 'ENTRYPOINT_METHOD_NAME'
+  },
+  logDirectoryPath: {
+    format: String,
+    default: path.resolve(process.env.HOME ?? '/', 'arbitrage', '.logs'),
+    env: 'LOG_DIRECTORY_PATH'
   }
 }

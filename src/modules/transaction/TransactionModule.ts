@@ -1,13 +1,13 @@
 import { ConfigModule } from '../config'
+import { BunyanLogger, BunyanLoggerModule } from '../logger'
 import { ProviderModule } from '../provider'
 
 import { TransactionService } from './TransactionService'
 
-import { Logger, LoggerModule } from '@space-it-blockchain/framework-logger'
 import { InitModule, module } from '@space-it-blockchain/framework-module'
 
 @module({
-  imports: [LoggerModule, ConfigModule, ProviderModule],
+  imports: [BunyanLoggerModule, ConfigModule, ProviderModule],
   deps: {
     export(exported) {
       exported.bind(TransactionService).toSelf().inSingletonScope()
@@ -15,7 +15,7 @@ import { InitModule, module } from '@space-it-blockchain/framework-module'
   }
 })
 export class TransactionModule implements InitModule {
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: BunyanLogger) {}
   init() {
     this.logger.info('TransactionModule is ready')
   }

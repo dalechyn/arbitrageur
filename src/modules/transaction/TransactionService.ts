@@ -2,11 +2,11 @@ import Arbitrageur from '../../../deployments/mainnet/Arbitrageur.json'
 import { BalanceResult } from '../balancer'
 import { ConfigService } from '../config'
 import { DEXType } from '../interfaces'
+import { BunyanLogger } from '../logger'
 import { ProviderService } from '../provider'
 
 import { TransactionRequest } from '@ethersproject/abstract-provider'
 import { FlashbotsBundleProvider } from '@flashbots/ethers-provider-bundle'
-import { Logger } from '@space-it-blockchain/framework-logger'
 import { ethers } from 'ethers'
 import { injectable } from 'inversify'
 import JSBI from 'jsbi'
@@ -15,7 +15,7 @@ import JSBI from 'jsbi'
 export class TransactionService {
   constructor(
     private readonly configService: ConfigService,
-    private readonly logger: Logger,
+    private readonly logger: BunyanLogger,
     private readonly providerService: ProviderService
   ) {}
 

@@ -49,6 +49,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@space-it-blockchain/framework-logger", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-logger%2F-%2F%40space-it-blockchain%2Fframework-logger-1.3.1.tgz"],\
             ["@space-it-blockchain/framework-module", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-module%2F-%2F%40space-it-blockchain%2Fframework-module-1.3.2.tgz"],\
             ["@space-it-blockchain/framework-web", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-web%2F-%2F%40space-it-blockchain%2Fframework-web-1.3.2.tgz"],\
+            ["@types/bunyan", "npm:1.8.8"],\
             ["@types/convict", "npm:6.1.1"],\
             ["@types/express", "npm:4.17.13"],\
             ["@types/koa-cookie", "npm:1.0.0"],\
@@ -1650,6 +1651,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@types/bunyan", [\
+        ["npm:1.8.8", {\
+          "packageLocation": "./.yarn/cache/@types-bunyan-npm-1.8.8-758f1a6368-b28966c135.zip/node_modules/@types/bunyan/",\
+          "packageDependencies": [\
+            ["@types/bunyan", "npm:1.8.8"],\
+            ["@types/node", "npm:18.6.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@types/chai", [\
         ["npm:4.3.1", {\
           "packageLocation": "./.yarn/cache/@types-chai-npm-4.3.1-dab3901c30-2ee246b76c.zip/node_modules/@types/chai/",\
@@ -2873,6 +2884,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@space-it-blockchain/framework-logger", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.1::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-logger%2F-%2F%40space-it-blockchain%2Fframework-logger-1.3.1.tgz"],\
             ["@space-it-blockchain/framework-module", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-module%2F-%2F%40space-it-blockchain%2Fframework-module-1.3.2.tgz"],\
             ["@space-it-blockchain/framework-web", "virtual:f0e365e9e52d66d78a59c4973f7b5ff7fbaa38095503b304c405de27db0b79b3f4d14c3976c04105f9f61176e32b06c65daddedb0f24dc0cf95468ddd503c4d2#npm:1.3.2::__archiveUrl=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F33089355%2Fpackages%2Fnpm%2F%40space-it-blockchain%2Fframework-web%2F-%2F%40space-it-blockchain%2Fframework-web-1.3.2.tgz"],\
+            ["@types/bunyan", "npm:1.8.8"],\
             ["@types/convict", "npm:6.1.1"],\
             ["@types/express", "npm:4.17.13"],\
             ["@types/koa-cookie", "npm:1.0.0"],\

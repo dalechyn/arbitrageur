@@ -2,11 +2,11 @@ import MultiCallTickLens from '../../../deployments/goerli/MulticallTickLens.jso
 import { ConfigService } from '../config'
 import { AbstractFetcher } from '../fetcher'
 import { DEXType, PoolWithContract } from '../interfaces'
+import { BunyanLogger } from '../logger'
 import { ProviderService } from '../provider'
 
 import { TickLensDataProvider } from './utils'
 
-import { Logger } from '@space-it-blockchain/framework-logger'
 import { BigintIsh, Token } from '@uniswap/sdk-core'
 import UniswapV3Pool from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json'
 import { Pool, Tick, TickMath, TICK_SPACINGS } from '@uniswap/v3-sdk'
@@ -16,7 +16,7 @@ import { injectable } from 'inversify'
 @injectable()
 export class FetcherUniswapV3Service implements AbstractFetcher {
   constructor(
-    private readonly logger: Logger,
+    private readonly logger: BunyanLogger,
     private readonly config: ConfigService,
     private readonly providerService: ProviderService
   ) {}

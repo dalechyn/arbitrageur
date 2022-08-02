@@ -1,8 +1,8 @@
 import { FetcherPoolDoesNotExistError, AbstractFetcher } from '../fetcher'
 import { DEXType, PoolWithContract } from '../interfaces'
+import { BunyanLogger } from '../logger'
 import { ProviderService } from '../provider'
 
-import { Logger } from '@space-it-blockchain/framework-logger'
 import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import UniswapV2Pair from '@uniswap/v2-core/build/UniswapV2Pair.json'
 import { Pair } from '@uniswap/v2-sdk'
@@ -11,7 +11,7 @@ import { injectable } from 'inversify'
 
 @injectable()
 export class FetcherUniswapV2Service implements AbstractFetcher {
-  constructor(private readonly logger: Logger, private readonly providerService: ProviderService) {}
+  constructor(private readonly logger: BunyanLogger, private readonly providerService: ProviderService) {}
 
   async fetch(poolAddress: string, baseToken: Token, quoteToken: Token): Promise<PoolWithContract> {
     this.logger.info(`UniswapV2: Checking ${baseToken.symbol}-${quoteToken.symbol}: ${poolAddress}`)

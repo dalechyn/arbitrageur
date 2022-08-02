@@ -1,12 +1,12 @@
+import { BunyanLogger, BunyanLoggerModule } from '../logger'
 import { ProviderModule } from '../provider'
 
 import { FetcherUniswapV2Service } from './FetcherUniswapV2Service'
 
-import { Logger, LoggerModule } from '@space-it-blockchain/framework-logger'
 import { InitModule, module } from '@space-it-blockchain/framework-module'
 
 @module({
-  imports: [LoggerModule, ProviderModule],
+  imports: [BunyanLoggerModule, ProviderModule],
   deps: {
     export(exported) {
       exported.bind(FetcherUniswapV2Service).toSelf().inSingletonScope()
@@ -14,7 +14,7 @@ import { InitModule, module } from '@space-it-blockchain/framework-module'
   }
 })
 export class FetcherUniswapV2Module implements InitModule {
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: BunyanLogger) {}
   init() {
     this.logger.info('FetcherUniswapV2Module is ready')
   }

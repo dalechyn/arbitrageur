@@ -1,15 +1,15 @@
 import { ConfigModule } from '../config'
+import { BunyanLogger, BunyanLoggerModule } from '../logger'
 
 import { ClusterService } from './ClusterService'
 import { ClusterWebController } from './ClusterWebController'
 
-import { Logger, LoggerModule } from '@space-it-blockchain/framework-logger'
 import { InitModule, module } from '@space-it-blockchain/framework-module'
 import { WebPlugin } from '@space-it-blockchain/framework-web'
 
 @module({
   plugins: [WebPlugin],
-  imports: [ConfigModule, LoggerModule],
+  imports: [ConfigModule, BunyanLoggerModule],
   deps: {
     init(local) {
       local.bind(ClusterService).toSelf().inSingletonScope()
@@ -21,7 +21,7 @@ import { WebPlugin } from '@space-it-blockchain/framework-web'
   }
 })
 export class ClusterModule implements InitModule {
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: BunyanLogger) {}
   init() {
     this.logger.info('ClusterModule is ready')
   }
