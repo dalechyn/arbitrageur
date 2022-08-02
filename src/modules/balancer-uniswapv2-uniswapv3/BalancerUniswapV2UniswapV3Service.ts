@@ -447,11 +447,12 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
   }
 
   balance(from: PoolWithContract, to: PoolWithContract, baseToken: Token): Promise<BalanceResult> {
+    const zeroForOne = from.price.lessThan(to.price)
     if (from.type === DEXType.UNISWAPV2 && to.type === DEXType.UNISWAPV3)
-      return this.v2ToV3(from, to, baseToken)
+      return zeroForOne ? this.v2ToV3(from, to, baseToken) : this.v3ToV2(to, from, baseToken)
 
     if (from.type === DEXType.UNISWAPV3 && to.type === DEXType.UNISWAPV2)
-      return this.v3ToV2(from, to, baseToken)
+      return zeroForOne ? this.v3ToV2(from, to, baseToken) : this.v2ToV3(to, from, baseToken)
 
     throw new BalancerWrongPoolsFedError(from.type, to.type)
   }
