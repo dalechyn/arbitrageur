@@ -4,7 +4,7 @@ import { BunyanLogger } from '../logger'
 import { UniswapV3Signature } from '../mempool-uniswapv3'
 import { ProviderService } from '../provider'
 
-import { NoSwapsFoundError } from './errors'
+import { NoUniswapV2SwapsFoundError } from './errors'
 import { UniswapV2SwapSignature, UniswapV2Swap, UniswapV2Signature } from './interfaces'
 import { UniswapV3RouterV2SwapSignature } from './interfaces/UniswapV3RouterV2SwapSignature'
 
@@ -86,7 +86,7 @@ export class MempoolUniswapV2Service {
           UniswapV3Signature.multicall_3
         ].includes(callDatas[0][0].slice(56) as UniswapV3Signature))
     )
-      throw new NoSwapsFoundError(tx)
+      throw new NoUniswapV2SwapsFoundError(tx)
 
     const swaps: UniswapV2Swap[] = []
     for (const callData of callDatas) {
@@ -140,7 +140,9 @@ export class MempoolUniswapV2Service {
   }
 
   onUniswapV2PendingTransaction(handler: (swaps: UniswapV2Swap[]) => unknown) {
+    this.logger.debug(`MempoolUniswapV2Service: Starting to listen for pending transactions`)
     this.providerService.on('pending', async (tx: Transaction) => {
+      this.logger.debug(`MempoolUniswapV2Service: Received transaction: ${tx.hash}`)
       if (!this.isTxToUniswapV2OrV3(tx.to)) {
         this.logger.debug(
           'MempoolUniswapV2Service:',
@@ -150,8 +152,8 @@ export class MempoolUniswapV2Service {
       }
       try {
         handler(await this.fromRawTx(tx))
-      } catch (e) {
-        this.logger.debug(e)
+      } catch (e: any) {
+        this.logger.debug(`MempoolUniswapV2Service: ${e.message}`)
       }
     })
   }

@@ -2,6 +2,7 @@
 // import { ClusterService } from '../cluster'
 // import { ConfigService } from '../config'
 // import { FetcherService } from '../fetcher'
+
 import { BunyanLogger } from '../logger'
 // import { ProviderService } from '../provider'
 // import { ProviderFlashbotsService } from '../provider-flashbots'
@@ -24,7 +25,15 @@ export class ArbitrageurService {
 
   run(): void {
     this.mempoolUniswapV2Service.onUniswapV2PendingTransaction((swaps) => {
-      this.logger.info(swaps)
+      this.logger.info(
+        swaps.map((v) => ({
+          amountIn: v.amountIn.toString(),
+          amountOut: v.amountOut.toString(),
+          path: v.path.map((p) => p.address),
+          deadline: v.deadline.toString(),
+          method: v.method
+        }))
+      )
     })
     // this.ethProvider.on('block', async (blockNumber: number) => {
     //   // logger.info(await flashbotsProvider.fetchBlocksApi(14949852))

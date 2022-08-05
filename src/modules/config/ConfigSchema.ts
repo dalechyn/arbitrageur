@@ -1,6 +1,7 @@
 import os from 'os'
 import path from 'path'
 
+import bunyan from 'bunyan'
 import { validate } from 'multicoin-address-validator'
 
 const formatEth = (address: string) => {
@@ -72,10 +73,22 @@ export default {
     default: 'arbitrage_003xYAO9',
     env: 'ENTRYPOINT_METHOD_NAME'
   },
-  logDirectoryPath: {
-    format: String,
-    default: path.resolve(process.env.HOME ?? '/', 'arbitrage', '.logs'),
-    env: 'LOG_DIRECTORY_PATH'
+  logger: {
+    level: {
+      format: (v: any) => {
+        if (['trace', 'debug', 'info', 'warn', 'error', 'fatal'].includes(v)) return
+        throw new Error(
+          `logger level should be one of: 'trace' , 'debug' , 'info' , 'warn' , 'error' , 'fatal'`
+        )
+      },
+      default: 'info' as bunyan.LogLevelString,
+      env: 'LOG_LEVEL'
+    },
+    path: {
+      format: String,
+      default: path.resolve(process.env.HOME ?? '/', 'arbitrage', '.logs'),
+      env: 'LOG_DIRECTORY_PATH'
+    }
   },
   dexes: {
     uniswapV2: {

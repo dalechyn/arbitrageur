@@ -1,1 +1,1 @@
-export * from './NoSwapsFoundError'
+export * from './NoUniswapV2SwapsFoundError'

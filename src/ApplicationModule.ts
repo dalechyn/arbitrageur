@@ -25,14 +25,15 @@ import { module } from '@space-it-blockchain/framework-module'
     BunyanLoggerModule.register((c) => {
       const configService = c.get(ConfigService)
       const loggerService = c.get(Logger)
-      if (!fs.existsSync(configService.get('logDirectoryPath'))) {
-        fs.mkdirSync(configService.get('logDirectoryPath'), { recursive: true })
+      if (!fs.existsSync(configService.get('logger.path'))) {
+        fs.mkdirSync(configService.get('logger.path'), { recursive: true })
       }
-      const logPath = path.resolve(configService.get('logDirectoryPath'), `arbitraguer.log`)
+      const logPath = path.resolve(configService.get('logger.path'), `arbitraguer.log`)
 
       loggerService.info(`Will write logs to ${logPath}`)
       return {
         name: `arbitraguer`,
+        level: configService.get('logger.level'),
         streams: [
           { stream: process.stdout },
           {
