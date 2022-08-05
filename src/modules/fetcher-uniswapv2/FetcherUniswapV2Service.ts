@@ -11,7 +11,10 @@ import { injectable } from 'inversify'
 
 @injectable()
 export class FetcherUniswapV2Service implements AbstractFetcher {
-  constructor(private readonly logger: BunyanLogger, private readonly providerService: ProviderService) {}
+  constructor(
+    private readonly logger: BunyanLogger,
+    private readonly providerService: ProviderService
+  ) {}
 
   async fetch(poolAddress: string, baseToken: Token, quoteToken: Token): Promise<PoolWithContract> {
     this.logger.info(`UniswapV2: Checking ${baseToken.symbol}-${quoteToken.symbol}: ${poolAddress}`)

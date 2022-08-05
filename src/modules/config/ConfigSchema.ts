@@ -76,5 +76,22 @@ export default {
     format: String,
     default: path.resolve(process.env.HOME ?? '/', 'arbitrage', '.logs'),
     env: 'LOG_DIRECTORY_PATH'
+  },
+  dexes: {
+    uniswapV2: {
+      routerAddress: {
+        format: String,
+        default: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+        env: 'DEXES_UNISWAPV2_ROUTER_ADDRESS'
+      }
+    },
+    uniswapV3: {
+      // note - v3 router can also make v2 transactions
+      routerAddress: {
+        format: String,
+        default: '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45',
+        env: 'DEXES_UNISWAPV3_ROUTER_ADDRESS'
+      }
+    }
   }
 }

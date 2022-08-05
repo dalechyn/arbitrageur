@@ -1,5 +1,4 @@
 import { BalancerModule } from '../balancer'
-import { ClusterModule } from '../cluster'
 import { ConfigModule } from '../config'
 import { FetcherModule } from '../fetcher'
 import { BunyanLogger, BunyanLoggerModule } from '../logger'
@@ -16,7 +15,6 @@ import { InitModule, module } from '@space-it-blockchain/framework-module'
     BunyanLoggerModule,
     ConfigModule,
     ProviderModule,
-    ClusterModule,
     FetcherModule,
     BalancerModule,
     TransactionModule,
