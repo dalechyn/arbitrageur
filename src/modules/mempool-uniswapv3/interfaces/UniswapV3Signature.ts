@@ -6,10 +6,6 @@ export enum UniswapV3Signature {
   callPositionManager = 'b3a2af13',
   checkOracleSlippage_1 = 'efdeed8e',
   checkOracleSlippage_2 = 'f25801a7',
-  exactInput = 'b858183f',
-  exactInputSingle = '04e45aaf',
-  exactOutput = '09b81346',
-  exactOutputSingle = '5023b4df',
   getApprovalType = 'dee00f35',
   increaseLiquidity = 'f100b205',
   mint = '11ed56c9',
@@ -33,3 +29,8 @@ export enum UniswapV3Signature {
   unwrapWETH9WithFee_2 = 'd4ef38de',
   wrapETH = '1c58db4f'
 }
+
+export const UNISWAP_V3_SIGNATURES = Object.values(UniswapV3Signature)
+
+export const isUniswapV3Signature = (signature: string) =>
+  UNISWAP_V3_SIGNATURES.includes(signature as UniswapV3Signature)

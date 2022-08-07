@@ -2,6 +2,8 @@ import { BalancerModule } from '../balancer'
 import { ConfigModule } from '../config'
 import { FetcherModule } from '../fetcher'
 import { BunyanLogger, BunyanLoggerModule } from '../logger'
+import { MempoolUniswapV2Module } from '../mempool-uniswapv2'
+import { MempoolUniswapV3Module } from '../mempool-uniswapv3/MempoolUniswapV3Module'
 import { ProviderModule } from '../provider'
 import { ProviderFlashbotsModule } from '../provider-flashbots'
 import { TransactionModule } from '../transaction'
@@ -18,7 +20,9 @@ import { InitModule, module } from '@space-it-blockchain/framework-module'
     FetcherModule,
     BalancerModule,
     TransactionModule,
-    ProviderFlashbotsModule
+    ProviderFlashbotsModule,
+    MempoolUniswapV2Module,
+    MempoolUniswapV3Module
   ],
   deps: {
     export(exported) {

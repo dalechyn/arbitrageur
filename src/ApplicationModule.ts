@@ -11,6 +11,7 @@ import { FetcherUniswapV2Module } from './modules/fetcher-uniswapv2'
 import { FetcherUniswapV3Module } from './modules/fetcher-uniswapv3'
 import { BunyanLoggerModule } from './modules/logger'
 import { MempoolUniswapV2Module } from './modules/mempool-uniswapv2'
+import { MempoolUniswapV3Module } from './modules/mempool-uniswapv3/MempoolUniswapV3Module'
 import { ProviderModule } from './modules/provider'
 import { ProviderFlashbotsModule } from './modules/provider-flashbots'
 import { TransactionModule } from './modules/transaction'
@@ -46,6 +47,7 @@ import { module } from '@space-it-blockchain/framework-module'
     BalancerUniswapV2UniswapV3Module,
     BalancerModule,
     ProviderModule,
+    MempoolUniswapV3Module,
     MempoolUniswapV2Module,
     ProviderFlashbotsModule,
     TransactionModule,

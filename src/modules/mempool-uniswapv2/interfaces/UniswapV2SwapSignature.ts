@@ -9,3 +9,8 @@ export enum UniswapV2SwapSignature {
   swapExactETHForTokensSupportingFeeOnTransferTokens = 'b6f9de95',
   swapExactTokensForTokensSupportingFeeOnTransferTokens = '5c11d795'
 }
+
+export const UNISWAP_V2_SWAP_SIGNATURES = Object.values(UniswapV2SwapSignature)
+
+export const isUniswapV2SwapSignature = (signature: string) =>
+  UNISWAP_V2_SWAP_SIGNATURES.includes(signature as UniswapV2SwapSignature)

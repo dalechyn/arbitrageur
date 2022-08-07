@@ -10,6 +10,7 @@ import { BunyanLogger } from '../logger'
 // import { FlashbotsBundleResolution } from '@flashbots/ethers-provider-bundle'
 // import { BigNumber, Wallet } from 'ethers'
 import { MempoolUniswapV2Service } from '../mempool-uniswapv2'
+import { MempoolUniswapV3Service } from '../mempool-uniswapv3/MempoolUniswapV3Service'
 
 import { injectable } from 'inversify'
 // import fetch from 'node-fetch'
@@ -20,20 +21,16 @@ export class ArbitrageurService {
     private readonly logger: BunyanLogger,
     // private readonly configService: ConfigService,
     // private readonly ethProvider: ProviderService, // private readonly clusterService: ClusterService, // private readonly fetcherService: FetcherService, // private readonly balancerService: BalancerService, // private readonly transactionService: TransactionService, // private readonly providerFlashbotsService: ProviderFlashbotsService,
-    private readonly mempoolUniswapV2Service: MempoolUniswapV2Service
+    private readonly mempoolUniswapV2Service: MempoolUniswapV2Service,
+    private readonly mempoolUniswapV3Service: MempoolUniswapV3Service
   ) {}
 
   run(): void {
     this.mempoolUniswapV2Service.onUniswapV2PendingTransaction((swaps) => {
-      this.logger.info(
-        swaps.map((v) => ({
-          amountIn: v.amountIn.toString(),
-          amountOut: v.amountOut.toString(),
-          path: v.path.map((p) => p.address),
-          deadline: v.deadline.toString(),
-          method: v.method
-        }))
-      )
+      this.logger.info(swaps)
+    })
+    this.mempoolUniswapV3Service.onUniswapV3PendingTransaction((swaps) => {
+      this.logger.info(swaps)
     })
     // this.ethProvider.on('block', async (blockNumber: number) => {
     //   // logger.info(await flashbotsProvider.fetchBlocksApi(14949852))

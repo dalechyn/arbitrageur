@@ -8,3 +8,8 @@ export enum UniswapV2Signature {
   removeLiquidityETHWithPermitSupportingFeeOnTransferTokens = '5b0d5984',
   removeLiquidityWithPermit = '2195995c'
 }
+
+export const UNISWAP_V2_SIGNATURES = Object.values(UniswapV2Signature)
+
+export const isUniswapV2Signature = (signature: string) =>
+  UNISWAP_V2_SIGNATURES.includes(signature as UniswapV2Signature)
