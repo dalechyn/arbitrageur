@@ -4,6 +4,12 @@ import { UniswapV3SwapV3Signature } from './UniswapV3SwapV3Signature'
 import { Token } from '@uniswap/sdk-core'
 import BigNumber from 'bignumber.js'
 
+export interface UniswapV3PathElement {
+  tokenA: Token
+  tokenB: Token
+  fee: number
+}
+
 export type UniswapV3Swap = {
   hash?: string
   from: string
@@ -34,7 +40,7 @@ export type UniswapV3Swap = {
           deadline: BigNumber
         }
     ) & {
-      path: Token[]
+      path: UniswapV3PathElement[]
       amountIn: BigNumber
       amountOutMinimum: BigNumber
     })
@@ -63,7 +69,7 @@ export type UniswapV3Swap = {
           deadline: BigNumber
         }
     ) & {
-      path: Token[]
+      path: UniswapV3PathElement[]
       amountInMaximum: BigNumber
       amountOut: BigNumber
     })

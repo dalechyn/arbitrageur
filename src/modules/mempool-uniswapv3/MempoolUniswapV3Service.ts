@@ -15,6 +15,7 @@ import {
 } from './errors'
 import {
   isUniswapV3SwapSignature,
+  UniswapV3PathElement,
   UniswapV3Swap,
   UniswapV3SwapSignature,
   UniswapV3SwapV3Signature
@@ -198,17 +199,32 @@ export class MempoolUniswapV3Service {
             })
         }
       } else {
-        const path: Token[] = await Promise.all(
-          result.path.map(async (tokenAddress: string) => {
-            const tokenContract = new Contract(tokenAddress, IERC20ABI, this.providerService)
-            const tokenSymbol = await tokenContract.symbol()
-            const tokenDecimals = await tokenContract.decimals()
-            return new Token(
-              this.configService.get('network.chainId'),
-              tokenAddress,
-              tokenDecimals,
-              tokenSymbol
-            )
+        const path: UniswapV3PathElement[] = await Promise.all(
+          result.path.map(async (path: string) => {
+            const tokenAAddress = `0x${path.slice(0, 40)}`
+            const fee = parseInt(path.slice(40, 46), 16)
+            const tokenBAddress = `0x${path.slice(46, 86)}`
+            const tokenAContract = new Contract(tokenAAddress, IERC20ABI, this.providerService)
+            const tokenBContract = new Contract(tokenBAddress, IERC20ABI, this.providerService)
+            const tokenASymbol = await tokenAContract.symbol()
+            const tokenADecimals = await tokenAContract.decimals()
+            const tokenBSymbol = await tokenBContract.symbol()
+            const tokenBDecimals = await tokenBContract.decimals()
+            return {
+              tokenA: new Token(
+                this.configService.get('network.chainId'),
+                tokenAAddress,
+                tokenADecimals,
+                tokenASymbol
+              ),
+              tokenB: new Token(
+                this.configService.get('network.chainId'),
+                tokenBAddress,
+                tokenBDecimals,
+                tokenBSymbol
+              ),
+              fee
+            }
           })
         )
 
