@@ -99,11 +99,16 @@ export default {
       }
     },
     uniswapV3: {
-      // note - v3 router can also make v2 transactions
       routerAddress: {
         format: String,
-        default: '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45',
+        default: '0xe592427a0aece92de3edee1f18e0157c05861564',
         env: 'DEXES_UNISWAPV3_ROUTER_ADDRESS'
+      },
+      // note - router2 can also make v2 transactions
+      router02Address: {
+        format: String,
+        default: '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45',
+        env: 'DEXES_UNISWAPV3_ROUTER02_ADDRESS'
       }
     }
   }

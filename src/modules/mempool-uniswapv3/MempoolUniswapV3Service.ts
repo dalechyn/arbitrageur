@@ -13,9 +13,15 @@ import {
   MempoolUniswapV3IncorrectSignatureError,
   MempoolUniswapV3NoSwapsFoundError
 } from './errors'
-import { UniswapV3Swap, UniswapV3SwapV3Signature } from './interfaces'
+import {
+  isUniswapV3SwapSignature,
+  UniswapV3Swap,
+  UniswapV3SwapSignature,
+  UniswapV3SwapV3Signature
+} from './interfaces'
 
 import { Token } from '@uniswap/sdk-core'
+import SwapRouter from '@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json'
 import BigNumber from 'bignumber.js'
 import { Contract, Transaction, utils } from 'ethers'
 import { injectable } from 'inversify'
@@ -36,11 +42,22 @@ export class MempoolUniswapV3Service {
   ) {}
 
   /**
-   * Returns true if to is UniswapV3 router
+   * Returns true if to is UniswapV3 Router1
+   * @param to destination address
+   */
+  private isTxToUniswapV3RouterAddress(to?: string): boolean {
+    return to === this.configService.get('dexes.uniswapV3.routerAddress')
+  }
+
+  /**
+   * Returns true if to is UniswapV3 Router1 or Router2
    * @param to destination address
    */
   private isTxToUniswapV3(to?: string): boolean {
-    return to === this.configService.get('dexes.uniswapV3.routerAddress')
+    return (
+      to === this.configService.get('dexes.uniswapV3.router02Address') ||
+      this.isTxToUniswapV3RouterAddress(to)
+    )
   }
 
   /**
@@ -53,6 +70,7 @@ export class MempoolUniswapV3Service {
     // check if the signature is valid
     if (
       !isUniswapV3Signature(rootSignature) &&
+      !isUniswapV3SwapSignature(rootSignature) &&
       !isUniswapV3SwapV2Signature(rootSignature) &&
       !isUniswapV3SwapV3Signature(rootSignature)
     )
@@ -68,8 +86,10 @@ export class MempoolUniswapV3Service {
         UniswapV3Signature.multicall_3
       ].includes(rootSignature as UniswapV3Signature)
     ) {
-      const swapRouter02Interface = new utils.Interface(SwapRouter02)
-      callDatas = swapRouter02Interface.parseTransaction({ data: tx.data }).args.data
+      const swapRouterInterface = new utils.Interface(
+        this.isTxToUniswapV3RouterAddress(tx.to) ? SwapRouter.abi : SwapRouter02
+      )
+      callDatas = swapRouterInterface.parseTransaction({ data: tx.data }).args.data
     } else {
       callDatas = [tx.data]
     }
@@ -83,7 +103,10 @@ export class MempoolUniswapV3Service {
           UniswapV3Signature.multicall_3
         ].includes(callDatas[0].slice(2, 10) as UniswapV3Signature)) ||
       // if no calldatas have swap signatures
-      !callDatas.every((data) => isUniswapV3SwapV3Signature(data.slice(2, 10)))
+      !callDatas.every((data) => {
+        const signature = data.slice(2, 10)
+        return isUniswapV3SwapSignature(signature) || isUniswapV3SwapV3Signature(signature)
+      })
     )
       throw new MempoolUniswapV3NoSwapsFoundError(tx)
 
@@ -97,11 +120,12 @@ export class MempoolUniswapV3Service {
 
       const iface = new utils.Interface(SwapRouter02)
       const result = iface.parseTransaction({ data }).args.params
-      console.log(result)
 
       if (
         signature === UniswapV3SwapV3Signature.exactInputSingle ||
-        signature === UniswapV3SwapV3Signature.exactOutputSingle
+        signature === UniswapV3SwapV3Signature.exactOutputSingle ||
+        signature === UniswapV3SwapSignature.exactInputSingle ||
+        signature === UniswapV3SwapSignature.exactOutputSingle
       ) {
         const tokenInAddress = result.tokenIn
         const tokenInContract = new Contract(tokenInAddress, IERC20ABI, this.providerService)
@@ -135,22 +159,46 @@ export class MempoolUniswapV3Service {
           sqrtPriceLimitX96: new BigNumber(result.sqrtPriceLimitX96.toString())
         }
 
-        if (signature === UniswapV3SwapV3Signature.exactInputSingle)
-          swaps.push({
+        if (
+          signature === UniswapV3SwapV3Signature.exactInputSingle ||
+          signature === UniswapV3SwapSignature.exactInputSingle
+        ) {
+          const commonResult = {
             ...baseResult,
-            method: signature,
-            amountIn: new BigNumber(result.amountIn),
+            amountIn: new BigNumber(result.amountIn.toString()),
             amountOutMinimum: new BigNumber(result.amountOutMinimum.toString())
-          })
-        else
-          swaps.push({
+          }
+          if (signature === UniswapV3SwapSignature.exactInputSingle)
+            swaps.push({
+              ...commonResult,
+              method: signature,
+              deadline: new BigNumber(result.deadline.toString())
+            })
+          else
+            swaps.push({
+              ...commonResult,
+              method: signature
+            })
+        } else {
+          const commonResult = {
             ...baseResult,
-            method: signature,
-            amountInMaximum: new BigNumber(result.amountInMaximum),
+            amountInMaximum: new BigNumber(result.amountInMaximum.toString()),
             amountOut: new BigNumber(result.amountOut.toString())
-          })
+          }
+          if (signature === UniswapV3SwapSignature.exactOutputSingle)
+            swaps.push({
+              ...commonResult,
+              method: signature,
+              deadline: new BigNumber(result.deadline.toString())
+            })
+          else
+            swaps.push({
+              ...commonResult,
+              method: signature
+            })
+        }
       } else {
-        const path = await Promise.all(
+        const path: Token[] = await Promise.all(
           result.path.map(async (tokenAddress: string) => {
             const tokenContract = new Contract(tokenAddress, IERC20ABI, this.providerService)
             const tokenSymbol = await tokenContract.symbol()
@@ -174,20 +222,43 @@ export class MempoolUniswapV3Service {
           sqrtPriceLimitX96: new BigNumber(result.sqrtPriceLimitX96.toString())
         }
 
-        if (signature === UniswapV3SwapV3Signature.exactInput)
-          swaps.push({
+        if (
+          signature === UniswapV3SwapV3Signature.exactInput ||
+          signature === UniswapV3SwapSignature.exactInput
+        ) {
+          const commonResult = {
             ...baseResult,
-            method: signature,
-            amountIn: new BigNumber(result.amountIn),
+            amountIn: new BigNumber(result.amountIn.toString()),
             amountOutMinimum: new BigNumber(result.amountOutMinimum.toString())
-          })
-        else if (signature === UniswapV3SwapV3Signature.exactOutput)
-          swaps.push({
+          }
+          if (signature === UniswapV3SwapSignature.exactInput)
+            swaps.push({
+              ...commonResult,
+              method: signature,
+              deadline: new BigNumber(result.deadline.toString())
+            })
+          else
+            swaps.push({
+              ...commonResult,
+              method: signature
+            })
+        } else if (
+          signature === UniswapV3SwapV3Signature.exactOutput ||
+          signature === UniswapV3SwapSignature.exactOutput
+        ) {
+          const commonResult = {
             ...baseResult,
-            method: signature,
-            amountInMaximum: new BigNumber(result.amountInMaximum),
+            amountInMaximum: new BigNumber(result.amountInMaximum.toString()),
             amountOut: new BigNumber(result.amountOut.toString())
-          })
+          }
+          if (signature === UniswapV3SwapSignature.exactOutput)
+            swaps.push({
+              ...commonResult,
+              method: signature,
+              deadline: new BigNumber(result.deadline.toString())
+            })
+          else swaps.push({ ...commonResult, method: signature })
+        }
       }
     }
     return swaps
