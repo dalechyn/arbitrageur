@@ -6,6 +6,7 @@
 import { Token } from '@uniswap/sdk-core'
 import { injectable } from 'inversify'
 
+import { BalanceResult, BalancerService } from '../balancer'
 import { DEX, PoolV2WithContract, PoolV3WithContract, PoolWithContract } from '../common'
 import { ConfigService } from '../config'
 import { FetcherService } from '../fetcher'
@@ -21,6 +22,8 @@ import { MempoolUniswapV3Service } from '../mempool-uniswapv3/MempoolUniswapV3Se
 
 // import fetch from 'node-fetch'
 
+type NodeWithNeighbours = { node: PoolWithContract; neighbours: PoolWithContract[] }
+
 @injectable()
 export class ArbitrageurService {
   private readonly rewardToken: Token
@@ -28,6 +31,7 @@ export class ArbitrageurService {
     private readonly logger: BunyanLogger,
     private readonly configService: ConfigService,
     private readonly fetcherService: FetcherService,
+    private readonly balancerService: BalancerService,
     // private readonly ethProvider: ProviderService, // private readonly clusterService: ClusterService, // private readonly fetcherService: FetcherService, // private readonly balancerService: BalancerService, // private readonly transactionService: TransactionService, // private readonly providerFlashbotsService: ProviderFlashbotsService,
     private readonly mempoolUniswapV2Service: MempoolUniswapV2Service,
     private readonly mempoolUniswapV3Service: MempoolUniswapV3Service
@@ -37,6 +41,38 @@ export class ArbitrageurService {
       this.configService.get('rewardToken.address'),
       this.configService.get('rewardToken.decimals'),
       this.configService.get('rewardToken.symbol')
+    )
+  }
+
+  private async getPoolsWithNeighboursFromPoolsInTx(
+    pools: PoolWithContract[]
+  ): Promise<NodeWithNeighbours[]> {
+    // here we need to find so called "neighbours" - pools with the same tokens on other dexes
+    const neighbourPoolsUntilftered: NodeWithNeighbours[] = []
+
+    for (const pool of pools)
+      neighbourPoolsUntilftered.push({
+        node: pool,
+        neighbours: await this.fetcherService.fetchNeihgbours(pool.token0, pool.token1, pool.dex)
+      })
+
+    return neighbourPoolsUntilftered.reduce(
+      (acc, { node: pool, neighbours: neighbourPoolsSet }) => {
+        if (
+          acc.find(
+            ({ node: uniquePool, neighbours: uniquePoolNeighbours }) =>
+              uniquePool.contract.address === pool.contract.address ||
+              uniquePoolNeighbours.find(
+                (uniquePoolNeighbour) =>
+                  uniquePoolNeighbour.contract.address === pool.contract.address
+              )
+          )
+        )
+          return acc
+
+        return [...acc, { node: pool, neighbours: neighbourPoolsSet }]
+      },
+      new Array<NodeWithNeighbours>()
     )
   }
 
@@ -52,6 +88,7 @@ export class ArbitrageurService {
 
           // we don't want to look for swaps of tokens we are not interested in
           if (!tokenPrev.equals(this.rewardToken) && !token.equals(this.rewardToken)) return pools
+          console.log(swap.dex)
           pools.push(
             await this.fetcherService.fetchUniswapV2(
               this.rewardToken,
@@ -66,20 +103,29 @@ export class ArbitrageurService {
             )
           )
         }
+        const poolsWithNeighbours = await this.getPoolsWithNeighboursFromPoolsInTx(pools)
 
-        // here we need to find so called "neighbours" - pools with the same tokens on other dexes
-        const neighbourPools: Record<string, PoolWithContract[]> = {}
+        this.logger.debug('NEIGHBOURS:', poolsWithNeighbours)
 
-        for (const pool of pools)
-          neighbourPools[pool.contract.address] = await this.fetcherService.fetchNeihgbours(
-            pool.token0,
-            pool.token1,
-            pool.dex
-          )
-
-        this.logger.debug('NEIGHBOURS:', neighbourPools)
-
-        // TODO: DROP duplicates
+        // Run the balancer on the pool and it's neighbours
+        const balanceResults: BalanceResult[] = []
+        for (const { node: pool, neighbours } of poolsWithNeighbours) {
+          for (const neighbourNode of neighbours) {
+            try {
+              balanceResults.push(
+                await this.balancerService.balance(pool, neighbourNode, this.rewardToken)
+              )
+            } catch (e) {}
+          }
+        }
+        this.logger.debug(
+          'BalanceResults:',
+          balanceResults.map((b) => ({
+            ...b,
+            profit: b.profit.toSignificant(6),
+            amountIn: b.amountIn.toSignificant(6)
+          }))
+        )
       }
     })
     this.mempoolUniswapV3Service.onUniswapV3PendingTransaction(async (swaps) => {
@@ -115,22 +161,32 @@ export class ArbitrageurService {
             )
           )
         }
-
-        // here we need to find so called "neighbours" - pools with the same tokens on other dexes
-        const neighbourPools: Record<string, PoolWithContract[]> = {}
-
-        for (const pool of pools)
-          neighbourPools[pool.contract.address] = await this.fetcherService.fetchNeihgbours(
-            pool.token0,
-            pool.token1,
-            pool.dex
-          )
-
-        this.logger.debug('NEIGHBOURS:', neighbourPools)
+        const poolsWithNeighbours = await this.getPoolsWithNeighboursFromPoolsInTx(pools)
+        this.logger.debug('NEIGHBOURS:', poolsWithNeighbours)
 
         // TODO: DROP duplicates
 
         this.logger.info(swaps)
+
+        // Run the balancer on the pool and it's neighbours
+        const balanceResults: BalanceResult[] = []
+        for (const { node: pool, neighbours } of poolsWithNeighbours) {
+          for (const neighbourNode of neighbours) {
+            try {
+              balanceResults.push(
+                await this.balancerService.balance(pool, neighbourNode, this.rewardToken)
+              )
+            } catch (e) {}
+          }
+        }
+        this.logger.debug(
+          'BalanceResults:',
+          balanceResults.map((b) => ({
+            ...b,
+            profit: b.profit.toSignificant(6),
+            amountIn: b.amountIn.toSignificant(6)
+          }))
+        )
       }
     })
     // this.ethProvider.on('block', async (blockNumber: number) => {

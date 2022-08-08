@@ -15,17 +15,21 @@ export class BalancerService implements AbstractBalancer {
     private readonly balancerUniswapV2UniswapV3Service: BalancerUniswapV2UniswapV3Service
   ) {}
 
-  balance(from: PoolWithContract, to: PoolWithContract, baseToken: Token): Promise<BalanceResult> {
-    if (from.type === DEXType.UNISWAPV3) {
-      if (to.type === DEXType.UNISWAPV2)
-        return this.balancerUniswapV2UniswapV3Service.balance(from, to, baseToken)
+  balance(
+    poolA: PoolWithContract,
+    poolB: PoolWithContract,
+    baseToken: Token
+  ): Promise<BalanceResult> {
+    if (poolA.type === DEXType.UNISWAPV3) {
+      if (poolB.type === DEXType.UNISWAPV2)
+        return this.balancerUniswapV2UniswapV3Service.balance(poolA, poolB, baseToken)
     } else {
-      if (to.type === DEXType.UNISWAPV3)
-        return this.balancerUniswapV2UniswapV3Service.balance(from, to, baseToken)
-      if (to.type === DEXType.UNISWAPV2)
-        return this.balancerUniswapV2UniswapV2Service.balance(from, to, baseToken)
+      if (poolB.type === DEXType.UNISWAPV3)
+        return this.balancerUniswapV2UniswapV3Service.balance(poolA, poolB, baseToken)
+      if (poolB.type === DEXType.UNISWAPV2)
+        return this.balancerUniswapV2UniswapV2Service.balance(poolA, poolB, baseToken)
     }
 
-    throw new BalancerNotSupportedError(from.type, to.type)
+    throw new BalancerNotSupportedError(poolA.type, poolB.type)
   }
 }

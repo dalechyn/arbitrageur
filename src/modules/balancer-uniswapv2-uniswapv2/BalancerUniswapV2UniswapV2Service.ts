@@ -102,10 +102,15 @@ export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
     secondPoolV2Info: PoolV2WithContract,
     tokenA: Token
   ) {
+    const tokenB = firstPoolV2Info.token0.equals(tokenA)
+      ? firstPoolV2Info.token1
+      : firstPoolV2Info.token0
     this.logger.info(
-      `Balancing pools, V2 price: ${firstPoolV2Info
-        .priceOf(tokenA)
-        .toSignificant(6)}, V2 price:${secondPoolV2Info.priceOf(tokenA).toSignificant(6)}`
+      `Balancing pools, V2 price: ${firstPoolV2Info.priceOf(tokenA).toSignificant(6)} ${
+        tokenB.symbol
+      }/${tokenA.symbol}, V2 price: ${secondPoolV2Info.priceOf(tokenA).toSignificant(6)} ${
+        tokenB.symbol
+      }/${tokenA.symbol}`
     )
     const [reservesIn0, reservesOut0] = this.getReserves(tokenA, firstPoolV2Info)
     const [reservesOut1, reservesIn1] = this.getReserves(tokenA, secondPoolV2Info)
@@ -149,11 +154,17 @@ export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
     }
   }
 
-  balance(from: PoolWithContract, to: PoolWithContract, baseToken: Token): Promise<BalanceResult> {
-    const zeroForOne = from.priceOf(baseToken).greaterThan(to.priceOf(baseToken))
-    if (from.type === DEXType.UNISWAPV2 && to.type === DEXType.UNISWAPV2)
-      return Promise.resolve(this.v2ToV2(zeroForOne ? from : to, zeroForOne ? to : from, baseToken))
+  balance(
+    poolA: PoolWithContract,
+    poolB: PoolWithContract,
+    baseToken: Token
+  ): Promise<BalanceResult> {
+    const zeroForOne = poolA.priceOf(baseToken).lessThan(poolB.priceOf(baseToken))
+    if (poolA.type === DEXType.UNISWAPV2 && poolB.type === DEXType.UNISWAPV2)
+      return Promise.resolve(
+        this.v2ToV2(zeroForOne ? poolA : poolB, zeroForOne ? poolB : poolA, baseToken)
+      )
 
-    throw new BalancerWrongPoolsFedError(from.type, to.type)
+    throw new BalancerWrongPoolsFedError(poolA.type, poolB.type)
   }
 }
