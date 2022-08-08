@@ -1,11 +1,13 @@
+import { Token } from '@uniswap/sdk-core'
+import BigNumber from 'bignumber.js'
+
+import { DEX } from '../../common'
 import { UniswapV3SwapV2Signature } from '../../mempool-uniswapv3'
 
 import { UniswapV2SwapSignature } from './UniswapV2SwapSignature'
 
-import { Token } from '@uniswap/sdk-core'
-import BigNumber from 'bignumber.js'
-
 export type UniswapV2Swap = {
+  dex: DEX.UniswapV2 | DEX.SushiSwap
   hash?: string
   from: string
   path: Token[]

@@ -1,4 +1,4 @@
-import { DEXType, DEXTypeConverter } from '../../interfaces'
+import { DEXType, DEXTypeConverter } from '../../common'
 
 export class BalancerWrongPoolsFedError extends Error {
   constructor(readonly pool0Type: DEXType, readonly pool1Type: DEXType) {

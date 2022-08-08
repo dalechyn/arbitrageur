@@ -20,7 +20,7 @@ export default {
     rpcUrl: {
       doc: 'Network RPC or IPC URL',
       format: String,
-      default: 'https://eth-goerli.alchemyapi.io/v2/oKG7sMevlL_ZQgGcZCOTEsaksS_nM922',
+      default: 'http://eth-goerli.alchemyapi.io/v2/oKG7sMevlL_ZQgGcZCOTEsaksS_nM922',
       env: 'NETWORK_RPC_OR_IPC_URL'
     },
     blocksInFuture: {
@@ -28,6 +28,23 @@ export default {
       format: 'nat',
       default: 1,
       env: 'NETWORK_BLOCKS_IN_FUTURE'
+    }
+  },
+  rewardToken: {
+    address: {
+      format: String,
+      default: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+      env: 'REWARD_TOKEN_ADDRESS'
+    },
+    symbol: {
+      format: String,
+      default: 'WETH',
+      env: 'REWARD_TOKEN_SYMBOL'
+    },
+    decimals: {
+      format: Number,
+      default: 18,
+      env: 'REWARD_TOKEN_DECIMALS'
     }
   },
   multiCallTickerLensAddress: {
@@ -109,6 +126,23 @@ export default {
         format: String,
         default: '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45',
         env: 'DEXES_UNISWAPV3_ROUTER02_ADDRESS'
+      }
+    },
+    sushiswap: {
+      routerAddress: {
+        format: String,
+        default: '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f',
+        env: 'DEXES_SUSHISWAP_ROUTER_ADDRESS'
+      },
+      pairCodeHash: {
+        format: String,
+        default: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
+        env: 'DEXES_SUSHISWAP_PAIR_CODE_HASH'
+      },
+      factoryAddress: {
+        format: String,
+        default: '0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac',
+        env: 'DEXES_SUSHISWAP_FACTORY_ADDRESS'
       }
     }
   }

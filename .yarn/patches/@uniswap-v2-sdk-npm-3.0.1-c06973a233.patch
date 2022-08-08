@@ -1,33 +1,28 @@
-diff --git a/dist/constants.d.ts b/dist/constants.d.ts
-index 7c92f1804640b2bbde3915ea88021ad388ebcb55..81eb35475aa4d839891740f6522e68b12d85a2e5 100644
---- a/dist/constants.d.ts
-+++ b/dist/constants.d.ts
-@@ -5,5 +5,3 @@ export declare const MINIMUM_LIQUIDITY: JSBI;
- export declare const ZERO: JSBI;
- export declare const ONE: JSBI;
- export declare const FIVE: JSBI;
--export declare const _997: JSBI;
--export declare const _1000: JSBI;
 diff --git a/dist/entities/pair.d.ts b/dist/entities/pair.d.ts
-index d0e2c7c18e7e39d329cb30b69ed8905f6ea41317..714cc445e8fa4452284e0e2daa33420139c47df5 100644
+index d0e2c7c18e7e39d329cb30b69ed8905f6ea41317..798ee9ada3d4c1bc60a2d0dd8d76b4d4636925a4 100644
 --- a/dist/entities/pair.d.ts
 +++ b/dist/entities/pair.d.ts
-@@ -1,4 +1,5 @@
+@@ -1,14 +1,16 @@
  import { BigintIsh, Price, Token, CurrencyAmount } from '@uniswap/sdk-core';
-+import JSBI from 'jsbi'
- export declare const computePairAddress: ({ factoryAddress, tokenA, tokenB }: {
+-export declare const computePairAddress: ({ factoryAddress, tokenA, tokenB }: {
++import JSBI from 'jsbi';
++export declare const computePairAddress: ({ factoryAddress, tokenA, tokenB, initCodeHash }: {
      factoryAddress: string;
      tokenA: Token;
-@@ -8,7 +9,7 @@ export declare class Pair {
+     tokenB: Token;
++    initCodeHash: string;
+ }) => string;
+ export declare class Pair {
      readonly liquidityToken: Token;
      private readonly tokenAmounts;
-     static getAddress(tokenA: Token, tokenB: Token): string;
+-    static getAddress(tokenA: Token, tokenB: Token): string;
 -    constructor(currencyAmountA: CurrencyAmount<Token>, tokenAmountB: CurrencyAmount<Token>);
-+    constructor(currencyAmountA: CurrencyAmount<Token>, tokenAmountB: CurrencyAmount<Token>, feeNumerator?: BigintIsh, feeDenominator?: BigintIsh);
++    static getAddress(tokenA: Token, tokenB: Token, factoryAddress?: string, initCodeHash?: string): string;
++    constructor(currencyAmountA: CurrencyAmount<Token>, tokenAmountB: CurrencyAmount<Token>, feeNumerator?: JSBI, feeDenominator?: JSBI);
      /**
       * Returns true if the token is either token0 or token1
       * @param token to check
-@@ -35,6 +36,8 @@ export declare class Pair {
+@@ -35,6 +37,8 @@ export declare class Pair {
      get token1(): Token;
      get reserve0(): CurrencyAmount<Token>;
      get reserve1(): CurrencyAmount<Token>;
@@ -36,8 +31,22 @@ index d0e2c7c18e7e39d329cb30b69ed8905f6ea41317..714cc445e8fa4452284e0e2daa334201
      reserveOf(token: Token): CurrencyAmount<Token>;
      getOutputAmount(inputAmount: CurrencyAmount<Token>): [CurrencyAmount<Token>, Pair];
      getInputAmount(outputAmount: CurrencyAmount<Token>): [CurrencyAmount<Token>, Pair];
+diff --git a/dist/index.js b/dist/index.js
+index b9df67ce78c9620be09296a8d7fdfce2358eebd5..d919a7d5f4fb43b1711c3702670778bab7c684e7 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,8 +1,3 @@
+ 
+ 'use strict'
+-
+-if (process.env.NODE_ENV === 'production') {
+-  module.exports = require('./v2-sdk.cjs.production.min.js')
+-} else {
+-  module.exports = require('./v2-sdk.cjs.development.js')
+-}
++module.exports = require('./v2-sdk.cjs.development.js')
 diff --git a/dist/v2-sdk.cjs.development.js b/dist/v2-sdk.cjs.development.js
-index f1a6331fa1f56547e8198356ed2944bff473be71..3172a04f8738e3c5b304c95c5f20609e8877362c 100644
+index f1a6331fa1f56547e8198356ed2944bff473be71..2ab48dc7912d50a729b67684150e9c4ba1a19a45 100644
 --- a/dist/v2-sdk.cjs.development.js
 +++ b/dist/v2-sdk.cjs.development.js
 @@ -17,8 +17,6 @@ var MINIMUM_LIQUIDITY = /*#__PURE__*/JSBI.BigInt(1000); // exports for internal
@@ -49,22 +58,46 @@ index f1a6331fa1f56547e8198356ed2944bff473be71..3172a04f8738e3c5b304c95c5f20609e
  
  function _defineProperties(target, props) {
    for (var i = 0; i < props.length; i++) {
-@@ -232,11 +230,13 @@ var computePairAddress = function computePairAddress(_ref) {
-   return address.getCreate2Address(factoryAddress, solidity.keccak256(['bytes'], [solidity.pack(['address', 'address'], [token0.address, token1.address])]), INIT_CODE_HASH);
+@@ -222,28 +220,32 @@ var InsufficientInputAmountError = /*#__PURE__*/function (_Error2) {
+ var computePairAddress = function computePairAddress(_ref) {
+   var factoryAddress = _ref.factoryAddress,
+       tokenA = _ref.tokenA,
+-      tokenB = _ref.tokenB;
++      tokenB = _ref.tokenB,
++      initCodeHash = _ref.initCodeHash;
+ 
+   var _ref2 = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA],
+       token0 = _ref2[0],
+       token1 = _ref2[1]; // does safety checks
+ 
+ 
+-  return address.getCreate2Address(factoryAddress, solidity.keccak256(['bytes'], [solidity.pack(['address', 'address'], [token0.address, token1.address])]), INIT_CODE_HASH);
++  return address.getCreate2Address(factoryAddress, solidity.keccak256(['bytes'], [solidity.pack(['address', 'address'], [token0.address, token1.address])]), initCodeHash);
  };
  var Pair = /*#__PURE__*/function () {
 -  function Pair(currencyAmountA, tokenAmountB) {
-+  function Pair(currencyAmountA, tokenAmountB, feeNumerator, feeDenominator) {
++  function Pair(currencyAmountA, tokenAmountB, feeNumerator = JSBI.BigInt(997), feeDenominator = JSBI.BigInt(1000)) {
      var tokenAmounts = currencyAmountA.currency.sortsBefore(tokenAmountB.currency) // does safety checks
      ? [currencyAmountA, tokenAmountB] : [tokenAmountB, currencyAmountA];
      this.liquidityToken = new sdkCore.Token(tokenAmounts[0].currency.chainId, Pair.getAddress(tokenAmounts[0].currency, tokenAmounts[1].currency), 18, 'UNI-V2', 'Uniswap V2');
      this.tokenAmounts = tokenAmounts;
-+    this.feeNumerator = feeNumerator ?? JSBI.BigInt(997)
-+    this.feeDenominator = feeDenominator ?? JSBI.BigInt(1000)
++    this.feeNumerator = feeNumerator;
++    this.feeDenominator = feeDenominator;
    }
  
-   Pair.getAddress = function getAddress(tokenA, tokenB) {
-@@ -289,9 +289,9 @@ var Pair = /*#__PURE__*/function () {
+-  Pair.getAddress = function getAddress(tokenA, tokenB) {
++  Pair.getAddress = function getAddress(tokenA, tokenB, factoryAddress = FACTORY_ADDRESS, initCodeHash = INIT_CODE_HASH) {
+     return computePairAddress({
+-      factoryAddress: FACTORY_ADDRESS,
++      factoryAddress: factoryAddress,
+       tokenA: tokenA,
+-      tokenB: tokenB
++      tokenB: tokenB,
++      initCodeHash: initCodeHash
+     });
+   }
+   /**
+@@ -289,9 +291,9 @@ var Pair = /*#__PURE__*/function () {
  
      var inputReserve = this.reserveOf(inputAmount.currency);
      var outputReserve = this.reserveOf(inputAmount.currency.equals(this.token0) ? this.token1 : this.token0);
@@ -76,7 +109,7 @@ index f1a6331fa1f56547e8198356ed2944bff473be71..3172a04f8738e3c5b304c95c5f20609e
      var outputAmount = sdkCore.CurrencyAmount.fromRawAmount(inputAmount.currency.equals(this.token0) ? this.token1 : this.token0, JSBI.divide(numerator, denominator));
  
      if (JSBI.equal(outputAmount.quotient, ZERO)) {
-@@ -310,8 +310,8 @@ var Pair = /*#__PURE__*/function () {
+@@ -310,8 +312,8 @@ var Pair = /*#__PURE__*/function () {
  
      var outputReserve = this.reserveOf(outputAmount.currency);
      var inputReserve = this.reserveOf(outputAmount.currency.equals(this.token0) ? this.token1 : this.token0);
@@ -85,56 +118,5 @@ index f1a6331fa1f56547e8198356ed2944bff473be71..3172a04f8738e3c5b304c95c5f20609e
 +    var numerator = JSBI.multiply(JSBI.multiply(inputReserve.quotient, outputAmount.quotient), this.feeDenominator);
 +    var denominator = JSBI.multiply(JSBI.subtract(outputReserve.quotient, outputAmount.quotient), this.feeNumerator);
      var inputAmount = sdkCore.CurrencyAmount.fromRawAmount(outputAmount.currency.equals(this.token0) ? this.token1 : this.token0, JSBI.add(JSBI.divide(numerator, denominator), ONE));
-     return [inputAmount, new Pair(inputReserve.add(inputAmount), outputReserve.subtract(outputAmount))];
-   };
-diff --git a/dist/v2-sdk.esm.js b/dist/v2-sdk.esm.js
-index 9a899edcbd2343622c2effbc1a3f241c27897378..e8919c13f33f3ffa5f72db1f7e2970a8513fbbf5 100644
---- a/dist/v2-sdk.esm.js
-+++ b/dist/v2-sdk.esm.js
-@@ -11,8 +11,6 @@ var MINIMUM_LIQUIDITY = /*#__PURE__*/JSBI.BigInt(1000); // exports for internal
- var ZERO = /*#__PURE__*/JSBI.BigInt(0);
- var ONE = /*#__PURE__*/JSBI.BigInt(1);
- var FIVE = /*#__PURE__*/JSBI.BigInt(5);
--var _997 = /*#__PURE__*/JSBI.BigInt(997);
--var _1000 = /*#__PURE__*/JSBI.BigInt(1000);
- 
- function _defineProperties(target, props) {
-   for (var i = 0; i < props.length; i++) {
-@@ -226,11 +224,13 @@ var computePairAddress = function computePairAddress(_ref) {
-   return getCreate2Address(factoryAddress, keccak256(['bytes'], [pack(['address', 'address'], [token0.address, token1.address])]), INIT_CODE_HASH);
- };
- var Pair = /*#__PURE__*/function () {
--  function Pair(currencyAmountA, tokenAmountB) {
-+  function Pair(currencyAmountA, tokenAmountB, feeNumerator = 997, feeDenominator = 1000) {
-     var tokenAmounts = currencyAmountA.currency.sortsBefore(tokenAmountB.currency) // does safety checks
-     ? [currencyAmountA, tokenAmountB] : [tokenAmountB, currencyAmountA];
-     this.liquidityToken = new Token(tokenAmounts[0].currency.chainId, Pair.getAddress(tokenAmounts[0].currency, tokenAmounts[1].currency), 18, 'UNI-V2', 'Uniswap V2');
-     this.tokenAmounts = tokenAmounts;
-+    this.feeNumerator = JSBI.BigInt(feeNumerator);
-+    this.feeDenominator = JSBI.BigInt(feeDenominator);
-   }
- 
-   Pair.getAddress = function getAddress(tokenA, tokenB) {
-@@ -283,9 +283,9 @@ var Pair = /*#__PURE__*/function () {
- 
-     var inputReserve = this.reserveOf(inputAmount.currency);
-     var outputReserve = this.reserveOf(inputAmount.currency.equals(this.token0) ? this.token1 : this.token0);
--    var inputAmountWithFee = JSBI.multiply(inputAmount.quotient, _997);
-+    var inputAmountWithFee = JSBI.multiply(inputAmount.quotient, this.feeNumerator);
-     var numerator = JSBI.multiply(inputAmountWithFee, outputReserve.quotient);
--    var denominator = JSBI.add(JSBI.multiply(inputReserve.quotient, _1000), inputAmountWithFee);
-+    var denominator = JSBI.add(JSBI.multiply(inputReserve.quotient, this.feeDenominator), inputAmountWithFee);
-     var outputAmount = CurrencyAmount.fromRawAmount(inputAmount.currency.equals(this.token0) ? this.token1 : this.token0, JSBI.divide(numerator, denominator));
- 
-     if (JSBI.equal(outputAmount.quotient, ZERO)) {
-@@ -304,8 +304,8 @@ var Pair = /*#__PURE__*/function () {
- 
-     var outputReserve = this.reserveOf(outputAmount.currency);
-     var inputReserve = this.reserveOf(outputAmount.currency.equals(this.token0) ? this.token1 : this.token0);
--    var numerator = JSBI.multiply(JSBI.multiply(inputReserve.quotient, outputAmount.quotient), _1000);
--    var denominator = JSBI.multiply(JSBI.subtract(outputReserve.quotient, outputAmount.quotient), _997);
-+    var numerator = JSBI.multiply(JSBI.multiply(inputReserve.quotient, outputAmount.quotient), this.feeDenominator);
-+    var denominator = JSBI.multiply(JSBI.subtract(outputReserve.quotient, outputAmount.quotient), this.feeNumerator);
-     var inputAmount = CurrencyAmount.fromRawAmount(outputAmount.currency.equals(this.token0) ? this.token1 : this.token0, JSBI.add(JSBI.divide(numerator, denominator), ONE));
      return [inputAmount, new Pair(inputReserve.add(inputAmount), outputReserve.subtract(outputAmount))];
    };

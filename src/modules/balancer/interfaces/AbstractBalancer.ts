@@ -1,8 +1,8 @@
-import { PoolWithContract } from '../../interfaces'
+import { Token } from '@uniswap/sdk-core'
+
+import { PoolWithContract } from '../../common'
 
 import { BalanceResult } from '.'
-
-import { Token } from '@uniswap/sdk-core'
 
 /**
  * Abstract Balancer interface which opens up a single method

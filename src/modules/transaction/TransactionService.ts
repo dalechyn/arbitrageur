@@ -1,15 +1,16 @@
-import Arbitrageur from '../../../deployments/mainnet/Arbitrageur.json'
-import { BalanceResult } from '../balancer'
-import { ConfigService } from '../config'
-import { DEXType } from '../interfaces'
-import { BunyanLogger } from '../logger'
-import { ProviderService } from '../provider'
-
 import { TransactionRequest } from '@ethersproject/abstract-provider'
-import { FlashbotsBundleProvider } from '@flashbots/ethers-provider-bundle'
 import { ethers } from 'ethers'
 import { injectable } from 'inversify'
 import JSBI from 'jsbi'
+
+import Arbitrageur from '../../../deployments/mainnet/Arbitrageur.json'
+import { BalanceResult } from '../balancer'
+import { DEXType } from '../common'
+import { ConfigService } from '../config'
+import { BunyanLogger } from '../logger'
+import { ProviderService } from '../provider'
+
+import { FlashbotsBundleProvider } from '@flashbots/ethers-provider-bundle'
 
 @injectable()
 export class TransactionService {

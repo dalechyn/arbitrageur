@@ -1,4 +1,11 @@
+import { Token } from '@uniswap/sdk-core'
+import SwapRouter from '@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json'
+import BigNumber from 'bignumber.js'
+import { Contract, Transaction, utils } from 'ethers'
+import { injectable } from 'inversify'
+
 import { IERC20ABI, SwapRouter02 } from '../abis'
+import { DEX } from '../common'
 import { ConfigService } from '../config'
 import { BunyanLogger } from '../logger'
 import {
@@ -20,12 +27,6 @@ import {
   UniswapV3SwapSignature,
   UniswapV3SwapV3Signature
 } from './interfaces'
-
-import { Token } from '@uniswap/sdk-core'
-import SwapRouter from '@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json'
-import BigNumber from 'bignumber.js'
-import { Contract, Transaction, utils } from 'ethers'
-import { injectable } from 'inversify'
 
 /**
  * Reconstructs and finds all UniswapV3 swaps in Tx's
@@ -151,6 +152,8 @@ export class MempoolUniswapV3Service {
         )
 
         const baseResult = {
+          // weird ts issue
+          dex: DEX.UniswapV3 as DEX.UniswapV3,
           tokenIn,
           tokenOut,
           hash: tx.hash,
@@ -199,8 +202,14 @@ export class MempoolUniswapV3Service {
             })
         }
       } else {
+        const unparsedPathSplitted = (result.path as string).split('').reduce((acc, c) => {
+          if (acc.length === 0) return [c]
+          if (acc[acc.length - 1].length === 86) return [...acc, c]
+          acc[acc.length - 1] += c
+          return acc
+        }, new Array<string>())
         const path: UniswapV3PathElement[] = await Promise.all(
-          result.path.map(async (path: string) => {
+          unparsedPathSplitted.map(async (path: string) => {
             const tokenAAddress = `0x${path.slice(0, 40)}`
             const fee = parseInt(path.slice(40, 46), 16)
             const tokenBAddress = `0x${path.slice(46, 86)}`
@@ -229,6 +238,8 @@ export class MempoolUniswapV3Service {
         )
 
         const baseResult = {
+          // weird ts issue
+          dex: DEX.UniswapV3 as DEX.UniswapV3,
           method: signature,
           path,
           from: tx.from!,

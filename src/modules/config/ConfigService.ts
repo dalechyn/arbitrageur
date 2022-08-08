@@ -1,7 +1,7 @@
-import schema from './ConfigSchema'
-
 import convict from 'convict'
 import { injectable } from 'inversify'
+
+import schema from './ConfigSchema'
 
 @injectable()
 export class ConfigService {

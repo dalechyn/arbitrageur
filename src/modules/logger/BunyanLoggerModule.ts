@@ -1,8 +1,9 @@
+import { LoggerOptions } from 'bunyan'
+
 import { BunyanLogger } from './BunyanLogger'
 import { TYPES } from './TYPES'
 
 import { module, DynamicModule, Configure } from '@space-it-blockchain/framework-module'
-import { LoggerOptions } from 'bunyan'
 
 @module(BunyanLoggerModule.register())
 export class BunyanLoggerModule {

@@ -1,8 +1,12 @@
+import { BlockTag, Networkish } from '@ethersproject/providers'
+import { ConnectionInfo } from '@ethersproject/web'
+import { BigNumber, Wallet } from 'ethers'
+import { id, fetchJson } from 'ethers/lib/utils'
+import { decorate, injectable } from 'inversify'
+
 import { ConfigService } from '../config'
 import { ProviderService } from '../provider'
 
-import { BlockTag, Networkish } from '@ethersproject/providers'
-import { ConnectionInfo } from '@ethersproject/web'
 import {
   FlashbotsBundleProvider,
   SimulationResponse,
@@ -11,9 +15,6 @@ import {
   GetBundleStatsResponse,
   GetUserStatsResponse
 } from '@flashbots/ethers-provider-bundle'
-import { BigNumber, Wallet } from 'ethers'
-import { id, fetchJson } from 'ethers/lib/utils'
-import { decorate, injectable } from 'inversify'
 
 decorate(injectable(), FlashbotsBundleProvider)
 

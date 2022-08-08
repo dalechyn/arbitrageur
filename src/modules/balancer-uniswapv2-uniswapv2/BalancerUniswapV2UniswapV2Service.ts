@@ -1,12 +1,12 @@
-import { AbstractBalancer, BalancerWrongPoolsFedError, BalanceResult } from '../balancer'
-import { PoolV2WithContract, PoolWithContract, DEXType } from '../interfaces'
-import { BunyanLogger } from '../logger'
-import { JSBIUtils } from '../utils'
-
 import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { injectable } from 'inversify'
 import JSBI from 'jsbi'
+
+import { AbstractBalancer, BalancerWrongPoolsFedError, BalanceResult } from '../balancer'
+import { PoolV2WithContract, PoolWithContract, DEXType } from '../common'
+import { BunyanLogger } from '../logger'
+import { JSBIUtils } from '../utils'
 
 @injectable()
 export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
@@ -20,7 +20,7 @@ export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
    */
   private getReserves(
     tokenIn: Token,
-    { pool: { token0, reserve0, reserve1 } }: PoolV2WithContract
+    { token0, reserve0, reserve1 }: PoolV2WithContract
   ): [JSBI, JSBI] {
     const zeroForOne = tokenIn.equals(token0)
     const reserves = [reserve0, reserve1]
@@ -103,9 +103,9 @@ export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
     tokenA: Token
   ) {
     this.logger.info(
-      `Balancing pools, V2 price: ${firstPoolV2Info.pool
+      `Balancing pools, V2 price: ${firstPoolV2Info
         .priceOf(tokenA)
-        .toSignificant(6)}, V2 price:${secondPoolV2Info.pool.priceOf(tokenA).toSignificant(6)}`
+        .toSignificant(6)}, V2 price:${secondPoolV2Info.priceOf(tokenA).toSignificant(6)}`
     )
     const [reservesIn0, reservesOut0] = this.getReserves(tokenA, firstPoolV2Info)
     const [reservesOut1, reservesIn1] = this.getReserves(tokenA, secondPoolV2Info)
@@ -115,17 +115,17 @@ export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
       reservesOut0,
       reservesIn1,
       reservesOut1,
-      firstPoolV2Info.pool.feeNumerator,
-      firstPoolV2Info.pool.feeDenominator,
-      secondPoolV2Info.pool.feeNumerator,
-      secondPoolV2Info.pool.feeDenominator
+      firstPoolV2Info.feeNumerator,
+      firstPoolV2Info.feeDenominator,
+      secondPoolV2Info.feeNumerator,
+      secondPoolV2Info.feeDenominator
     )
     // convert to an amount without a reminder - integer division problem
     const amountInFalsy = CurrencyAmount.fromRawAmount(tokenA, x)
-    const amountIn = firstPoolV2Info.pool.getInputAmount(
-      firstPoolV2Info.pool.getOutputAmount(amountInFalsy)[0]
+    const amountIn = firstPoolV2Info.getInputAmount(
+      firstPoolV2Info.getOutputAmount(amountInFalsy)[0]
     )[0]
-    const [maxProfit] = this.calculateProfit(firstPoolV2Info.pool, secondPoolV2Info.pool, amountIn)
+    const [maxProfit] = this.calculateProfit(firstPoolV2Info, secondPoolV2Info, amountIn)
 
     if (maxProfit.lessThan(0)) throw new Error('not profitable')
     this.logger.info('Finished! Amount:', x.toString(), ' weiWETH')
@@ -135,14 +135,14 @@ export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
       from: {
         address: firstPoolV2Info.contract.address,
         type: firstPoolV2Info.type,
-        feeNumerator: firstPoolV2Info.pool.feeNumerator,
-        feeDenominator: firstPoolV2Info.pool.feeDenominator
+        feeNumerator: firstPoolV2Info.feeNumerator,
+        feeDenominator: firstPoolV2Info.feeDenominator
       },
       to: {
         address: secondPoolV2Info.contract.address,
         type: secondPoolV2Info.type,
-        feeNumerator: secondPoolV2Info.pool.feeNumerator,
-        feeDenominator: secondPoolV2Info.pool.feeDenominator
+        feeNumerator: secondPoolV2Info.feeNumerator,
+        feeDenominator: secondPoolV2Info.feeDenominator
       },
       amountIn,
       profit: maxProfit
@@ -150,7 +150,7 @@ export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
   }
 
   balance(from: PoolWithContract, to: PoolWithContract, baseToken: Token): Promise<BalanceResult> {
-    const zeroForOne = from.price.lessThan(to.price)
+    const zeroForOne = from.priceOf(baseToken).greaterThan(to.priceOf(baseToken))
     if (from.type === DEXType.UNISWAPV2 && to.type === DEXType.UNISWAPV2)
       return Promise.resolve(this.v2ToV2(zeroForOne ? from : to, zeroForOne ? to : from, baseToken))
 

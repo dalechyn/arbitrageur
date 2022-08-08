@@ -1,7 +1,7 @@
-import { DEXType } from '../../interfaces'
-
 import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import JSBI from 'jsbi'
+
+import { DEXType } from '../../common'
 
 type BalanceUniswapV2Info = {
   type: DEXType.UNISWAPV2

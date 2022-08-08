@@ -1,5 +1,5 @@
 diff --git a/build/index.d.ts b/build/index.d.ts
-index d317e4985a5b70c194fbcbdd657c4acdc6548cbb..7f9ed65f1ec937ace61715c65fb8af1a708dd3c4 100644
+index d317e4985a5b70c194fbcbdd657c4acdc6548cbb..471aead86811de2414df338b596b1796d4bb9525 100644
 --- a/build/index.d.ts
 +++ b/build/index.d.ts
 @@ -153,9 +153,9 @@ export interface FlashbotsBundleConflictWithGasPricing extends FlashbotsBundleCo
@@ -20,18 +20,14 @@ index d317e4985a5b70c194fbcbdd657c4acdc6548cbb..7f9ed65f1ec937ace61715c65fb8af1a
      sendBundle(bundledTransactions: Array<FlashbotsBundleTransaction | FlashbotsBundleRawTransaction>, targetBlockNumber: number, opts?: FlashbotsOptions): Promise<FlashbotsTransaction>;
      signBundle(bundledTransactions: Array<FlashbotsBundleTransaction | FlashbotsBundleRawTransaction>): Promise<Array<string>>;
 -    private wait;
--    getUserStats(): Promise<GetUserStatsResponse>;
--    getBundleStats(bundleHash: string, blockNumber: number): Promise<GetBundleStatsResponse>;
 +    protected wait;
-+    protectedStats(): Promise<GetUserStatsResponse>;
-+    protectedleStats(bundleHash: string, blockNumber: number): Promise<GetBundleStatsResponse>;
+     getUserStats(): Promise<GetUserStatsResponse>;
+     getBundleStats(bundleHash: string, blockNumber: number): Promise<GetBundleStatsResponse>;
      simulate(signedBundledTransactions: Array<string>, blockTag: BlockTag, stateBlockTag?: BlockTag, blockTimestamp?: number): Promise<SimulationResponse>;
 -    private calculateBundlePricing;
--    getConflictingBundle(targetSignedBundledTransactions: Array<string>, targetBlockNumber: number): Promise<FlashbotsBundleConflictWithGasPricing>;
--    getConflictingBundleWithoutGasPricing(targetSignedBundledTransactions: Array<string>, targetBlockNumber: number): Promise<FlashbotsBundleConflict>;
 +    protected calculateBundlePricing;
-+    protectedlictingBundle(targetSignedBundledTransactions: Array<string>, targetBlockNumber: number): Promise<FlashbotsBundleConflictWithGasPricing>;
-+    protectedlictingBundleWithoutGasPricing(targetSignedBundledTransactions: Array<string>, targetBlockNumber: number): Promise<FlashbotsBundleConflict>;
+     getConflictingBundle(targetSignedBundledTransactions: Array<string>, targetBlockNumber: number): Promise<FlashbotsBundleConflictWithGasPricing>;
+     getConflictingBundleWithoutGasPricing(targetSignedBundledTransactions: Array<string>, targetBlockNumber: number): Promise<FlashbotsBundleConflict>;
      fetchBlocksApi(blockNumber: number): Promise<BlocksApiResponse>;
 -    private request;
 -    private fetchReceipts;

@@ -1,19 +1,19 @@
+import { CurrencyAmount, Price, Token } from '@uniswap/sdk-core'
+import { LiquidityMath, priceToClosestTick, TickMath, tickToPrice } from '@uniswap/v3-sdk'
+import { injectable } from 'inversify'
+import JSBI from 'jsbi'
+
 import {
   NEGATIVE_ONE,
   AbstractBalancer,
   BalanceResult,
   BalancerWrongPoolsFedError
 } from '../balancer'
-import { DEXType, PoolV2WithContract, PoolV3WithContract, PoolWithContract } from '../interfaces'
+import { DEXType, PoolV2WithContract, PoolV3WithContract, PoolWithContract } from '../common'
 import { BunyanLogger } from '../logger'
 
 import { FractionUtils } from './utils'
 import { SwapToPriceMath } from './utils/SwapToPriceMath'
-
-import { CurrencyAmount, Price, Token } from '@uniswap/sdk-core'
-import { LiquidityMath, priceToClosestTick, TickMath, tickToPrice } from '@uniswap/v3-sdk'
-import { injectable } from 'inversify'
-import JSBI from 'jsbi'
 
 interface StepComputations {
   sqrtPriceStartX96: JSBI
@@ -63,12 +63,10 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
    * @param tokenA Base token
    */
   private async v2ToV3(
-    fromPoolInfo: PoolV2WithContract,
-    toPoolInfo: PoolV3WithContract,
+    initialPair: PoolV2WithContract,
+    pool: PoolV3WithContract,
     tokenA: Token
   ): Promise<BalanceResult> {
-    const { pool } = toPoolInfo
-    const { pool: initialPair } = fromPoolInfo
     const tokenB = tokenA === pool.token0 ? pool.token1 : pool.token0
     const tokenC = tokenA
 
@@ -160,14 +158,14 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
         this.logger.debug('Profit from previous step was higher, finished')
         return {
           from: {
-            address: fromPoolInfo.contract.address,
-            type: fromPoolInfo.type,
-            feeNumerator: fromPoolInfo.pool.feeNumerator,
-            feeDenominator: fromPoolInfo.pool.feeDenominator
+            address: initialPair.contract.address,
+            type: initialPair.type,
+            feeNumerator: initialPair.feeNumerator,
+            feeDenominator: initialPair.feeDenominator
           },
           to: {
-            address: toPoolInfo.contract.address,
-            type: toPoolInfo.type
+            address: pool.contract.address,
+            type: pool.type
           },
           amountIn: CurrencyAmount.fromRawAmount(tokenA, state.amountA),
           profit
@@ -244,14 +242,14 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
 
     return {
       from: {
-        address: fromPoolInfo.contract.address,
-        type: fromPoolInfo.type,
-        feeNumerator: fromPoolInfo.pool.feeNumerator,
-        feeDenominator: fromPoolInfo.pool.feeDenominator
+        address: initialPair.contract.address,
+        type: initialPair.type,
+        feeNumerator: initialPair.feeNumerator,
+        feeDenominator: initialPair.feeDenominator
       },
       to: {
-        address: toPoolInfo.contract.address,
-        type: toPoolInfo.type
+        address: pool.contract.address,
+        type: pool.type
       },
       amountIn: CurrencyAmount.fromRawAmount(tokenA, state.amountA),
       profit: CurrencyAmount.fromRawAmount(tokenA, profit)
@@ -265,12 +263,10 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
    * @param tokenA Base token
    */
   private async v3ToV2(
-    fromPoolInfo: PoolV3WithContract,
-    toPoolInfo: PoolV2WithContract,
+    pool: PoolV3WithContract,
+    initialPair: PoolV2WithContract,
     tokenA: Token
   ): Promise<BalanceResult> {
-    const { pool } = fromPoolInfo
-    const { pool: initialPair } = toPoolInfo
     const tokenB = tokenA === pool.token0 ? pool.token1 : pool.token0
     const tokenC = tokenA
 
@@ -351,14 +347,14 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
         this.logger.debug('Profit from previous step was higher, finished')
         return {
           from: {
-            address: fromPoolInfo.contract.address,
-            type: fromPoolInfo.type
+            address: pool.contract.address,
+            type: pool.type
           },
           to: {
-            address: toPoolInfo.contract.address,
-            type: toPoolInfo.type,
-            feeNumerator: toPoolInfo.pool.feeNumerator,
-            feeDenominator: toPoolInfo.pool.feeDenominator
+            address: initialPair.contract.address,
+            type: initialPair.type,
+            feeNumerator: initialPair.feeNumerator,
+            feeDenominator: initialPair.feeDenominator
           },
           amountIn: CurrencyAmount.fromRawAmount(tokenA, state.amountA),
           profit
@@ -432,14 +428,14 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
 
     return {
       from: {
-        address: fromPoolInfo.contract.address,
-        type: fromPoolInfo.type
+        address: pool.contract.address,
+        type: pool.type
       },
       to: {
-        address: toPoolInfo.contract.address,
-        type: toPoolInfo.type,
-        feeNumerator: toPoolInfo.pool.feeNumerator,
-        feeDenominator: toPoolInfo.pool.feeDenominator
+        address: initialPair.contract.address,
+        type: initialPair.type,
+        feeNumerator: initialPair.feeNumerator,
+        feeDenominator: initialPair.feeDenominator
       },
       amountIn: CurrencyAmount.fromRawAmount(tokenA, state.amountA),
       profit: CurrencyAmount.fromRawAmount(tokenA, profit)
@@ -447,7 +443,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
   }
 
   balance(from: PoolWithContract, to: PoolWithContract, baseToken: Token): Promise<BalanceResult> {
-    const zeroForOne = from.price.lessThan(to.price)
+    const zeroForOne = from.priceOf(baseToken).greaterThan(to.priceOf(baseToken))
     if (from.type === DEXType.UNISWAPV2 && to.type === DEXType.UNISWAPV3)
       return zeroForOne ? this.v2ToV3(from, to, baseToken) : this.v3ToV2(to, from, baseToken)
 

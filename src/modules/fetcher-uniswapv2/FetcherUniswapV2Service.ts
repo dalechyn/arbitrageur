@@ -1,41 +1,54 @@
-import { FetcherPoolDoesNotExistError, AbstractFetcher } from '../fetcher'
-import { DEXType, PoolWithContract } from '../interfaces'
+import { CurrencyAmount, Token } from '@uniswap/sdk-core'
+import UniswapV2Pair from '@uniswap/v2-core/build/UniswapV2Pair.json'
+import { Contract } from 'ethers'
+import { injectable } from 'inversify'
+import JSBI from 'jsbi'
+
+import { DEX, PoolV2WithContract } from '../common'
 import { BunyanLogger } from '../logger'
 import { ProviderService } from '../provider'
 
-import { CurrencyAmount, Token } from '@uniswap/sdk-core'
-import UniswapV2Pair from '@uniswap/v2-core/build/UniswapV2Pair.json'
-import { Pair } from '@uniswap/v2-sdk'
-import { Contract } from 'ethers'
-import { injectable } from 'inversify'
+import { FetcherUniswapV2PoolDoesNotExistError } from './errors'
 
+/**
+ * FetcherUniswapV2Service
+ *
+ * Provides API for fetching any pool that matches UniswapV2 interface.
+ */
 @injectable()
-export class FetcherUniswapV2Service implements AbstractFetcher {
+export class FetcherUniswapV2Service {
   constructor(
     private readonly logger: BunyanLogger,
     private readonly providerService: ProviderService
   ) {}
 
-  async fetch(poolAddress: string, baseToken: Token, quoteToken: Token): Promise<PoolWithContract> {
-    this.logger.info(`UniswapV2: Checking ${baseToken.symbol}-${quoteToken.symbol}: ${poolAddress}`)
+  async fetch(
+    tokenA: Token,
+    tokenB: Token,
+    dex: DEX,
+    factoryAddress?: string,
+    initCodeHash?: string,
+    feeNumerator?: number,
+    feeDenominator?: number
+  ): Promise<PoolV2WithContract> {
+    const poolAddress = PoolV2WithContract.getAddress(tokenA, tokenB, factoryAddress, initCodeHash)
+    this.logger.info(`UniswapV2: Checking ${tokenA.symbol}-${tokenB.symbol}: ${poolAddress}`)
     const pairContract = new Contract(poolAddress, UniswapV2Pair.abi, this.providerService)
     try {
       const { _reserve0, _reserve1 } = await pairContract.getReserves()
-      const [reserveA, reserveB] = baseToken.sortsBefore(quoteToken)
+      const [reserveA, reserveB] = tokenA.sortsBefore(tokenB)
         ? [_reserve0, _reserve1]
         : [_reserve1, _reserve0]
-      const pair = new Pair(
-        CurrencyAmount.fromRawAmount(baseToken, reserveA),
-        CurrencyAmount.fromRawAmount(quoteToken, reserveB)
+      return new PoolV2WithContract(
+        CurrencyAmount.fromRawAmount(tokenA, reserveA),
+        CurrencyAmount.fromRawAmount(tokenB, reserveB),
+        pairContract,
+        dex,
+        feeNumerator ? JSBI.BigInt(feeNumerator) : undefined,
+        feeDenominator ? JSBI.BigInt(feeDenominator) : undefined
       )
-      return {
-        price: pair.priceOf(quoteToken),
-        contract: pairContract,
-        pool: pair,
-        type: DEXType.UNISWAPV2
-      }
     } catch {
-      throw new FetcherPoolDoesNotExistError(poolAddress)
+      throw new FetcherUniswapV2PoolDoesNotExistError(poolAddress, tokenA, tokenB)
     }
   }
 }

@@ -1,4 +1,11 @@
+import { Token } from '@uniswap/sdk-core'
+import UniswapV2Router from '@uniswap/v2-periphery/build/UniswapV2Router02.json'
+import BigNumber from 'bignumber.js'
+import { Contract, Transaction, utils } from 'ethers'
+import { injectable } from 'inversify'
+
 import { IERC20ABI, SwapRouter02 } from '../abis'
+import { DEX } from '../common'
 import { ConfigService } from '../config'
 import { BunyanLogger } from '../logger'
 import {
@@ -21,12 +28,6 @@ import {
   isUniswapV2SwapSignature
 } from './interfaces'
 
-import { Token } from '@uniswap/sdk-core'
-import UniswapV2Router from '@uniswap/v2-periphery/build/UniswapV2Router02.json'
-import BigNumber from 'bignumber.js'
-import { Contract, Transaction, utils } from 'ethers'
-import { injectable } from 'inversify'
-
 /**
  * Reconstructs and finds all UniswapV2 swaps in Tx's
  *
@@ -43,6 +44,14 @@ export class MempoolUniswapV2Service {
   ) {}
 
   /**
+   * Returns true if to is Sushiswap router
+   * @param to destination address
+   */
+  private isTxToSushiswap(to?: string): boolean {
+    return to === this.configService.get('dexes.sushiswap.routerAddress')
+  }
+
+  /**
    * Returns true if to is UniswapV2 router
    * @param to destination address
    */
@@ -51,12 +60,14 @@ export class MempoolUniswapV2Service {
   }
 
   /**
-   * Returns true if to is UniswapV2 or V3 router
+   * Returns true if to is UniswapV2-type router or V3 router
    * @param to destination address
    */
   private isTxToUniswapV2OrV3(to?: string): boolean {
     return (
-      this.isTxToUniswapV2(to) || to === this.configService.get('dexes.uniswapV3.routerAddress')
+      this.isTxToUniswapV2(to) ||
+      this.isTxToSushiswap(to) ||
+      to === this.configService.get('dexes.uniswapV3.router02Address')
     )
   }
 
@@ -141,7 +152,14 @@ export class MempoolUniswapV2Service {
         })
       )
 
-      const baseResult = {
+      const baseResult: {
+        dex: DEX.UniswapV2 | DEX.SushiSwap
+        hash?: string
+        from: string
+        path: Token[]
+        to: string
+      } = {
+        dex: this.isTxToSushiswap() ? DEX.SushiSwap : DEX.UniswapV2,
         hash: tx.hash,
         from: tx.from!,
         path,

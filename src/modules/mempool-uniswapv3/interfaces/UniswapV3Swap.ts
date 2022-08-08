@@ -1,8 +1,10 @@
-import { UniswapV3SwapSignature } from './UniswapV3SwapSignature'
-import { UniswapV3SwapV3Signature } from './UniswapV3SwapV3Signature'
-
 import { Token } from '@uniswap/sdk-core'
 import BigNumber from 'bignumber.js'
+
+import { DEX } from '../../common'
+
+import { UniswapV3SwapSignature } from './UniswapV3SwapSignature'
+import { UniswapV3SwapV3Signature } from './UniswapV3SwapV3Signature'
 
 export interface UniswapV3PathElement {
   tokenA: Token
@@ -11,6 +13,7 @@ export interface UniswapV3PathElement {
 }
 
 export type UniswapV3Swap = {
+  dex: DEX.UniswapV3
   hash?: string
   from: string
   recipient: string

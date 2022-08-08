@@ -1,7 +1,7 @@
-import { TYPES } from './TYPES'
-
 import bunyan from 'bunyan'
 import { inject, injectable } from 'inversify'
+
+import { TYPES } from './TYPES'
 @injectable()
 export class BunyanLogger {
   private readonly logger: bunyan

@@ -3,6 +3,12 @@
 // import { ConfigService } from '../config'
 // import { FetcherService } from '../fetcher'
 
+import { Token } from '@uniswap/sdk-core'
+import { injectable } from 'inversify'
+
+import { DEX, PoolV2WithContract, PoolV3WithContract, PoolWithContract } from '../common'
+import { ConfigService } from '../config'
+import { FetcherService } from '../fetcher'
 import { BunyanLogger } from '../logger'
 // import { ProviderService } from '../provider'
 // import { ProviderFlashbotsService } from '../provider-flashbots'
@@ -10,27 +16,122 @@ import { BunyanLogger } from '../logger'
 // import { FlashbotsBundleResolution } from '@flashbots/ethers-provider-bundle'
 // import { BigNumber, Wallet } from 'ethers'
 import { MempoolUniswapV2Service } from '../mempool-uniswapv2'
+import { UniswapV3SwapSignature, UniswapV3SwapV3Signature } from '../mempool-uniswapv3'
 import { MempoolUniswapV3Service } from '../mempool-uniswapv3/MempoolUniswapV3Service'
 
-import { injectable } from 'inversify'
 // import fetch from 'node-fetch'
 
 @injectable()
 export class ArbitrageurService {
+  private readonly rewardToken: Token
   constructor(
     private readonly logger: BunyanLogger,
-    // private readonly configService: ConfigService,
+    private readonly configService: ConfigService,
+    private readonly fetcherService: FetcherService,
     // private readonly ethProvider: ProviderService, // private readonly clusterService: ClusterService, // private readonly fetcherService: FetcherService, // private readonly balancerService: BalancerService, // private readonly transactionService: TransactionService, // private readonly providerFlashbotsService: ProviderFlashbotsService,
     private readonly mempoolUniswapV2Service: MempoolUniswapV2Service,
     private readonly mempoolUniswapV3Service: MempoolUniswapV3Service
-  ) {}
+  ) {
+    this.rewardToken = new Token(
+      this.configService.get('network.chainId'),
+      this.configService.get('rewardToken.address'),
+      this.configService.get('rewardToken.decimals'),
+      this.configService.get('rewardToken.symbol')
+    )
+  }
 
   run(): void {
-    this.mempoolUniswapV2Service.onUniswapV2PendingTransaction((swaps) => {
-      this.logger.info(swaps)
+    this.mempoolUniswapV2Service.onUniswapV2PendingTransaction(async (swaps) => {
+      // loop all swaps in tx
+      for (const swap of swaps) {
+        // loop through all pools in the path as they all change and can create an arbitrage opportunity
+        const pools = new Array<PoolV2WithContract>()
+        for (let i = 1; i < swap.path.length; i++) {
+          const tokenPrev = swap.path[i - 1]
+          const token = swap.path[i]
+
+          // we don't want to look for swaps of tokens we are not interested in
+          if (!tokenPrev.equals(this.rewardToken) && !token.equals(this.rewardToken)) return pools
+          pools.push(
+            await this.fetcherService.fetchUniswapV2(
+              this.rewardToken,
+              token.equals(this.rewardToken) ? tokenPrev : token,
+              swap.dex,
+              ...(swap.dex === DEX.UniswapV2
+                ? []
+                : [
+                    this.configService.get(`dexes.${swap.dex}.factoryAddress`),
+                    this.configService.get(`dexes.${swap.dex}.pairCodeHash`)
+                  ])
+            )
+          )
+        }
+
+        // here we need to find so called "neighbours" - pools with the same tokens on other dexes
+        const neighbourPools: Record<string, PoolWithContract[]> = {}
+
+        for (const pool of pools)
+          neighbourPools[pool.contract.address] = await this.fetcherService.fetchNeihgbours(
+            pool.token0,
+            pool.token1,
+            pool.dex
+          )
+
+        this.logger.debug('NEIGHBOURS:', neighbourPools)
+
+        // TODO: DROP duplicates
+      }
     })
-    this.mempoolUniswapV3Service.onUniswapV3PendingTransaction((swaps) => {
-      this.logger.info(swaps)
+    this.mempoolUniswapV3Service.onUniswapV3PendingTransaction(async (swaps) => {
+      // loop all swaps in tx
+      for (const swap of swaps) {
+        // loop through all pools in the path as they all change and can create an arbitrage opportunity
+        const pools = new Array<PoolV3WithContract>()
+        if (
+          swap.method === UniswapV3SwapV3Signature.exactInput ||
+          swap.method === UniswapV3SwapSignature.exactInput ||
+          swap.method === UniswapV3SwapV3Signature.exactOutput ||
+          swap.method === UniswapV3SwapSignature.exactOutput
+        )
+          for (const { tokenA, tokenB, fee } of swap.path) {
+            // we don't want to look for swaps of tokens we are not interested in
+            if (!tokenA.equals(this.rewardToken) && !tokenB.equals(this.rewardToken)) return pools
+            pools.push(
+              await this.fetcherService.fetchUniswapV3(
+                this.rewardToken,
+                tokenA.equals(this.rewardToken) ? tokenB : tokenA,
+                fee,
+                swap.dex
+              )
+            )
+          }
+        else {
+          pools.push(
+            await this.fetcherService.fetchUniswapV3(
+              this.rewardToken,
+              swap.tokenIn.equals(this.rewardToken) ? swap.tokenOut : swap.tokenIn,
+              swap.fee,
+              swap.dex
+            )
+          )
+        }
+
+        // here we need to find so called "neighbours" - pools with the same tokens on other dexes
+        const neighbourPools: Record<string, PoolWithContract[]> = {}
+
+        for (const pool of pools)
+          neighbourPools[pool.contract.address] = await this.fetcherService.fetchNeihgbours(
+            pool.token0,
+            pool.token1,
+            pool.dex
+          )
+
+        this.logger.debug('NEIGHBOURS:', neighbourPools)
+
+        // TODO: DROP duplicates
+
+        this.logger.info(swaps)
+      }
     })
     // this.ethProvider.on('block', async (blockNumber: number) => {
     //   // logger.info(await flashbotsProvider.fetchBlocksApi(14949852))
