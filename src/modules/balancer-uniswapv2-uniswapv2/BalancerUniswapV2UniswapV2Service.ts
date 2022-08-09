@@ -8,6 +8,8 @@ import { PoolV2WithContract, PoolWithContract, DEXType } from '../common'
 import { BunyanLogger } from '../logger'
 import { JSBIUtils } from '../utils'
 
+import { BalancerUniswapV2UniswapV2NotProfitableError } from './errors'
+
 @injectable()
 export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
   constructor(private readonly logger: BunyanLogger) {}
@@ -132,9 +134,10 @@ export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
     )[0]
     const [maxProfit] = this.calculateProfit(firstPoolV2Info, secondPoolV2Info, amountIn)
 
-    if (maxProfit.lessThan(0)) throw new Error('not profitable')
-    this.logger.info('Finished! Amount:', x.toString(), ' weiWETH')
-    this.logger.info('Finished! Profit:', maxProfit.toSignificant(), ' WETH')
+    if (maxProfit.lessThan(0))
+      throw new BalancerUniswapV2UniswapV2NotProfitableError(tokenA, tokenB)
+    this.logger.info('Finished! Amount:', x.toString(), 'wei')
+    this.logger.info('Finished! Profit:', maxProfit.toSignificant(), 'WETH')
 
     return {
       from: {
@@ -159,7 +162,7 @@ export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
     poolB: PoolWithContract,
     baseToken: Token
   ): Promise<BalanceResult> {
-    const zeroForOne = poolA.priceOf(baseToken).lessThan(poolB.priceOf(baseToken))
+    const zeroForOne = poolA.priceOf(baseToken).greaterThan(poolB.priceOf(baseToken))
     if (poolA.type === DEXType.UNISWAPV2 && poolB.type === DEXType.UNISWAPV2)
       return Promise.resolve(
         this.v2ToV2(zeroForOne ? poolA : poolB, zeroForOne ? poolB : poolA, baseToken)

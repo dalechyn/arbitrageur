@@ -7,5 +7,6 @@ export class BalancerWrongPoolsFedError extends Error {
         pool0Type
       )} and ${DEXTypeConverter.toLongFormat(pool1Type)}`
     )
+    this.name = 'BalancerWrongPoolsFedError'
   }
 }

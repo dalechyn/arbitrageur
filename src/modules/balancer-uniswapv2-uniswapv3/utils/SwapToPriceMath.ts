@@ -79,8 +79,8 @@ export abstract class SwapToPriceMath {
     reservesIn: CurrencyAmount<Token>,
     reservesOut: CurrencyAmount<Token>,
     targetPrice: Fraction,
-    FEE_NUMERATOR = JSBI.BigInt(997),
-    FEE_DENOMINATOR = JSBI.BigInt(1000)
+    FEE_NUMERATOR: JSBI,
+    FEE_DENOMINATOR: JSBI
   ) {
     // dif numerators as square formula has two roots - pick biggest of em
     const rIn = reservesIn.quotient

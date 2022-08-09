@@ -3,7 +3,7 @@
 // import { ConfigService } from '../config'
 // import { FetcherService } from '../fetcher'
 
-import { Token } from '@uniswap/sdk-core'
+import { CurrencyAmount, NativeCurrency, Token } from '@uniswap/sdk-core'
 import { injectable } from 'inversify'
 
 import { BalanceResult, BalancerService } from '../balancer'
@@ -16,8 +16,13 @@ import { BunyanLogger } from '../logger'
 // import { TransactionService } from '../transaction'
 // import { FlashbotsBundleResolution } from '@flashbots/ethers-provider-bundle'
 // import { BigNumber, Wallet } from 'ethers'
-import { MempoolUniswapV2Service } from '../mempool-uniswapv2'
-import { UniswapV3SwapSignature, UniswapV3SwapV3Signature } from '../mempool-uniswapv3'
+import {
+  isUniswapV2ETHInExactTokensOutSwap,
+  isUniswapV2ExactOutSignature,
+  isUniswapV2ExactTokensInSwap,
+  MempoolUniswapV2Service
+} from '../mempool-uniswapv2'
+import { isUniswapV3ExactInput, isUniswapV3Multi } from '../mempool-uniswapv3'
 import { MempoolUniswapV3Service } from '../mempool-uniswapv3/MempoolUniswapV3Service'
 
 // import fetch from 'node-fetch'
@@ -82,17 +87,36 @@ export class ArbitrageurService {
       for (const swap of swaps) {
         // loop through all pools in the path as they all change and can create an arbitrage opportunity
         const pools = new Array<PoolV2WithContract>()
-        for (let i = 1; i < swap.path.length; i++) {
-          const tokenPrev = swap.path[i - 1]
-          const token = swap.path[i]
+        const tokenAmounts = new Array<CurrencyAmount<Token>>(swap.path.length)
 
-          // we don't want to look for swaps of tokens we are not interested in
-          if (!tokenPrev.equals(this.rewardToken) && !token.equals(this.rewardToken)) return pools
-          console.log(swap.dex)
-          pools.push(
-            await this.fetcherService.fetchUniswapV2(
-              this.rewardToken,
-              token.equals(this.rewardToken) ? tokenPrev : token,
+        const exactIn = !isUniswapV2ExactOutSignature(swap)
+        // EXACT IN type trades
+        if (isUniswapV2ETHInExactTokensOutSwap(swap))
+          tokenAmounts[0] = CurrencyAmount<NativeCurrency>.fromRawAmount(
+            swap.path[0],
+            swap.value.toFixed()
+          )
+        else if (isUniswapV2ExactTokensInSwap(swap))
+          tokenAmounts[0] = CurrencyAmount<Token>.fromRawAmount(
+            swap.path[0],
+            swap.amountIn.toFixed()
+          )
+        // EXACT OUT type trades
+        else if (!exactIn)
+          tokenAmounts[tokenAmounts.length - 1] = CurrencyAmount<NativeCurrency>.fromRawAmount(
+            swap.path[swap.path.length - 1],
+            swap.amountOut.toFixed()
+          )
+
+        if (exactIn)
+          for (let i = 1; i < swap.path.length; i++) {
+            const tokenPrev = swap.path[i - 1]
+            const token = swap.path[i]
+
+            console.log(swap.dex)
+            const pool = await this.fetcherService.fetchUniswapV2(
+              tokenPrev,
+              token,
               swap.dex,
               ...(swap.dex === DEX.UniswapV2
                 ? []
@@ -101,8 +125,47 @@ export class ArbitrageurService {
                     this.configService.get(`dexes.${swap.dex}.pairCodeHash`)
                   ])
             )
-          )
-        }
+
+            if (!tokenAmounts[0]) console.log(swap)
+            try {
+              const [outputAmount, poolAfterSwap] = pool.getOutputAmount(tokenAmounts[i - 1])
+              tokenAmounts[i] = outputAmount
+              // we don't want to look for pools of tokens we are not interested in
+              if (!tokenPrev.equals(this.rewardToken) && !token.equals(this.rewardToken)) continue
+              pools.push(poolAfterSwap)
+            } catch (e) {
+              this.logger.error(e)
+            }
+          }
+        else
+          for (let i = swap.path.length - 1; i >= 1; i--) {
+            const tokenPrev = swap.path[i]
+            const token = swap.path[i - 1]
+
+            console.log(swap.dex)
+            const pool = await this.fetcherService.fetchUniswapV2(
+              tokenPrev,
+              token,
+              swap.dex,
+              ...(swap.dex === DEX.UniswapV2
+                ? []
+                : [
+                    this.configService.get(`dexes.${swap.dex}.factoryAddress`),
+                    this.configService.get(`dexes.${swap.dex}.pairCodeHash`)
+                  ])
+            )
+
+            try {
+              const [inputAmount, poolAfterSwap] = pool.getInputAmount(tokenAmounts[i])
+              tokenAmounts[i - 1] = inputAmount
+              // we don't want to look for pools of tokens we are not interested in
+              if (!tokenPrev.equals(this.rewardToken) && !token.equals(this.rewardToken)) continue
+              pools.push(poolAfterSwap)
+            } catch (e) {
+              this.logger.error(e)
+            }
+          }
+
         const poolsWithNeighbours = await this.getPoolsWithNeighboursFromPoolsInTx(pools)
 
         this.logger.debug('NEIGHBOURS:', poolsWithNeighbours)
@@ -133,33 +196,83 @@ export class ArbitrageurService {
       for (const swap of swaps) {
         // loop through all pools in the path as they all change and can create an arbitrage opportunity
         const pools = new Array<PoolV3WithContract>()
-        if (
-          swap.method === UniswapV3SwapV3Signature.exactInput ||
-          swap.method === UniswapV3SwapSignature.exactInput ||
-          swap.method === UniswapV3SwapV3Signature.exactOutput ||
-          swap.method === UniswapV3SwapSignature.exactOutput
-        )
-          for (const { tokenA, tokenB, fee } of swap.path) {
-            // we don't want to look for swaps of tokens we are not interested in
-            if (!tokenA.equals(this.rewardToken) && !tokenB.equals(this.rewardToken)) return pools
-            pools.push(
-              await this.fetcherService.fetchUniswapV3(
-                this.rewardToken,
-                tokenA.equals(this.rewardToken) ? tokenB : tokenA,
-                fee,
-                swap.dex
-              )
+        const exactIn = isUniswapV3ExactInput(swap)
+        if (isUniswapV3Multi(swap)) {
+          const tokenAmounts = new Array<CurrencyAmount<Token>>(swap.path.length + 1)
+
+          if (exactIn)
+            tokenAmounts[0] = CurrencyAmount.fromRawAmount(
+              swap.path[0].tokenA,
+              swap.amountIn.toFixed()
             )
-          }
-        else {
-          pools.push(
-            await this.fetcherService.fetchUniswapV3(
-              this.rewardToken,
-              swap.tokenIn.equals(this.rewardToken) ? swap.tokenOut : swap.tokenIn,
-              swap.fee,
-              swap.dex
+          else
+            tokenAmounts[tokenAmounts.length - 1] = CurrencyAmount.fromRawAmount(
+              swap.path[swap.path.length - 1].tokenB,
+              swap.amountOut.toFixed()
             )
+
+          if (exactIn)
+            for (let i = 0; i < swap.path.length; i++) {
+              const { tokenA, tokenB, fee } = swap.path[i]
+              const pool = await this.fetcherService.fetchUniswapV3(tokenA, tokenB, fee, swap.dex)
+
+              try {
+                const [outputAmount, poolAfterSwap] = await pool.getOutputAmount(tokenAmounts[i])
+                tokenAmounts[i + 1] = outputAmount
+                // we don't want to look for swaps of tokens we are not interested in
+                if (!tokenA.equals(this.rewardToken) && !tokenB.equals(this.rewardToken)) continue
+                pools.push(poolAfterSwap)
+              } catch (e) {
+                this.logger.error(e)
+              }
+            }
+          else
+            for (let i = swap.path.length - 1; i >= 0; i--) {
+              const { tokenA, tokenB, fee } = swap.path[i]
+              const pool = await this.fetcherService.fetchUniswapV3(tokenA, tokenB, fee, swap.dex)
+
+              try {
+                const [inputAmount, poolAfterSwap] = await pool.getInputAmount(tokenAmounts[i + 1])
+                tokenAmounts[i] = inputAmount
+                // we don't want to look for swaps of tokens we are not interested in
+                if (!tokenA.equals(this.rewardToken) && !tokenB.equals(this.rewardToken)) continue
+                pools.push(poolAfterSwap)
+              } catch (e) {
+                this.logger.error(e)
+              }
+            }
+        } else {
+          const tokenAmounts = new Array<CurrencyAmount<Token>>(2)
+
+          if (exactIn)
+            tokenAmounts[0] = CurrencyAmount.fromRawAmount(swap.tokenIn, swap.amountIn.toString())
+          else
+            tokenAmounts[tokenAmounts.length - 1] = CurrencyAmount.fromRawAmount(
+              swap.tokenOut,
+              swap.amountOut.toString()
+            )
+
+          const pool = await this.fetcherService.fetchUniswapV3(
+            this.rewardToken,
+            swap.tokenIn.equals(this.rewardToken) ? swap.tokenOut : swap.tokenIn,
+            swap.fee,
+            swap.dex
           )
+          if (exactIn) {
+            const [outputAmount, poolAfterSwap] = await pool.getOutputAmount(tokenAmounts[0])
+            tokenAmounts[1] = outputAmount
+
+            if (swap.tokenIn.equals(this.rewardToken) || swap.tokenOut.equals(this.rewardToken))
+              pools.push(poolAfterSwap)
+          } else {
+            const [inputAmount, poolAfterSwap] = await pool.getInputAmount(
+              tokenAmounts[tokenAmounts.length - 1]
+            )
+            tokenAmounts[0] = inputAmount
+
+            if (swap.tokenIn.equals(this.rewardToken) || swap.tokenOut.equals(this.rewardToken))
+              pools.push(poolAfterSwap)
+          }
         }
         const poolsWithNeighbours = await this.getPoolsWithNeighboursFromPoolsInTx(pools)
         this.logger.debug('NEIGHBOURS:', poolsWithNeighbours)

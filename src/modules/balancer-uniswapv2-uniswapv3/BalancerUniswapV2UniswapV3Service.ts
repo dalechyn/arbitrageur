@@ -1,4 +1,4 @@
-import { CurrencyAmount, Price, Token } from '@uniswap/sdk-core'
+import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { LiquidityMath, priceToClosestTick, TickMath, tickToPrice } from '@uniswap/v3-sdk'
 import { injectable } from 'inversify'
 import JSBI from 'jsbi'
@@ -12,7 +12,7 @@ import {
 import { DEXType, PoolV2WithContract, PoolV3WithContract, PoolWithContract } from '../common'
 import { BunyanLogger } from '../logger'
 
-import { FractionUtils } from './utils'
+import { BalancerUniswapV2UniswapV3NotProfitableError } from './errors'
 import { SwapToPriceMath } from './utils/SwapToPriceMath'
 
 interface StepComputations {
@@ -29,34 +29,6 @@ interface StepComputations {
 export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
   constructor(private readonly logger: BunyanLogger) {}
   /**
-   * Returns the closest tick to the price without a regard if pool's tick grows left or right.
-   *
-   * Pretty much same as @uniswap/v3-core priceToClosestTick, but selects not the one that equal or the less,
-   * but the one which has the minimum between the price given and nearest upper
-   * and lower tick
-   *
-   * @dev wtf do we actually need this
-   * @param price Price of token to check tick for
-   * @param tickSpacing Tick Spacing of the pool
-   * @param zeroForOne Magic fucking variable which indicates both direction of the pool and sort of token0 and token1
-   */
-  private priceToBestTick(
-    price: Price<Token, Token>,
-    tickSpacing: number,
-    zeroForOne: boolean
-  ): number {
-    const t = priceToClosestTick(price)
-    const tPrev = t + (zeroForOne ? tickSpacing : -tickSpacing)
-    const pricePrevTick = tickToPrice(price.baseCurrency, price.quoteCurrency, tPrev)
-    const priceFromClosestTick = tickToPrice(price.baseCurrency, price.quoteCurrency, t)
-    return FractionUtils.ABS(pricePrevTick.subtract(price)).lessThan(
-      FractionUtils.ABS(priceFromClosestTick.subtract(price))
-    )
-      ? tPrev
-      : t
-  }
-
-  /**
    * Returns Balance Result of UniswapV2 to UniswapV3
    * @param fromPoolInfo UniswapV2 Pool
    * @param toPoolInfo UniswapV3 Pool
@@ -68,16 +40,16 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
     tokenA: Token
   ): Promise<BalanceResult> {
     const tokenB = tokenA === pool.token0 ? pool.token1 : pool.token0
-    const tokenC = tokenA
 
     // Our target is to push price lower on UniV3
-    // If x is baseToken - price is ratio of quoteToken / baseToken, need to BUY
+    // If x is baseToken - sqrtPriceX96 is ratio of quoteToken / baseToken, need to BUY
     //  baseTokens,
-    // if x is quoteToken - price is ratio of baseToken / quoteToken, need to BUY
-    // queryTokens
+    // if x is quoteToken - sqrtPriceX96 is ratio of baseToken / quoteToken, need to BUY
+    // quoteTokens
     // Taken from UniswapV3Pool contract:
     // sqrtRatioX96 - The sqrt of the current ratio of amounts of token1 to token0
     // ! invert because it's a sell operation
+    const tickGoingLeft = !tokenA.equals(pool.token0)
     const state = {
       amountA: JSBI.BigInt(0), // in UniswapV2
       amountB: JSBI.BigInt(0), // out UniswapV2=in UniswapV3
@@ -85,30 +57,22 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
       sqrtPriceX96: pool.sqrtRatioX96,
       tick: pool.tickCurrent,
       liquidity: pool.liquidity,
-      pair: initialPair
+      pair: initialPair,
+      previousProfit: CurrencyAmount.fromRawAmount(tokenA, 0)
     }
 
-    // The next code is a copy of Pool.swap, except for final price calculation
     this.logger.info(
-      `Balancing pools, V2 price: ${state.pair.priceOf(tokenB).toSignificant(6)} ${tokenB.symbol}/${
+      `Balancing pools, V2 price: ${state.pair.priceOf(tokenA).toSignificant(6)} ${tokenB.symbol}/${
         tokenA.symbol
-      } ⬆️, V3 price: ${tickToPrice(tokenB, tokenC, state.tick).toSignificant(6)} ⬇️ ${
+      } ⬆️, V3 price: ${tickToPrice(tokenA, tokenB, state.tick).toSignificant(6)} ⬇️  ${
         tokenB.symbol
       }/${tokenA.symbol}`
     )
-    let previousProfit = CurrencyAmount.fromRawAmount(tokenA, 0)
     while (true) {
-      /*     this.logger.debug(
-        `Balancing pools, V2 price: ${state.pair
-          .priceOf(tokenB)
-          .toSignificant(6)} ⬆️, V3 price: ${tickToPrice(tokenB, tokenC, state.tick).toSignificant(
-          6
-        )} ⬇️`
-      ) */
       const step = {} as StepComputations
       step.sqrtPriceStartX96 = state.sqrtPriceX96
 
-      step.tickNext = state.tick + (tokenB.equals(pool.token0) ? -1 : 1)
+      step.tickNext = state.tick + (tickGoingLeft ? -1 : 1)
 
       if (step.tickNext < TickMath.MIN_TICK) {
         step.tickNext = TickMath.MIN_TICK
@@ -116,27 +80,17 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
         step.tickNext = TickMath.MAX_TICK
       }
 
-      // need to make sure the next price is not bigger than Pair price
       const sqrtPriceNextX96V3 = TickMath.getSqrtRatioAtTick(step.tickNext)
-      // ensure that the final price is not the nearest from the left
-      // TODO: catch this and if so don't move the tick at all
-      // Write a logic that just buys on univ2 and sells on univ3 at constant price
-      // here we need a logic that computes amount of tokens to move V2 price to V3
-      // and therefore - just puts it to the formula.
-      // amountC may be computed wrong by sdk? but as it should not move the tick
-      // it should just move the tick correctly (pool.getOutputAmount)
 
-      const tickBestFromV2 = this.priceToBestTick(
-        initialPair.priceOf(tokenB),
-        pool.tickSpacing,
-        tokenB.equals(pool.token0)
-      )
+      const tickFromV2 = priceToClosestTick(initialPair.priceOf(tokenB))
+      const sqrtPriceFinalX96 = TickMath.getSqrtRatioAtTick(tickFromV2)
 
-      const sqrtPriceFinalX96 = TickMath.getSqrtRatioAtTick(tickBestFromV2)
-      const nextV3Price = tickToPrice(tokenB, tokenC, step.tickNext)
-      step.sqrtPriceNextX96 = nextV3Price.lessThan(initialPair.priceOf(tokenB))
+      const priceV3Next = tickToPrice(tokenA, tokenB, step.tickNext)
+      step.sqrtPriceNextX96 = priceV3Next.greaterThan(initialPair.priceOf(tokenA))
         ? sqrtPriceFinalX96
         : sqrtPriceNextX96V3
+
+      // perform the swap step
       ;[state.sqrtPriceX96, step.amountIn, step.amountOut, step.feeAmount] =
         SwapToPriceMath.computeSwapStep(
           state.sqrtPriceX96,
@@ -145,45 +99,39 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
           pool.fee
         )
       state.amountB = JSBI.add(state.amountB, JSBI.add(step.amountIn, step.feeAmount))
-      state.amountC = JSBI.add(state.amountC, step.amountOut)
+
+      // next code checks if prev profit is bigger than current profit
       const [currencyAmountA, pairUpdated] = initialPair.getInputAmount(
         CurrencyAmount.fromRawAmount(tokenB, state.amountB)
       )
-      state.amountA = currencyAmountA.quotient
       const profit = CurrencyAmount.fromRawAmount(
         tokenA,
-        JSBI.subtract(state.amountC, state.amountA)
+        JSBI.subtract(JSBI.add(state.amountC, step.amountOut), currencyAmountA.quotient)
       )
-      if (previousProfit.greaterThan(profit)) {
+      if (state.previousProfit.greaterThan(profit)) {
+        if (state.previousProfit.lessThan(0))
+          throw new BalancerUniswapV2UniswapV3NotProfitableError(tokenA, tokenB)
         this.logger.debug('Profit from previous step was higher, finished')
-        return {
-          from: {
-            address: initialPair.contract.address,
-            type: initialPair.type,
-            feeNumerator: initialPair.feeNumerator,
-            feeDenominator: initialPair.feeDenominator
-          },
-          to: {
-            address: pool.contract.address,
-            type: pool.type
-          },
-          amountIn: CurrencyAmount.fromRawAmount(tokenA, state.amountA),
-          profit
-        }
-      }
-      previousProfit = profit
+        break
+      } else state.previousProfit = profit
+
+      state.amountA = currencyAmountA.quotient
+      state.amountC = JSBI.add(state.amountC, step.amountOut)
+
       // if the next is true - tick crossing will take so much liquidity that V2 price will be
       // bumped too much
       // So here we look how much liquidity is needed to push V2 price to the current V3 price
       if (
-        pairUpdated.priceOf(tokenB).greaterThan(nextV3Price) &&
+        pairUpdated.priceOf(tokenA).lessThan(priceV3Next) &&
         JSBI.notEqual(step.sqrtPriceNextX96, sqrtPriceFinalX96)
       ) {
         this.logger.debug('Last step! V3 reached, pulling V2 price to match V3')
         const amountIn = SwapToPriceMath.computeAmountOfTokensToPrice(
           initialPair.reserveOf(tokenA),
           initialPair.reserveOf(tokenB),
-          nextV3Price.invert()
+          priceV3Next,
+          initialPair.feeNumerator,
+          initialPair.feeDenominator
         )
         state.amountA = amountIn.quotient
         const [amountOut] = initialPair.getOutputAmount(amountIn)
@@ -191,28 +139,13 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
         state.amountC = (await pool.getOutputAmount(amountOut))[0].quotient
         break
       }
-
       state.pair = pairUpdated
 
       if (JSBI.equal(sqrtPriceFinalX96, state.sqrtPriceX96)) {
         this.logger.debug('Equillibrim met')
-        if (JSBI.lessThan(state.amountC, state.amountA)) {
-          this.logger.debug('But it`s not profitable. Fees eat up too much.')
-        }
         break
       }
 
-      /*
-      save from exactInput = false
-       {
-        state.amountSpecifiedRemaining = JSBI.add(state.amountSpecifiedRemaining, step.amountOut)
-        state.amountOutCalculated = JSBI.add(
-          state.amountOutCalculated,
-          JSBI.add(step.amountIn, step.feeAmount)
-        )
-      } */
-
-      // TODO
       if (JSBI.equal(state.sqrtPriceX96, step.sqrtPriceNextX96)) {
         // if the tick is initialized, run the tick transition
         const tickLiquidity = JSBI.BigInt(
@@ -222,7 +155,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
           let liquidityNet = tickLiquidity
           // if we're moving leftward, we interpret liquidityNet as the opposite sign
           // safe because liquidityNet cannot be type(int128).min
-          if (tokenB.equals(pool.token0)) liquidityNet = JSBI.multiply(liquidityNet, NEGATIVE_ONE)
+          if (tickGoingLeft) liquidityNet = JSBI.multiply(liquidityNet, NEGATIVE_ONE)
 
           state.liquidity = LiquidityMath.addDelta(state.liquidity, liquidityNet)
         }
@@ -233,12 +166,11 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
         state.tick = TickMath.getTickAtSqrtRatio(state.sqrtPriceX96)
       }
     }
-    // ALCHEMY
-    // REQ -> NODE -> SYNC (ETH)
-    // LOCAL REQ -> NODE -> SYNC
 
     const profit = JSBI.subtract(state.amountC, state.amountA)
-    this.logger.info(`Finished! Profit: ${profit.toString()} weiETH`)
+    if (JSBI.lessThanOrEqual(profit, JSBI.BigInt(0)))
+      throw new BalancerUniswapV2UniswapV3NotProfitableError(tokenA, tokenB)
+    this.logger.info(`Finished! Profit: ${profit.toString()} wei`)
 
     return {
       from: {
@@ -268,7 +200,6 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
     tokenA: Token
   ): Promise<BalanceResult> {
     const tokenB = tokenA === pool.token0 ? pool.token1 : pool.token0
-    const tokenC = tokenA
 
     // Our target is to push price higher on UniV3
     // If x is baseToken - price is ratio of quoteToken / baseToken, need to BUY
@@ -277,6 +208,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
     // queryTokens
     // Taken from UniswapV3Pool contract:
     // sqrtRatioX96 - The sqrt of the current ratio of amounts of token1 to token0
+    const tickGoingLeft = tokenA.equals(pool.token0)
     const state = {
       amountA: JSBI.BigInt(0),
       amountB: JSBI.BigInt(0),
@@ -284,29 +216,23 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
       sqrtPriceX96: pool.sqrtRatioX96,
       tick: pool.tickCurrent,
       liquidity: pool.liquidity,
-      pair: initialPair
+      pair: initialPair,
+      previousProfit: CurrencyAmount.fromRawAmount(tokenA, 0)
     }
 
     this.logger.info(
-      `Balancing pools, V3 price: ${tickToPrice(tokenB, tokenA, state.tick).toSignificant(6)} ${
+      `Balancing pools, V3 price: ${tickToPrice(tokenA, tokenB, state.tick).toSignificant(6)} ${
         tokenB.symbol
-      }/${tokenA.symbol} ⬆️, V2 price: ${state.pair.priceOf(tokenB).toSignificant(6)} ⬇️ ${
+      }/${tokenA.symbol} ⬆️, V2 price: ${state.pair.priceOf(tokenA).toSignificant(6)} ⬇️  ${
         tokenB.symbol
       }/${tokenA.symbol}`
     )
-    let previousProfit = CurrencyAmount.fromRawAmount(tokenA, 0)
-    // The next code is a copy of Pool.swap, except for final price calculation
     while (true) {
-      /*   this.logger.debug(
-      `Balancing pools, V3 price: ${tickToPrice(tokenB, tokenA, state.tick).toSignificant(
-        6
-      )} ⬆️, V2 price: ${state.pair.priceOf(tokenB).toSignificant(6)} ⬇️`
-    ) */
       const step = {} as StepComputations
       step.sqrtPriceStartX96 = state.sqrtPriceX96
 
       // we have to go through each tick as it changes the V2 pair accordingly
-      step.tickNext = state.tick + (tokenA.equals(pool.token0) ? -1 : 1)
+      step.tickNext = state.tick + (tickGoingLeft ? -1 : 1)
 
       if (step.tickNext < TickMath.MIN_TICK) {
         step.tickNext = TickMath.MIN_TICK
@@ -314,19 +240,18 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
         step.tickNext = TickMath.MAX_TICK
       }
 
-      const tickBestFromV2 = this.priceToBestTick(
-        initialPair.priceOf(tokenB),
-        pool.tickSpacing,
-        tokenA.equals(pool.token0)
-      )
-      // need to make sure the next price is not bigger than Pair price
       const sqrtPriceNextX96V3 = TickMath.getSqrtRatioAtTick(step.tickNext)
-      const sqrtPriceFinalX96 = TickMath.getSqrtRatioAtTick(tickBestFromV2)
 
-      const nextV3Price = tickToPrice(tokenB, tokenA, step.tickNext)
-      step.sqrtPriceNextX96 = nextV3Price.greaterThan(initialPair.priceOf(tokenB))
+      // CHECK maybe tokenA
+      const tickFromV2 = priceToClosestTick(initialPair.priceOf(tokenB))
+      const sqrtPriceFinalX96 = TickMath.getSqrtRatioAtTick(tickFromV2)
+
+      const priceV3Next = tickToPrice(tokenA, tokenB, step.tickNext)
+      step.sqrtPriceNextX96 = priceV3Next.lessThan(initialPair.priceOf(tokenA))
         ? sqrtPriceFinalX96
         : sqrtPriceNextX96V3
+
+      // perform the swap step
       ;[state.sqrtPriceX96, step.amountIn, step.amountOut, step.feeAmount] =
         SwapToPriceMath.computeSwapStep(
           state.sqrtPriceX96,
@@ -335,73 +260,52 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
           pool.fee
         )
 
-      state.amountA = JSBI.add(state.amountA, JSBI.add(step.amountIn, step.feeAmount))
       state.amountB = JSBI.add(state.amountB, step.amountOut)
       const [currencyAmountC, pairUpdated] = initialPair.getOutputAmount(
         CurrencyAmount.fromRawAmount(tokenB, state.amountB)
       )
-      state.amountC = currencyAmountC.quotient
       const profit = CurrencyAmount.fromRawAmount(
         tokenA,
         JSBI.subtract(state.amountC, state.amountA)
       )
-      if (previousProfit.greaterThan(profit)) {
+      if (state.previousProfit.greaterThan(profit)) {
+        if (state.previousProfit.lessThan(0))
+          throw new BalancerUniswapV2UniswapV3NotProfitableError(tokenA, tokenB)
         this.logger.debug('Profit from previous step was higher, finished')
-        return {
-          from: {
-            address: pool.contract.address,
-            type: pool.type
-          },
-          to: {
-            address: initialPair.contract.address,
-            type: initialPair.type,
-            feeNumerator: initialPair.feeNumerator,
-            feeDenominator: initialPair.feeDenominator
-          },
-          amountIn: CurrencyAmount.fromRawAmount(tokenA, state.amountA),
-          profit
-        }
-      }
-      previousProfit = profit
+        break
+      } else state.previousProfit = profit
+
+      state.amountA = JSBI.add(state.amountA, JSBI.add(step.amountIn, step.feeAmount))
+      state.amountC = currencyAmountC.quotient
+
       // if the next is true - tick crossing will take so much liquidity that V2 price will be
       // bumped too much
       // So here we look how much liquidity is needed to push V2 price to the current V3 price
-      if (pairUpdated.priceOf(tokenB).lessThan(nextV3Price)) {
+      if (
+        pairUpdated.priceOf(tokenB).lessThan(priceV3Next) &&
+        JSBI.notEqual(step.sqrtPriceNextX96, sqrtPriceFinalX96)
+      ) {
         this.logger.debug('Last step! V3 reached, pulling V2 price to match V3')
         const amountIn = SwapToPriceMath.computeAmountOfTokensToPrice(
           initialPair.reserveOf(tokenB),
-          initialPair.reserveOf(tokenC),
-          tickToPrice(tokenB, tokenA, state.tick)
+          initialPair.reserveOf(tokenA),
+          priceV3Next,
+          initialPair.feeNumerator,
+          initialPair.feeDenominator
         )
         state.amountB = amountIn.quotient
         const [amountOut] = initialPair.getOutputAmount(amountIn)
         state.amountC = amountOut.quotient
         state.amountA = (await pool.getInputAmount(amountIn))[0].quotient
-        // tick changing in newPool not just by tickSpacing
-        // tick changes differently, should be precise but it's not
         break
       }
       state.pair = pairUpdated
 
       if (JSBI.equal(sqrtPriceFinalX96, state.sqrtPriceX96)) {
         this.logger.debug('Equillibrium met')
-        if (JSBI.lessThan(state.amountC, state.amountA)) {
-          this.logger.debug('But it`s not profitable. Fees eat up too much.')
-        }
         break
       }
 
-      /*
-    save from exactInput = false
-     {
-      state.amountSpecifiedRemaining = JSBI.add(state.amountSpecifiedRemaining, step.amountOut)
-      state.amountOutCalculated = JSBI.add(
-        state.amountOutCalculated,
-        JSBI.add(step.amountIn, step.feeAmount)
-      )
-    } */
-
-      // TODO
       if (JSBI.equal(state.sqrtPriceX96, step.sqrtPriceNextX96)) {
         // if the tick is initialized, run the tick transition
         const tickLiquidity = JSBI.BigInt(
@@ -412,7 +316,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
           let liquidityNet = tickLiquidity
           // if we're moving leftward, we interpret liquidityNet as the opposite sign
           // safe because liquidityNet cannot be type(int128).min
-          if (tokenA.equals(pool.token0)) liquidityNet = JSBI.multiply(liquidityNet, NEGATIVE_ONE)
+          if (tickGoingLeft) liquidityNet = JSBI.multiply(liquidityNet, NEGATIVE_ONE)
 
           state.liquidity = LiquidityMath.addDelta(state.liquidity, liquidityNet)
         }
@@ -425,8 +329,9 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
     }
 
     const profit = JSBI.subtract(state.amountC, state.amountA)
-    if (JSBI.lessThanOrEqual(profit, JSBI.BigInt(0))) throw new Error('not profitable')
-    this.logger.info(`Finished! Profit: ${profit.toString()} WETH`)
+    if (JSBI.lessThanOrEqual(profit, JSBI.BigInt(0)))
+      throw new BalancerUniswapV2UniswapV3NotProfitableError(tokenA, tokenB)
+    this.logger.info(`Finished! Profit: ${profit.toString()} wei`)
 
     return {
       from: {

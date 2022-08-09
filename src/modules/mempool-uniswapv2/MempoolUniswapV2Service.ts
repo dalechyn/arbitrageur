@@ -169,21 +169,21 @@ export class MempoolUniswapV2Service {
       if (signature === UniswapV3SwapV2Signature.swapExactTokensForTokens)
         swaps.push({
           ...baseResult,
-          method: signature,
+          signature: signature,
           amountIn: new BigNumber(result.amountIn.toString()),
           amountOutMin: new BigNumber(result.amountOutMin.toString())
         })
       else if (signature === UniswapV3SwapV2Signature.swapTokensForExactTokens)
         swaps.push({
           ...baseResult,
-          method: signature,
+          signature: signature,
           amountInMax: new BigNumber(result.amountInMax.toString()),
           amountOut: new BigNumber(result.amountOut.toString())
         })
       else if (signature === UniswapV2SwapSignature.swapETHForExactTokens)
         swaps.push({
           ...baseResult,
-          method: signature,
+          signature: signature,
           amountOut: new BigNumber(result.amountOut.toString()),
           deadline: new BigNumber(result.deadline.toString()),
           value: new BigNumber(tx.value.toString())
@@ -194,7 +194,7 @@ export class MempoolUniswapV2Service {
       )
         swaps.push({
           ...baseResult,
-          method: signature,
+          signature: signature,
           amountOutMin: new BigNumber(result.amountOutMin.toString()),
           deadline: new BigNumber(result.deadline.toString()),
           value: new BigNumber(tx.value.toString())
@@ -207,7 +207,7 @@ export class MempoolUniswapV2Service {
       )
         swaps.push({
           ...baseResult,
-          method: signature,
+          signature: signature,
           amountIn: new BigNumber(result.amountIn.toString()),
           amountOutMin: new BigNumber(result.amountOutMin.toString()),
           deadline: new BigNumber(result.deadline.toString())
@@ -215,7 +215,7 @@ export class MempoolUniswapV2Service {
       else
         swaps.push({
           ...baseResult,
-          method: signature as
+          signature: signature as
             | UniswapV2SwapSignature.swapTokensForExactETH
             | UniswapV2SwapSignature.swapTokensForExactTokens,
           amountInMax: new BigNumber(result.amountInMax.toString()),

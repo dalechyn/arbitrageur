@@ -175,13 +175,13 @@ export class MempoolUniswapV3Service {
           if (signature === UniswapV3SwapSignature.exactInputSingle)
             swaps.push({
               ...commonResult,
-              method: signature,
+              signature: signature,
               deadline: new BigNumber(result.deadline.toString())
             })
           else
             swaps.push({
               ...commonResult,
-              method: signature
+              signature: signature
             })
         } else {
           const commonResult = {
@@ -192,13 +192,13 @@ export class MempoolUniswapV3Service {
           if (signature === UniswapV3SwapSignature.exactOutputSingle)
             swaps.push({
               ...commonResult,
-              method: signature,
+              signature: signature,
               deadline: new BigNumber(result.deadline.toString())
             })
           else
             swaps.push({
               ...commonResult,
-              method: signature
+              signature: signature
             })
         }
       } else {
@@ -240,7 +240,7 @@ export class MempoolUniswapV3Service {
         const baseResult = {
           // weird ts issue
           dex: DEX.UniswapV3 as DEX.UniswapV3,
-          method: signature,
+          signature: signature,
           path,
           from: tx.from!,
           recipient: result.recipient,
@@ -261,13 +261,13 @@ export class MempoolUniswapV3Service {
           if (signature === UniswapV3SwapSignature.exactInput)
             swaps.push({
               ...commonResult,
-              method: signature,
+              signature,
               deadline: new BigNumber(result.deadline.toString())
             })
           else
             swaps.push({
               ...commonResult,
-              method: signature
+              signature
             })
         } else if (
           signature === UniswapV3SwapV3Signature.exactOutput ||
@@ -281,10 +281,10 @@ export class MempoolUniswapV3Service {
           if (signature === UniswapV3SwapSignature.exactOutput)
             swaps.push({
               ...commonResult,
-              method: signature,
+              signature,
               deadline: new BigNumber(result.deadline.toString())
             })
-          else swaps.push({ ...commonResult, method: signature })
+          else swaps.push({ ...commonResult, signature: signature })
         }
       }
     }

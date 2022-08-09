@@ -7,5 +7,6 @@ export class BalancerNotSupportedError extends Error {
         pool0Type
       )} and ${DEXTypeConverter.toLongFormat(pool1Type)} is not supported`
     )
+    this.name = 'BalancerNotSupportedError'
   }
 }
