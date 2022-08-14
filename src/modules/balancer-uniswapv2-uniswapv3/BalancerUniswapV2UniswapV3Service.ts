@@ -27,7 +27,7 @@ interface StepComputations {
 
 @injectable()
 export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
-  constructor(private readonly logger: BunyanLogger) {}
+  constructor(private readonly logger?: BunyanLogger) {}
   /**
    * Returns Balance Result of UniswapV2 to UniswapV3
    * @param fromPoolInfo UniswapV2 Pool
@@ -61,7 +61,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
       previousProfit: CurrencyAmount.fromRawAmount(tokenA, 0)
     }
 
-    this.logger.info(
+    this.logger?.info(
       `Balancing pools, V2 price: ${state.pair.priceOf(tokenA).toSignificant(6)} ${tokenB.symbol}/${
         tokenA.symbol
       } ⬆️, V3 price: ${tickToPrice(tokenA, tokenB, state.tick).toSignificant(6)} ⬇️  ${
@@ -111,7 +111,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
       if (state.previousProfit.greaterThan(profit)) {
         if (state.previousProfit.lessThan(0))
           throw new BalancerUniswapV2UniswapV3NotProfitableError(tokenA, tokenB)
-        this.logger.debug('Profit from previous step was higher, finished')
+        this.logger?.debug('Profit from previous step was higher, finished')
         break
       } else state.previousProfit = profit
 
@@ -125,7 +125,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
         pairUpdated.priceOf(tokenA).lessThan(priceV3Next) &&
         JSBI.notEqual(step.sqrtPriceNextX96, sqrtPriceFinalX96)
       ) {
-        this.logger.debug('Last step! V3 reached, pulling V2 price to match V3')
+        this.logger?.debug('Last step! V3 reached, pulling V2 price to match V3')
         const amountIn = SwapToPriceMath.computeAmountOfTokensToPrice(
           initialPair.reserveOf(tokenA),
           initialPair.reserveOf(tokenB),
@@ -142,7 +142,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
       state.pair = pairUpdated
 
       if (JSBI.equal(sqrtPriceFinalX96, state.sqrtPriceX96)) {
-        this.logger.debug('Equillibrim met')
+        this.logger?.debug('Equillibrim met')
         break
       }
 
@@ -170,7 +170,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
     const profit = JSBI.subtract(state.amountC, state.amountA)
     if (JSBI.lessThanOrEqual(profit, JSBI.BigInt(0)))
       throw new BalancerUniswapV2UniswapV3NotProfitableError(tokenA, tokenB)
-    this.logger.info(`Finished! Profit: ${profit.toString()} wei`)
+    this.logger?.info(`Finished! Profit: ${profit.toString()} wei`)
 
     return {
       from: {
@@ -220,7 +220,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
       previousProfit: CurrencyAmount.fromRawAmount(tokenA, 0)
     }
 
-    this.logger.info(
+    this.logger?.info(
       `Balancing pools, V3 price: ${tickToPrice(tokenA, tokenB, state.tick).toSignificant(6)} ${
         tokenB.symbol
       }/${tokenA.symbol} ⬆️, V2 price: ${state.pair.priceOf(tokenA).toSignificant(6)} ⬇️  ${
@@ -271,7 +271,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
       if (state.previousProfit.greaterThan(profit)) {
         if (state.previousProfit.lessThan(0))
           throw new BalancerUniswapV2UniswapV3NotProfitableError(tokenA, tokenB)
-        this.logger.debug('Profit from previous step was higher, finished')
+        this.logger?.debug('Profit from previous step was higher, finished')
         break
       } else state.previousProfit = profit
 
@@ -285,7 +285,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
         pairUpdated.priceOf(tokenB).lessThan(priceV3Next) &&
         JSBI.notEqual(step.sqrtPriceNextX96, sqrtPriceFinalX96)
       ) {
-        this.logger.debug('Last step! V3 reached, pulling V2 price to match V3')
+        this.logger?.debug('Last step! V3 reached, pulling V2 price to match V3')
         const amountIn = SwapToPriceMath.computeAmountOfTokensToPrice(
           initialPair.reserveOf(tokenB),
           initialPair.reserveOf(tokenA),
@@ -302,7 +302,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
       state.pair = pairUpdated
 
       if (JSBI.equal(sqrtPriceFinalX96, state.sqrtPriceX96)) {
-        this.logger.debug('Equillibrium met')
+        this.logger?.debug('Equillibrium met')
         break
       }
 
@@ -331,7 +331,7 @@ export class BalancerUniswapV2UniswapV3Service implements AbstractBalancer {
     const profit = JSBI.subtract(state.amountC, state.amountA)
     if (JSBI.lessThanOrEqual(profit, JSBI.BigInt(0)))
       throw new BalancerUniswapV2UniswapV3NotProfitableError(tokenA, tokenB)
-    this.logger.info(`Finished! Profit: ${profit.toString()} wei`)
+    this.logger?.info(`Finished! Profit: ${profit.toString()} wei`)
 
     return {
       from: {

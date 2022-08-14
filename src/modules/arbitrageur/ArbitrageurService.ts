@@ -168,8 +168,6 @@ export class ArbitrageurService {
 
         const poolsWithNeighbours = await this.getPoolsWithNeighboursFromPoolsInTx(pools)
 
-        this.logger.debug('NEIGHBOURS:', poolsWithNeighbours)
-
         // Run the balancer on the pool and it's neighbours
         const balanceResults: BalanceResult[] = []
         for (const { node: pool, neighbours } of poolsWithNeighbours) {
@@ -275,9 +273,6 @@ export class ArbitrageurService {
           }
         }
         const poolsWithNeighbours = await this.getPoolsWithNeighboursFromPoolsInTx(pools)
-        this.logger.debug('NEIGHBOURS:', poolsWithNeighbours)
-
-        // TODO: DROP duplicates
 
         this.logger.info(swaps)
 

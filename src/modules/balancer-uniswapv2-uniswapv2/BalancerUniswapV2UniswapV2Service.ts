@@ -12,7 +12,7 @@ import { BalancerUniswapV2UniswapV2NotProfitableError } from './errors'
 
 @injectable()
 export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
-  constructor(private readonly logger: BunyanLogger) {}
+  constructor(private readonly logger?: BunyanLogger) {}
 
   /**
    * Returns reserves by TokenIn
@@ -85,72 +85,62 @@ export class BalancerUniswapV2UniswapV2Service implements AbstractBalancer {
 
   /**
    * Returns profit of arbitrage given the input amount
-   * @param firstPair Pool A
-   * @param secondPair Pool B
+   * @param from Pool From
+   * @param to Pool To
    * @param amountIn Amount to arbitrage
    */
   private calculateProfit(
-    firstPair: Pair,
-    secondPair: Pair,
+    from: Pair,
+    to: Pair,
     amountIn: CurrencyAmount<Token>
   ): [CurrencyAmount<Token>, CurrencyAmount<Token>] {
-    const [amountB] = firstPair.getOutputAmount(amountIn)
-    const [amountC] = secondPair.getOutputAmount(amountB)
+    const [amountB] = from.getOutputAmount(amountIn)
+    const [amountC] = to.getOutputAmount(amountB)
     return [amountC.subtract(amountIn), amountB]
   }
 
-  private v2ToV2(
-    firstPoolV2Info: PoolV2WithContract,
-    secondPoolV2Info: PoolV2WithContract,
-    tokenA: Token
-  ) {
-    const tokenB = firstPoolV2Info.token0.equals(tokenA)
-      ? firstPoolV2Info.token1
-      : firstPoolV2Info.token0
-    this.logger.info(
-      `Balancing pools, V2 price: ${firstPoolV2Info.priceOf(tokenA).toSignificant(6)} ${
-        tokenB.symbol
-      }/${tokenA.symbol}, V2 price: ${secondPoolV2Info.priceOf(tokenA).toSignificant(6)} ${
-        tokenB.symbol
-      }/${tokenA.symbol}`
+  private v2ToV2(from: PoolV2WithContract, to: PoolV2WithContract, tokenA: Token) {
+    const tokenB = from.token0.equals(tokenA) ? from.token1 : from.token0
+    this.logger?.info(
+      `Balancing pools, V2 price: ${from.priceOf(tokenA).toSignificant(6)} ${tokenB.symbol}/${
+        tokenA.symbol
+      }, V2 price: ${to.priceOf(tokenA).toSignificant(6)} ${tokenB.symbol}/${tokenA.symbol}`
     )
-    const [reservesIn0, reservesOut0] = this.getReserves(tokenA, firstPoolV2Info)
-    const [reservesOut1, reservesIn1] = this.getReserves(tokenA, secondPoolV2Info)
+    const [reservesIn0, reservesOut0] = this.getReserves(tokenA, from)
+    const [reservesOut1, reservesIn1] = this.getReserves(tokenA, to)
 
     const x = this.calculateMaxPoint(
       reservesIn0,
       reservesOut0,
       reservesIn1,
       reservesOut1,
-      firstPoolV2Info.feeNumerator,
-      firstPoolV2Info.feeDenominator,
-      secondPoolV2Info.feeNumerator,
-      secondPoolV2Info.feeDenominator
+      from.feeNumerator,
+      from.feeDenominator,
+      to.feeNumerator,
+      to.feeDenominator
     )
     // convert to an amount without a reminder - integer division problem
     const amountInFalsy = CurrencyAmount.fromRawAmount(tokenA, x)
-    const amountIn = firstPoolV2Info.getInputAmount(
-      firstPoolV2Info.getOutputAmount(amountInFalsy)[0]
-    )[0]
-    const [maxProfit] = this.calculateProfit(firstPoolV2Info, secondPoolV2Info, amountIn)
+    const amountIn = from.getInputAmount(from.getOutputAmount(amountInFalsy)[0])[0]
+    const [maxProfit] = this.calculateProfit(from, to, amountIn)
 
-    if (maxProfit.lessThan(0))
+    if (maxProfit.lessThan(0) || amountIn.lessThan(0))
       throw new BalancerUniswapV2UniswapV2NotProfitableError(tokenA, tokenB)
-    this.logger.info('Finished! Amount:', x.toString(), 'wei')
-    this.logger.info('Finished! Profit:', maxProfit.toSignificant(), 'WETH')
+    this.logger?.info('Finished! Amount:', amountIn.toSignificant(), tokenA.symbol)
+    this.logger?.info('Finished! Profit:', maxProfit.toSignificant(), tokenA.symbol)
 
     return {
       from: {
-        address: firstPoolV2Info.contract.address,
-        type: firstPoolV2Info.type,
-        feeNumerator: firstPoolV2Info.feeNumerator,
-        feeDenominator: firstPoolV2Info.feeDenominator
+        address: from.contract.address,
+        type: from.type,
+        feeNumerator: from.feeNumerator,
+        feeDenominator: from.feeDenominator
       },
       to: {
-        address: secondPoolV2Info.contract.address,
-        type: secondPoolV2Info.type,
-        feeNumerator: secondPoolV2Info.feeNumerator,
-        feeDenominator: secondPoolV2Info.feeDenominator
+        address: to.contract.address,
+        type: to.type,
+        feeNumerator: to.feeNumerator,
+        feeDenominator: to.feeDenominator
       },
       amountIn,
       profit: maxProfit
